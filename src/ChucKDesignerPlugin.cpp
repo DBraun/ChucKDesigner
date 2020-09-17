@@ -80,10 +80,53 @@ ChucKDesignerPlugin::ChucKDesignerPlugin(const OP_NodeInfo* info) : myNodeInfo(i
 {
 	myExecuteCount = 0;
 	myOffset = 0.0;
+
+    int sampleRate = 44100;
+
+    inbuffer = new float[sampleRate / 60. * 600.];
+    outbuffer = new float[sampleRate / 60. * 60.];
+
+    int chuckID = 0;
+
+    initChuckInstance(0, sampleRate);
+
+  //  //const char* code =
+  //  //    "SinOsc foo = > dac; \
+  //  //    while (true) \
+  //  //    { \
+  //  //        Math.random2f(300, 1000) = > foo.freq; \
+  //  //        100::ms = > now; \
+  //  //    }";
+
+    const char* code = R"V0G0N(
+
+		SinOsc foo => dac;
+		while( true )
+		{
+			Math.random2f( 300, 1000 ) => foo.freq;
+			200::ms => now;
+		}
+    )V0G0N";
+    myStatus = runChuckCode(chuckID, code);
+
+    if (myStatus) {
+        std::cout << "running code" << std::endl;
+    }
+    else {
+        std::cout << "not running code" << std::endl;
+    }
+
+
 }
 
 ChucKDesignerPlugin::~ChucKDesignerPlugin()
 {
+    int chuckID = 0;
+    //clearChuckInstance(chuckID);
+    //clearGlobals(chuckID);
+    //bool chuckManualAudioCallback(unsigned int chuckID, float* inBuffer, float* outBuffer, unsigned int numFrames, unsigned int inChannels, unsigned int outChannels);
+    //cleanRegisteredChucks();
+    //cleanupChuckInstance(chuckID);
 	ChucK::globalCleanup();
 }
 
@@ -107,21 +150,21 @@ ChucKDesignerPlugin::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* input
 {
 	// If there is an input connected, we are going to match it's channel names etc
 	// otherwise we'll specify our own.
-	if (inputs->getNumInputs() > 0)
+	//if (inputs->getNumInputs() > 0)
+	//{
+	//	return false;
+	//}
+	//else
 	{
-		return false;
-	}
-	else
-	{
-		info->numChannels = 1;
+		info->numChannels = 2;
 
 		// Since we are outputting a timeslice, the system will dictate
 		// the numSamples and startIndex of the CHOP data
 		//info->numSamples = 1;
-		//info->startIndex = 0
+        info->startIndex = 0;
 
 		// For illustration we are going to output 120hz data
-		info->sampleRate = 120;
+		info->sampleRate = 44100.;
 		return true;
 	}
 }
@@ -129,14 +172,23 @@ ChucKDesignerPlugin::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* input
 void
 ChucKDesignerPlugin::getChannelName(int32_t index, OP_String *name, const OP_Inputs* inputs, void* reserved1)
 {
-	name->setString("chan1");
+    if (index == 0) {
+        name->setString("chan1");
+    }
+    else {
+        name->setString("chan2");
+    }
+	
 }
 
 
 // C# "string" corresponds to passing char *
 bool ChucKDesignerPlugin::runChuckCode(unsigned int chuckID, const char* code)
 {
-    if (chuck_instances.count(chuckID) == 0) { return false; }
+    if (chuck_instances.count(chuckID) == 0) {
+        std::cout << "tried to run chuck code but no instance was found." << std::endl;
+        return false;
+    }
 
     // don't want to replace dac
     // (a safeguard in case compiler got interrupted while replacing dac)
@@ -541,8 +593,6 @@ bool ChucKDesignerPlugin::initChuckInstance(unsigned int chuckID, unsigned int s
         chuck->setParam(CHUCK_PARAM_WORKING_DIRECTORY, chuck_global_data_dir);
         // directories to search for chugins and auto-run ck files
         std::list< std::string > chugin_search;
-        chugin_search.push_back(chuck_global_data_dir + "/Chugins");
-        chugin_search.push_back(chuck_global_data_dir + "/Chugins");
         chugin_search.push_back(chuck_global_data_dir + "/chugins");
         chuck->setParam(CHUCK_PARAM_USER_CHUGIN_DIRECTORIES, chugin_search);
 
@@ -646,7 +696,7 @@ bool ChucKDesignerPlugin::chuckManualAudioCallback(unsigned int chuckID, float* 
 
         // call callback
         // TODO: check inChannels, outChannels
-        chuck_instances[chuckID]->run(inBuffer, outBuffer, numFrames);
+        //chuck_instances[chuckID]->run(inBuffer, outBuffer, numFrames);
 
     }
 
@@ -806,6 +856,30 @@ ChucKDesignerPlugin::execute(CHOP_Output* output,
 							  void* reserved)
 {
 	myExecuteCount++;
+
+    if (needCompile) {
+
+        const OP_DATInput* input = inputs->getParDAT("Code");
+        const char* code = *(input->cellData);
+        std::cout << "code: " << code << std::endl;
+
+        if (chuck_instances.size()) {
+
+            ChucK* chuck = chuck_instances[0];
+            clearChuckInstance(0);
+            myStatus = runChuckCode(0, code);
+
+            if (myStatus) {
+                std::cout << "running code" << std::endl;
+            }
+            else {
+                std::cout << "not running code" << std::endl;
+            }
+
+        }
+
+        needCompile = false;
+    }
 	
 	double	 scale = inputs->getParDouble("Scale");
 
@@ -817,7 +891,6 @@ ChucKDesignerPlugin::execute(CHOP_Output* output,
 		// because we returned false from getOutputInfo. 
 
 		inputs->enablePar("Speed", 0);	// not used
-		inputs->enablePar("Reset", 0);	// not used
 		inputs->enablePar("Shape", 0);	// not used
 
 		int ind = 0;
@@ -839,7 +912,6 @@ ChucKDesignerPlugin::execute(CHOP_Output* output,
 	else // If not input is connected, lets output a sine wave instead
 	{
 		inputs->enablePar("Speed", 1);
-		inputs->enablePar("Reset", 1);
 
 		double speed = inputs->getParDouble("Speed");
 		double step = speed * 0.01f;
@@ -908,12 +980,19 @@ ChucKDesignerPlugin::execute(CHOP_Output* output,
     //if (chuck_instances.count(data->myId) > 0    // do we have a chuck
     //    && data_instances.count(data->myId) > 0  // do we have a data
     //    && data_instances[data->myId] == data)    // && is it still aligned
-    //{
-    //    ChucK* chuck = chuck_instances[data->myId];
 
-    //    // TODO: check inChannels, outChannels
-    //    chuck->run(inbuffer, outbuffer, length);
-    //}
+
+
+    if (chuck_instances.size())
+    {
+        ChucK* chuck = chuck_instances[0];
+
+        if (output->numSamples > 1) {
+            chuck->run(inbuffer, *(output->channels), output->numSamples);
+        }
+
+        
+    }
 
 }
 
@@ -1045,21 +1124,34 @@ ChucKDesignerPlugin::setupParameters(OP_ParameterManager* manager, void *reserve
 	{
 		OP_NumericParameter	np;
 
-		np.name = "Reset";
-		np.label = "Reset";
+		np.name = "Compile";
+		np.label = "Compile";
 		
 		OP_ParAppendResult res = manager->appendPulse(np);
 		assert(res == OP_ParAppendResult::Success);
 	}
+
+    // chuck source code DAT
+    {
+        OP_StringParameter	sp;
+
+        sp.name = "Code";
+        sp.label = "Code";
+
+        sp.defaultValue = "";
+
+        OP_ParAppendResult res = manager->appendDAT(sp);
+        assert(res == OP_ParAppendResult::Success);
+    }
 
 }
 
 void 
 ChucKDesignerPlugin::pulsePressed(const char* name, void* reserved1)
 {
-	if (!strcmp(name, "Reset"))
+	if (!strcmp(name, "Compile"))
 	{
-		myOffset = 0.0;
+        needCompile = true;
 	}
 }
 

@@ -160,4 +160,10 @@ private:
 
     bool RegisterChuckData(EffectData::Data* data, const unsigned int id);
 
+    bool myStatus = false;
+    bool needCompile = false;
+
+    float* inbuffer;
+    float* outbuffer;
+
 };
