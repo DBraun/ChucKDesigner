@@ -63,6 +63,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>winmm.lib;dsound.lib;dinput8.lib;dxguid.lib;wsock32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -80,10 +81,203 @@
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <AdditionalDependencies>winmm.lib;dsound.lib;dinput8.lib;dxguid.lib;wsock32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ChucKDesignerPlugin.cpp" />
+    <!-- <ClCompile Include="..\thirdparty\AudioPluginUtil.cpp" /> -->
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_absyn.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_carrier.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_compile.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_dl.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_emit.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_errmsg.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_frame.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_instr.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_io.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_lang.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_oo.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_otf.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_parse.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_scan.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_shell.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_stats.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_symbol.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_table.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_type.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_ugen.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_utils.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_vm.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\chuck_win32.c" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\hidio_sdl.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\lo\address.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\lo\blob.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\lo\bundle.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\lo\message.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\lo\method.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\lo\pattern_match.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\lo\send.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\lo\server.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\lo\timetag.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\midiio_rtmidi.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\regcomp.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\regerror.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\regexec.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;__USE_DINPUT8LIB__;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;_DEBUG;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\tre-ast.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\tre-compile.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;__USE_DINPUT8LIB__;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;_DEBUG;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\tre-filter.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\tre-match-approx.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\tre-match-backtrack.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\tre-match-parallel.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\tre-mem.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\tre-parse.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\tre-stack.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\regex\xmalloc.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\thirdparty\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\rtmidi.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\uana_extract.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\uana_xform.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\ugen_filter.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\ugen_osc.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\ugen_stk.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\ugen_xxx.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\ulib_machine.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\ulib_math.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\ulib_opsc.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\thirdparty\chuck\src\core\ulib_regex.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\ulib_std.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_buffers.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_console.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_hid.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_math.c" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_network.c" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_opsc.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_raw.c" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_serial.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_sndfile.c" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_string.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_thread.cpp" />
+    <ClCompile Include="..\thirdparty\chuck\src\core\util_xforms.c" />
+    <!--     <ClCompile Include="hrtftable.cpp" />
+    <ClCompile Include="Plugin_ChucK.cpp" />
+    <ClCompile Include="Plugin_PanSpatializer.cpp" />
+    <ClCompile Include="Plugin_Spatializer.cpp" />
+    <ClCompile Include="Plugin_SpatializerReverb.cpp" /> -->
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CHOP_CPlusPlusBase.h" />
