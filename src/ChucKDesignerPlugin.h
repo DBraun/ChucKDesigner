@@ -31,11 +31,11 @@ If no input is connected then the node will output a smooth sine wave at 120hz.
 
 
 // To get more help about these functions, look at CHOP_CPlusPlusBase.h
-class CPlusPlusCHOPExample : public CHOP_CPlusPlusBase
+class ChucKDesignerPlugin : public CHOP_CPlusPlusBase
 {
 public:
-	CPlusPlusCHOPExample(const OP_NodeInfo* info);
-	virtual ~CPlusPlusCHOPExample();
+	ChucKDesignerPlugin(const OP_NodeInfo* info);
+	virtual ~ChucKDesignerPlugin();
 
 	virtual void		getGeneralInfo(CHOP_GeneralInfo*, const OP_Inputs*, void* ) override;
 	virtual bool		getOutputInfo(CHOP_OutputInfo*, const OP_Inputs*, void*) override;

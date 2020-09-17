@@ -12,7 +12,7 @@
 * prior written permission from Derivative.
 */
 
-#include "CPlusPlusCHOPExample.h"
+#include "ChucKDesignerPlugin.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -58,7 +58,7 @@ CreateCHOPInstance(const OP_NodeInfo* info)
 {
 	// Return a new instance of your class every time this is called.
 	// It will be called once per CHOP that is using the .dll
-	return new CPlusPlusCHOPExample(info);
+	return new ChucKDesignerPlugin(info);
 }
 
 DLLEXPORT
@@ -68,25 +68,25 @@ DestroyCHOPInstance(CHOP_CPlusPlusBase* instance)
 	// Delete the instance here, this will be called when
 	// Touch is shutting down, when the CHOP using that instance is deleted, or
 	// if the CHOP loads a different DLL
-	delete (CPlusPlusCHOPExample*)instance;
+	delete (ChucKDesignerPlugin*)instance;
 }
 
 };
 
 
-CPlusPlusCHOPExample::CPlusPlusCHOPExample(const OP_NodeInfo* info) : myNodeInfo(info)
+ChucKDesignerPlugin::ChucKDesignerPlugin(const OP_NodeInfo* info) : myNodeInfo(info)
 {
 	myExecuteCount = 0;
 	myOffset = 0.0;
 }
 
-CPlusPlusCHOPExample::~CPlusPlusCHOPExample()
+ChucKDesignerPlugin::~ChucKDesignerPlugin()
 {
 
 }
 
 void
-CPlusPlusCHOPExample::getGeneralInfo(CHOP_GeneralInfo* ginfo, const OP_Inputs* inputs, void* reserved1)
+ChucKDesignerPlugin::getGeneralInfo(CHOP_GeneralInfo* ginfo, const OP_Inputs* inputs, void* reserved1)
 {
 	// This will cause the node to cook every frame
 	ginfo->cookEveryFrameIfAsked = true;
@@ -101,7 +101,7 @@ CPlusPlusCHOPExample::getGeneralInfo(CHOP_GeneralInfo* ginfo, const OP_Inputs* i
 }
 
 bool
-CPlusPlusCHOPExample::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs, void* reserved1)
+ChucKDesignerPlugin::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs, void* reserved1)
 {
 	// If there is an input connected, we are going to match it's channel names etc
 	// otherwise we'll specify our own.
@@ -125,13 +125,13 @@ CPlusPlusCHOPExample::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inpu
 }
 
 void
-CPlusPlusCHOPExample::getChannelName(int32_t index, OP_String *name, const OP_Inputs* inputs, void* reserved1)
+ChucKDesignerPlugin::getChannelName(int32_t index, OP_String *name, const OP_Inputs* inputs, void* reserved1)
 {
 	name->setString("chan1");
 }
 
 void
-CPlusPlusCHOPExample::execute(CHOP_Output* output,
+ChucKDesignerPlugin::execute(CHOP_Output* output,
 							  const OP_Inputs* inputs,
 							  void* reserved)
 {
@@ -225,7 +225,7 @@ CPlusPlusCHOPExample::execute(CHOP_Output* output,
 }
 
 int32_t
-CPlusPlusCHOPExample::getNumInfoCHOPChans(void * reserved1)
+ChucKDesignerPlugin::getNumInfoCHOPChans(void * reserved1)
 {
 	// We return the number of channel we want to output to any Info CHOP
 	// connected to the CHOP. In this example we are just going to send one channel.
@@ -233,7 +233,7 @@ CPlusPlusCHOPExample::getNumInfoCHOPChans(void * reserved1)
 }
 
 void
-CPlusPlusCHOPExample::getInfoCHOPChan(int32_t index,
+ChucKDesignerPlugin::getInfoCHOPChan(int32_t index,
 										OP_InfoCHOPChan* chan,
 										void* reserved1)
 {
@@ -254,7 +254,7 @@ CPlusPlusCHOPExample::getInfoCHOPChan(int32_t index,
 }
 
 bool		
-CPlusPlusCHOPExample::getInfoDATSize(OP_InfoDATSize* infoSize, void* reserved1)
+ChucKDesignerPlugin::getInfoDATSize(OP_InfoDATSize* infoSize, void* reserved1)
 {
 	infoSize->rows = 2;
 	infoSize->cols = 2;
@@ -265,7 +265,7 @@ CPlusPlusCHOPExample::getInfoDATSize(OP_InfoDATSize* infoSize, void* reserved1)
 }
 
 void
-CPlusPlusCHOPExample::getInfoDATEntries(int32_t index,
+ChucKDesignerPlugin::getInfoDATEntries(int32_t index,
 										int32_t nEntries,
 										OP_InfoDATEntries* entries, 
 										void* reserved1)
@@ -302,7 +302,7 @@ CPlusPlusCHOPExample::getInfoDATEntries(int32_t index,
 }
 
 void
-CPlusPlusCHOPExample::setupParameters(OP_ParameterManager* manager, void *reserved1)
+ChucKDesignerPlugin::setupParameters(OP_ParameterManager* manager, void *reserved1)
 {
 	// speed
 	{
@@ -362,7 +362,7 @@ CPlusPlusCHOPExample::setupParameters(OP_ParameterManager* manager, void *reserv
 }
 
 void 
-CPlusPlusCHOPExample::pulsePressed(const char* name, void* reserved1)
+ChucKDesignerPlugin::pulsePressed(const char* name, void* reserved1)
 {
 	if (!strcmp(name, "Reset"))
 	{
