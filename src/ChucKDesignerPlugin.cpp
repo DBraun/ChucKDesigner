@@ -36,14 +36,14 @@ FillCHOPPluginInfo(CHOP_PluginInfo *info)
 	// The opType is the unique name for this CHOP. It must start with a 
 	// capital A-Z character, and all the following characters must lower case
 	// or numbers (a-z, 0-9)
-	info->customOPInfo.opType->setString("Customsignal");
+	info->customOPInfo.opType->setString("Chuckaudio");
 
 	// The opLabel is the text that will show up in the OP Create Dialog
-	info->customOPInfo.opLabel->setString("Custom Signal");
+	info->customOPInfo.opLabel->setString("ChucK Audio");
 
 	// Information about the author of this OP
-	info->customOPInfo.authorName->setString("Author Name");
-	info->customOPInfo.authorEmail->setString("email@email.com");
+	info->customOPInfo.authorName->setString("David Braun");
+	info->customOPInfo.authorEmail->setString("github.com/DBraun");
 
 	// This CHOP can work with 0 inputs
 	info->customOPInfo.minInputs = 0;
@@ -74,6 +74,8 @@ DestroyCHOPInstance(CHOP_CPlusPlusBase* instance)
 };
 
 
+
+
 ChucKDesignerPlugin::ChucKDesignerPlugin(const OP_NodeInfo* info) : myNodeInfo(info)
 {
 	myExecuteCount = 0;
@@ -82,7 +84,7 @@ ChucKDesignerPlugin::ChucKDesignerPlugin(const OP_NodeInfo* info) : myNodeInfo(i
 
 ChucKDesignerPlugin::~ChucKDesignerPlugin()
 {
-
+	ChucK::globalCleanup();
 }
 
 void
@@ -129,6 +131,674 @@ ChucKDesignerPlugin::getChannelName(int32_t index, OP_String *name, const OP_Inp
 {
 	name->setString("chan1");
 }
+
+
+// C# "string" corresponds to passing char *
+bool ChucKDesignerPlugin::runChuckCode(unsigned int chuckID, const char* code)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    // don't want to replace dac
+    // (a safeguard in case compiler got interrupted while replacing dac)
+    chuck_instances[chuckID]->compiler()->setReplaceDac(FALSE, "");
+
+    // compile it!
+    return chuck_instances[chuckID]->compileCode(
+        std::string(code), std::string(""));
+}
+
+
+
+bool ChucKDesignerPlugin::runChuckCodeWithReplacementDac(unsigned int chuckID, const char* code, const char* replacement_dac)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    // replace dac
+    chuck_instances[chuckID]->compiler()->setReplaceDac(TRUE,
+        std::string(replacement_dac));
+
+    // compile it!
+    bool ret = chuck_instances[chuckID]->compileCode(
+        std::string(code), std::string(""));
+
+    // don't replace dac for future compilations
+    chuck_instances[chuckID]->compiler()->setReplaceDac(FALSE, "");
+
+    return ret;
+}
+
+
+
+bool ChucKDesignerPlugin::runChuckFile(unsigned int chuckID, const char* filename)
+{
+    // run with empty args
+    return runChuckFileWithArgs(chuckID, filename, "");
+}
+
+
+
+bool ChucKDesignerPlugin::runChuckFileWithArgs(unsigned int chuckID, const char* filename, const char* args)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    // don't want to replace dac
+    // (a safeguard in case compiler got interrupted while replacing dac)
+    chuck_instances[chuckID]->compiler()->setReplaceDac(FALSE, "");
+
+    // compile it!
+    return chuck_instances[chuckID]->compileFile(
+        std::string(filename), std::string(args)
+    );
+}
+
+
+
+bool ChucKDesignerPlugin::runChuckFileWithReplacementDac(unsigned int chuckID, const char* filename, const char* replacement_dac)
+{
+    // run with empty args
+    return runChuckFileWithArgsWithReplacementDac(
+        chuckID, filename, "", replacement_dac
+    );
+}
+
+
+
+bool ChucKDesignerPlugin::runChuckFileWithArgsWithReplacementDac(unsigned int chuckID, const char* filename, const char* args, const char* replacement_dac)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    // replace dac
+    chuck_instances[chuckID]->compiler()->setReplaceDac(TRUE,
+        std::string(replacement_dac));
+
+    // compile it!
+    bool ret = chuck_instances[chuckID]->compileFile(
+        std::string(filename), std::string(args)
+    );
+
+    // don't replace dac for future compilations
+    chuck_instances[chuckID]->compiler()->setReplaceDac(FALSE, "");
+
+    return ret;
+}
+
+
+
+bool ChucKDesignerPlugin::setChuckInt(unsigned int chuckID, const char* name, t_CKINT val)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->setGlobalInt(name, val);
+}
+
+
+
+bool ChucKDesignerPlugin::getChuckInt(unsigned int chuckID, const char* name, void (*callback)(t_CKINT))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->getGlobalInt(name, callback);
+}
+
+
+
+bool ChucKDesignerPlugin::setChuckFloat(unsigned int chuckID, const char* name, t_CKFLOAT val)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->setGlobalFloat(name, val);
+}
+
+
+
+bool ChucKDesignerPlugin::getChuckFloat(unsigned int chuckID, const char* name, void (*callback)(t_CKFLOAT))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->getGlobalFloat(name, callback);
+}
+
+
+
+bool ChucKDesignerPlugin::setChuckString(unsigned int chuckID, const char* name, const char* val)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->setGlobalString(name, val);
+}
+
+
+
+bool ChucKDesignerPlugin::getChuckString(unsigned int chuckID, const char* name, void (*callback)(const char*))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->getGlobalString(name, callback);
+}
+
+
+
+bool ChucKDesignerPlugin::signalChuckEvent(unsigned int chuckID, const char* name)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->signalGlobalEvent(name);
+}
+
+
+
+bool ChucKDesignerPlugin::broadcastChuckEvent(unsigned int chuckID, const char* name)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->broadcastGlobalEvent(name);
+}
+
+
+
+bool ChucKDesignerPlugin::listenForChuckEventOnce(unsigned int chuckID, const char* name, void (*callback)(void))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->listenForGlobalEvent(
+        name, callback, FALSE);
+}
+
+
+
+bool ChucKDesignerPlugin::startListeningForChuckEvent(unsigned int chuckID, const char* name, void (*callback)(void))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->listenForGlobalEvent(
+        name, callback, TRUE);
+}
+
+
+
+bool ChucKDesignerPlugin::stopListeningForChuckEvent(unsigned int chuckID, const char* name, void (*callback)(void))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->stopListeningForGlobalEvent(
+        name, callback);
+}
+
+
+bool ChucKDesignerPlugin::getGlobalUGenSamples(unsigned int chuckID,
+    const char* name, SAMPLE* buffer, int numSamples)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    if (!chuck_instances[chuckID]->getGlobalUGenSamples(
+        name, buffer, numSamples))
+    {
+        // failed. fill with zeroes.
+        memset(buffer, 0, sizeof(SAMPLE) * numSamples);
+        return false;
+    }
+
+    return true;
+}
+
+
+
+// int array methods
+bool ChucKDesignerPlugin::setGlobalIntArray(unsigned int chuckID,
+    const char* name, t_CKINT arrayValues[], unsigned int numValues)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->setGlobalIntArray(
+        name, arrayValues, numValues);
+}
+
+
+
+bool ChucKDesignerPlugin::getGlobalIntArray(unsigned int chuckID,
+    const char* name, void (*callback)(t_CKINT[], t_CKUINT))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->getGlobalIntArray(
+        name, callback);
+}
+
+
+
+bool ChucKDesignerPlugin::setGlobalIntArrayValue(unsigned int chuckID,
+    const char* name, unsigned int index, t_CKINT value)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->setGlobalIntArrayValue(
+        name, index, value);
+}
+
+
+
+bool ChucKDesignerPlugin::getGlobalIntArrayValue(unsigned int chuckID,
+    const char* name, unsigned int index, void (*callback)(t_CKINT))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->getGlobalIntArrayValue(
+        name, index, callback);
+}
+
+
+
+bool ChucKDesignerPlugin::setGlobalAssociativeIntArrayValue(
+    unsigned int chuckID, const char* name, char* key, t_CKINT value)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->setGlobalAssociativeIntArrayValue(
+        name, key, value);
+}
+
+
+
+bool ChucKDesignerPlugin::getGlobalAssociativeIntArrayValue(
+    unsigned int chuckID, const char* name, char* key,
+    void (*callback)(t_CKINT))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->getGlobalAssociativeIntArrayValue(
+        name, key, callback);
+}
+
+
+
+// float array methods
+bool ChucKDesignerPlugin::setGlobalFloatArray(unsigned int chuckID,
+    const char* name, t_CKFLOAT arrayValues[], unsigned int numValues)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->setGlobalFloatArray(
+        name, arrayValues, numValues);
+}
+
+
+
+bool ChucKDesignerPlugin::getGlobalFloatArray(unsigned int chuckID,
+    const char* name, void (*callback)(t_CKFLOAT[], t_CKUINT))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->getGlobalFloatArray(
+        name, callback);
+}
+
+
+
+bool ChucKDesignerPlugin::setGlobalFloatArrayValue(unsigned int chuckID,
+    const char* name, unsigned int index, t_CKFLOAT value)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->setGlobalFloatArrayValue(
+        name, index, value);
+}
+
+
+
+bool ChucKDesignerPlugin::getGlobalFloatArrayValue(unsigned int chuckID,
+    const char* name, unsigned int index, void (*callback)(t_CKFLOAT))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->getGlobalFloatArrayValue(
+        name, index, callback);
+}
+
+
+
+bool ChucKDesignerPlugin::setGlobalAssociativeFloatArrayValue(
+    unsigned int chuckID, const char* name, char* key, t_CKFLOAT value)
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->setGlobalAssociativeFloatArrayValue(
+        name, key, value);
+}
+
+
+
+bool ChucKDesignerPlugin::getGlobalAssociativeFloatArrayValue(
+    unsigned int chuckID, const char* name, char* key,
+    void (*callback)(t_CKFLOAT))
+{
+    if (chuck_instances.count(chuckID) == 0) { return false; }
+
+    return chuck_instances[chuckID]->getGlobalAssociativeFloatArrayValue(
+        name, key, callback);
+}
+
+
+
+bool ChucKDesignerPlugin::setChoutCallback(unsigned int chuckID, void (*callback)(const char*))
+{
+    return chuck_instances[chuckID]->setChoutCallback(callback);
+}
+
+
+
+bool ChucKDesignerPlugin::setCherrCallback(unsigned int chuckID, void (*callback)(const char*))
+{
+    return chuck_instances[chuckID]->setCherrCallback(callback);
+}
+
+
+
+bool ChucKDesignerPlugin::setStdoutCallback(void (*callback)(const char*))
+{
+    return ChucK::setStdoutCallback(callback);
+}
+
+
+
+bool ChucKDesignerPlugin::setStderrCallback(void (*callback)(const char*))
+{
+    return ChucK::setStderrCallback(callback);
+}
+
+
+
+bool ChucKDesignerPlugin::setDataDir(const char* dir)
+{
+    chuck_global_data_dir = std::string(dir);
+    return true;
+}
+
+
+
+bool ChucKDesignerPlugin::setLogLevel(unsigned int level)
+{
+    EM_setlog(level);
+    return true;
+}
+
+
+
+bool ChucKDesignerPlugin::initChuckInstance(unsigned int chuckID, unsigned int sampleRate)
+{
+    if (chuck_instances.count(chuckID) == 0)
+    {
+        // if we aren't tracking a chuck vm on this ID, create a new one
+        ChucK* chuck = new ChucK();
+
+        // set params: sample rate, 2 in channels, 2 out channels,
+        // don't halt the vm, and use our data directory
+        chuck->setParam(CHUCK_PARAM_SAMPLE_RATE, (t_CKINT)sampleRate);
+        chuck->setParam(CHUCK_PARAM_INPUT_CHANNELS, (t_CKINT)2);
+        chuck->setParam(CHUCK_PARAM_OUTPUT_CHANNELS, (t_CKINT)2);
+        chuck->setParam(CHUCK_PARAM_VM_HALT, (t_CKINT)0);
+        chuck->setParam(CHUCK_PARAM_DUMP_INSTRUCTIONS, (t_CKINT)0);
+        // directory for compiled.code
+        chuck->setParam(CHUCK_PARAM_WORKING_DIRECTORY, chuck_global_data_dir);
+        // directories to search for chugins and auto-run ck files
+        std::list< std::string > chugin_search;
+        chugin_search.push_back(chuck_global_data_dir + "/Chugins");
+        chugin_search.push_back(chuck_global_data_dir + "/Chugins");
+        chugin_search.push_back(chuck_global_data_dir + "/chugins");
+        chuck->setParam(CHUCK_PARAM_USER_CHUGIN_DIRECTORIES, chugin_search);
+
+        // initialize and start
+        chuck->init();
+        chuck->start();
+
+        chuck_instances[chuckID] = chuck;
+    }
+    return true;
+}
+
+
+
+bool ChucKDesignerPlugin::clearChuckInstance(unsigned int chuckID)
+{
+    if (chuck_instances.count(chuckID) > 0)
+    {
+        // the chuck to clear
+        ChucK* chuck = chuck_instances[chuckID];
+
+        // create a msg asking to clear the VM
+        Chuck_Msg* msg = new Chuck_Msg;
+        msg->type = MSG_CLEARVM;
+
+        // null reply so that VM will delete for us when it's done
+        msg->reply = (ck_msg_func)NULL;
+
+        // tell the VM to clear
+        chuck->vm()->execute_chuck_msg_with_globals(msg);
+
+        return true;
+    }
+
+    return false;
+}
+
+
+
+bool ChucKDesignerPlugin::clearGlobals(unsigned int chuckID)
+{
+    if (chuck_instances.count(chuckID) > 0)
+    {
+        // the chuck to clear
+        ChucK* chuck = chuck_instances[chuckID];
+
+        // create a msg asking to clear the globals
+        Chuck_Msg* msg = new Chuck_Msg;
+        msg->type = MSG_CLEARGLOBALS;
+
+        // null reply so that VM will delete for us when it's done
+        msg->reply = (ck_msg_func)NULL;
+
+        // tell the VM to clear
+        chuck->vm()->execute_chuck_msg_with_globals(msg);
+
+        return true;
+    }
+
+    return false;
+}
+
+
+bool ChucKDesignerPlugin::cleanupChuckInstance(unsigned int chuckID)
+{
+    if (chuck_instances.count(chuckID) > 0)
+    {
+        ChucK* chuck = chuck_instances[chuckID];
+
+        // don't track it anymore
+        chuck_instances.erase(chuckID);
+
+        if (data_instances.count(chuckID) > 0)
+        {
+            data_instances[chuckID]->myId = -1;
+            data_instances.erase(chuckID);
+        }
+
+        // wait a bit
+        usleep(30000);
+
+        // cleanup this chuck early
+        delete chuck;
+
+    }
+
+    return true;
+}
+
+
+
+bool ChucKDesignerPlugin::chuckManualAudioCallback(unsigned int chuckID, float* inBuffer, float* outBuffer, unsigned int numFrames, unsigned int inChannels, unsigned int outChannels)
+{
+    if (chuck_instances.count(chuckID) > 0)
+    {
+        // zero out the output buffer, in case chuck isn't running
+        for (unsigned int n = 0; n < numFrames * outChannels; n++)
+        {
+            outBuffer[n] = 0;
+        }
+
+        // call callback
+        // TODO: check inChannels, outChannels
+        chuck_instances[chuckID]->run(inBuffer, outBuffer, numFrames);
+
+    }
+
+    return true;
+}
+
+
+
+// on launch, reset all ids (necessary when relaunching a lot in unity editor)
+void ChucKDesignerPlugin::cleanRegisteredChucks() {
+
+    // first, invalidate all callbacks' references to chucks
+    for (std::map< unsigned int, EffectData::Data* >::iterator it =
+        data_instances.begin(); it != data_instances.end(); it++)
+    {
+        EffectData::Data* data = it->second;
+        data->myId = -1;
+    }
+
+    // wait for callbacks to finish their current run
+    usleep(30000);
+
+    // next, delete chucks
+    for (std::map< unsigned int, ChucK* >::iterator it =
+        chuck_instances.begin(); it != chuck_instances.end(); it++)
+    {
+        ChucK* chuck = it->second;
+        delete chuck;
+    }
+
+    // delete stored chuck pointers
+    chuck_instances.clear();
+    // delete data instances
+    data_instances.clear();
+
+    // clear out callbacks also
+    setStdoutCallback(NULL);
+    setStderrCallback(NULL);
+}
+
+
+bool ChucKDesignerPlugin::RegisterChuckData(EffectData::Data* data, const unsigned int id)
+{
+    // only store if id has been used / a chuck is already initialized
+    if (chuck_instances.count(id) == 0)
+    {
+        return false;
+    }
+
+    // store id on data; note we might be replacing a non-zero id
+    //  in the case when unity is reusing an audio callback the next time
+    //  the scene is entered.
+    data->myId = id;
+
+    // store the data pointer, for validation later.
+    // the chuck associated with id should only work with *this* data.
+    data_instances[id] = data;
+
+    return true;
+}
+
+
+#if !UNITY_SPU
+
+//int InternalRegisterEffectDefinition(UnityAudioEffectDefinition& definition)
+//{
+//    int numparams = P_NUM;
+//    definition.paramdefs = new UnityAudioParameterDefinition[numparams];
+//    // float vals are: min, max, default, scale (?), scale (?)
+//    RegisterParameter(definition, "ChucK ID", "#", -1.0f, 256.0f, -1.0f, 1.0f, 1.0f, P_CHUCKID, "Internal ID number used to run ChucK scripts programmatically. Leave set to -1 manually.");
+//    return numparams;
+//}
+
+
+// NOTE: CreateCallback and ReleaseCallback are called at odd times, e.g.
+// - When unity launches for the first time and when unity exits
+// - When a new effect is added
+// - When a parameter is exposed
+// - NOT when play mode is activated or deactivated
+// instantiation
+//UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK CreateCallback(UnityAudioEffectState* state)
+//{
+//    EffectData* effectdata = new EffectData;
+//    memset(effectdata, 0, sizeof(EffectData));
+
+//    // don't hook into any particular chuck; id not yet set
+//    effectdata->data.myId = -1;
+
+//    state->effectdata = effectdata;
+//    InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
+
+//    return UNITY_AUDIODSP_OK;
+//}
+
+
+// deletion
+//UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
+//{
+//    EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
+
+//    delete data;
+
+//    return UNITY_AUDIODSP_OK;
+//}
+
+
+// set param (piggy-backed to store chucks by id)
+//UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK SetFloatParameterCallback(UnityAudioEffectState* state, int index, float value)
+//{
+//    EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
+//    if (index >= P_NUM)
+//        return UNITY_AUDIODSP_ERR_UNSUPPORTED;
+
+//    // setting ID, time to cache the pointer to effect data
+//    if (index == P_CHUCKID && value >= 0.0f)
+//    {
+//        // if false( ie already registered data or id ),
+//        // an error will be outputted to the Unity console
+//        if (RegisterChuckData(data, (unsigned int)value) == false)
+//        {
+//            return UNITY_AUDIODSP_ERR_UNSUPPORTED;
+//        }
+//    }
+
+//    data->p[index] = value;
+//    return UNITY_AUDIODSP_OK;
+//}
+
+
+// get param (not useful for anything for ChucK)
+//UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK GetFloatParameterCallback(UnityAudioEffectState* state, int index, float* value, char* valuestr)
+//{
+//    EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
+//    if (index >= P_NUM)
+//        return UNITY_AUDIODSP_ERR_UNSUPPORTED;
+//    if (value != NULL) {
+//        *value = data->p[index];
+//    }
+//    if (valuestr != NULL)
+//        valuestr[0] = 0;
+//    return UNITY_AUDIODSP_OK;
+//}
+
+
+// get float buffer (not useful for anything for ChucK)
+//int UNITY_AUDIODSP_CALLBACK GetFloatBufferCallback(UnityAudioEffectState* state, const char* name, float* buffer, int numsamples)
+//{
+//    return UNITY_AUDIODSP_OK;
+//}
+
+#endif
+
 
 void
 ChucKDesignerPlugin::execute(CHOP_Output* output,
@@ -222,6 +892,29 @@ ChucKDesignerPlugin::execute(CHOP_Output* output,
 
 		myOffset += step * output->numSamples; 
 	}
+
+    // ChucK stuff
+
+    // UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ProcessCallback(UnityAudioEffectState * state, float* inbuffer, float* outbuffer, unsigned int length, int inchannels, int outchannels)
+    // EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
+
+    //// zero out the output buffer, in case chuck isn't running
+    //for (unsigned int n = 0; n < length * outchannels; n++)
+    //{
+    //    outbuffer[n] = 0;
+    //}
+
+    //// if we think we can, call chuck callback
+    //if (chuck_instances.count(data->myId) > 0    // do we have a chuck
+    //    && data_instances.count(data->myId) > 0  // do we have a data
+    //    && data_instances[data->myId] == data)    // && is it still aligned
+    //{
+    //    ChucK* chuck = chuck_instances[data->myId];
+
+    //    // TODO: check inChannels, outChannels
+    //    chuck->run(inbuffer, outbuffer, length);
+    //}
+
 }
 
 int32_t

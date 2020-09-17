@@ -86,7 +86,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ChucKDesignerPlugin.cpp" />
-    <!-- <ClCompile Include="..\thirdparty\AudioPluginUtil.cpp" /> -->
+    <!-- <ClCompile Include="AudioPluginUtil.cpp" /> -->
     <ClCompile Include="..\thirdparty\chuck\src\core\chuck.cpp" />
     <ClCompile Include="..\thirdparty\chuck\src\core\chuck_absyn.cpp" />
     <ClCompile Include="..\thirdparty\chuck\src\core\chuck_carrier.cpp" />
@@ -273,11 +273,11 @@
     <ClCompile Include="..\thirdparty\chuck\src\core\util_string.cpp" />
     <ClCompile Include="..\thirdparty\chuck\src\core\util_thread.cpp" />
     <ClCompile Include="..\thirdparty\chuck\src\core\util_xforms.c" />
-    <!--     <ClCompile Include="hrtftable.cpp" />
-    <ClCompile Include="Plugin_ChucK.cpp" />
-    <ClCompile Include="Plugin_PanSpatializer.cpp" />
-    <ClCompile Include="Plugin_Spatializer.cpp" />
-    <ClCompile Include="Plugin_SpatializerReverb.cpp" /> -->
+    <!-- <ClCompile Include="hrtftable.cpp" /> -->
+    <!-- <ClCompile Include="Plugin_ChucK.cpp" /> -->
+    <!-- <ClCompile Include="Plugin_PanSpatializer.cpp" /> -->
+    <!-- <ClCompile Include="Plugin_Spatializer.cpp" /> -->
+    <!-- <ClCompile Include="Plugin_SpatializerReverb.cpp" /> -->
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CHOP_CPlusPlusBase.h" />
