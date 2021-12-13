@@ -50,6 +50,7 @@ add_library(ChucKDesignerShared SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CPlusPlus_Common.h
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/GL_Extensions.h
     )
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 
 # Include header directories
 target_include_directories(ChucKDesignerShared PUBLIC
@@ -120,6 +121,7 @@ add_library(ChucKListenerCHOP SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CPlusPlus_Common.h
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/GL_Extensions.h
     )
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 
 # Include header directories
 target_include_directories(ChucKListenerCHOP PUBLIC
@@ -189,6 +191,7 @@ add_library(ChucKDesignerCHOP SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CPlusPlus_Common.h
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/GL_Extensions.h
     )
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 
 # Include header directories
 target_include_directories(ChucKDesignerCHOP PUBLIC
