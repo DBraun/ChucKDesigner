@@ -14,9 +14,9 @@ jobs:
         python-version: [3.9]
 
     steps:
-    # - uses: actions/checkout@v2
-    #   with:
-    #     submodules: true
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
 
     # - name: Setup Python ${{ matrix.python-version }}
     #   uses: actions/setup-python@v2
@@ -36,9 +36,9 @@ jobs:
 
     - name: Build Windows (Release)
       run: |
-        mkdir build_release
-        cmake -DCMAKE_BUILD_TYPE=Release -Bbuild_release
-        cd build_release
+        mkdir build
+        cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
+        cd build
         msbuild ChucKDesignerCHOP.sln /property:Configuration=Release
 
   build-macos:
@@ -55,18 +55,8 @@ jobs:
     - name: Get CMake
       uses: lukka/get-cmake@latest
 
-    - name: Build libsamplerate
-      run: |
-        cd thirdparty/libsamplerate
-        mkdir build_release
-        cmake -DCMAKE_BUILD_TYPE=Release -Bbuild_release
-        make --directory=build_release
-
     - name: Build MacOS (Release)
-      # the Projucer refers to PYTHONMAJOR
-      env:
-        PYTHONMAJOR: ${{ matrix.python-version }} 
       run: |
-        mkdir build_release
-        cmake -DCMAKE_BUILD_TYPE=Release -Bbuild_release
-        make --directory=build_release
+        mkdir build
+        cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
+        make --directory=build
