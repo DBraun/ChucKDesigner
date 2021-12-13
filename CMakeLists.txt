@@ -9,7 +9,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Sub-projects
 ################################################################################
 project(ChucKDesignerShared VERSION 0.0.1)
-# include(CMake/Utils.cmake)
 
 file(GLOB CK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/*.h
@@ -35,6 +34,9 @@ file(GLOB CK_SOURCES
 if(WIN32)
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*server_thread.c")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/config.h")
+else()
+    list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.h")
+    list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.c")
 endif()
 
 add_library(ChucKDesignerShared SHARED
