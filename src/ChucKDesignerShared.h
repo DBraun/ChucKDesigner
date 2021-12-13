@@ -24,10 +24,16 @@
 #include <string>
 #include <mutex>
 
+#ifdef WIN32
+
 #ifdef CHUCKDESIGNERSHARED_EXPORTS
 #define CHUCKDESIGNERSHARED_API __declspec(dllexport)
 #else
 #define CHUCKDESIGNERSHARED_API __declspec(dllimport)
+#endif
+
+#else
+#define CHUCKDESIGNERSHARED_API
 #endif
 
 class ChucKDesignerPlugin;
