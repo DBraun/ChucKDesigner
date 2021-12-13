@@ -114,7 +114,7 @@ add_library(ChucKListenerCHOP SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKListenerCHOP.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKListenerCHOP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CHOP_CPlusPlusBase.h
@@ -131,6 +131,8 @@ target_include_directories(ChucKListenerCHOP PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner>
     $<INSTALL_INTERFACE:ChucKListenerCHOP>
     )
+
+target_link_libraries(${PROJECT_NAME} ChucKDesignerShared)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
@@ -185,7 +187,7 @@ add_library(ChucKDesignerCHOP SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKDesignerCHOP_plugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CHOP_CPlusPlusBase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CPlusPlus_Common.h
@@ -201,6 +203,8 @@ target_include_directories(ChucKDesignerCHOP PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner>
     $<INSTALL_INTERFACE:ChucKDesignerCHOP>
     )
+
+target_link_libraries(${PROJECT_NAME} ChucKDesignerShared)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
@@ -248,5 +252,5 @@ add_custom_command(TARGET ${PROJECT_NAME}
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
                       VS_DEBUGGER_COMMAND "C:\\Program Files\\Derivative\\TouchDesigner\\bin\\TouchDesigner.exe"
-                      VS_DEBUGGER_COMMAND_ARGUMENTS "..\\$(ProjectName).toe")
+                      VS_DEBUGGER_COMMAND_ARGUMENTS "..\\ChucKDesigner.toe")
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)

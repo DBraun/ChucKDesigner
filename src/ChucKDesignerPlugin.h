@@ -88,7 +88,12 @@ public:
 
     virtual void getErrorString(OP_String* error, void* reserved1);
 
-    std::string getNodeFullPath() const;
+    std::string getNodeFullPath() const {
+
+        std::string pluginFullPath(myNodeInfo->opPath);
+
+        return pluginFullPath;
+    }
 
     bool runChuckCode(unsigned int chuckID, const char* code);
     bool runChuckCodeWithReplacementDac(unsigned int chuckID, const char* code, const char* replacement_dac);

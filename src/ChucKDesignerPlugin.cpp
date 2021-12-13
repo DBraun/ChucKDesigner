@@ -22,14 +22,6 @@
 #include "chuck_globals.h"
 
 
-std::string
-ChucKDesignerPlugin::getNodeFullPath() const {
-
-    std::string pluginFullPath(myNodeInfo->opPath);
-
-    return pluginFullPath;
-}
-
 ChucKDesignerPlugin::ChucKDesignerPlugin(const OP_NodeInfo* info) : myNodeInfo(info)
 {
     ChucKDesignerShared::addChuckPluginInstance(this);
@@ -600,7 +592,7 @@ ChucKDesignerPlugin::cleanupChuckInstance(unsigned int chuckID)
         }
 
         // wait a bit
-        usleep(30000);
+        //usleep(30000);
 
         // cleanup this chuck early
         delete chuck;
@@ -645,7 +637,7 @@ ChucKDesignerPlugin::cleanRegisteredChucks() {
     }
 
     // wait for callbacks to finish their current run
-    usleep(30000);
+    //usleep(30000);
 
     // next, delete chucks
     for (std::map< unsigned int, ChucK* >::iterator it =
@@ -744,7 +736,6 @@ ChucKDesignerPlugin::execute(CHOP_Output* output,
 
         const OP_DATInput* input = inputs->getParDAT("Code");
         const char* code = *(input->cellData);
-        std::cout << "code: " << code << std::endl;
 
         if (chuck_instances.size()) {
 

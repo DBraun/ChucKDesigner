@@ -184,8 +184,6 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 		return;
 	}
 
-	const char str[] = "How many characters does this string contain?";
-
 	std::string pluginFullPath(pluginCHOP->opPath);
 
 	if (!myChucKDesignerPlugin) {
