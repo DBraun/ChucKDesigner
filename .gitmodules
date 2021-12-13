@@ -1,0 +1,3 @@
+[submodule "thirdparty/chuck"]
+	path = thirdparty/chuck
+	url = https://github.com/ccrma/chuck

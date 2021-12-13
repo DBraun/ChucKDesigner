@@ -1,0 +1,5 @@
+# ChucKDesigner
+
+[ChucK](https://chuck.stanford.edu/) + [TouchDesigner](https://derivative.ca/)
+
+ChucKDesigner is an integration of the ChucK music/audio programming language with the TouchDesigner visual programming language. ChucKDesigner is similar in spirit to [Chunity](https://chuck.stanford.edu/chunity/), the combination of ChucK and the Unity game engine. With ChucKDesigner, TouchDesigner can control ChucK code via user interfaces and channel operator streams. In the other direction, ChucK can send audio, events, and arrays back to TouchDesigner. This enables tight synchronization of audio and video. ChucKDesigner is supported on Windows and will have MacOS support soon. Please use the [issues](https://github.com/DBraun/ChucKDesigner/issues) and [discussions](https://github.com/DBraun/ChucKDesigner/discussions) pages on Github.
