@@ -38,9 +38,15 @@
 
 class ChucKDesignerPlugin;
 
+void sharedFloatCallback(const char* varName, t_CKFLOAT val);
+static std::map<std::string, double> myFloatVars;
+
+
 // thread-safe class for sharing data between CHOPs and TOPs
 class ChucKDesignerShared {
 public:
+	CHUCKDESIGNERSHARED_API static float getFloat(const char* varStr);
+
 	CHUCKDESIGNERSHARED_API static void addChuckPluginInstance(ChucKDesignerPlugin* top);
 	CHUCKDESIGNERSHARED_API static void removeChuckPluginInstance(ChucKDesignerPlugin* top);
 	CHUCKDESIGNERSHARED_API static ChucKDesignerPlugin* getChuckPluginInstance(const std::string& chucKNodeName);

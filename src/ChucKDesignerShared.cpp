@@ -16,6 +16,17 @@ static mutex plugin_access_mutex;
 
 typedef std::lock_guard<std::mutex> ScopedLock;
 
+void sharedFloatCallback(const char* varName, t_CKFLOAT val) {
+	myFloatVars[varName] = val;
+}
+
+float ChucKDesignerShared::getFloat(const char* varName) {
+	if (myFloatVars.find(varName) != myFloatVars.end()) {
+		return myFloatVars[varName];
+	}
+	return 0.f;
+}
+
 void ChucKDesignerShared::addChuckPluginInstance(ChucKDesignerPlugin* top)
 {
 	ScopedLock lock(plugin_access_mutex);

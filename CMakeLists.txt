@@ -71,6 +71,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "NDEBUG"
     "_USRDLL"
     "HAVE_CONFIG_H"
+    "CHUCKDESIGNERSHARED_EXPORTS"
 )
 
 if(WIN32)
@@ -82,19 +83,19 @@ if(WIN32)
         "_WINDOWS;"
     )
   # win sock 32
-  target_link_libraries(${PROJECT_NAME} ws2_32)
+  target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
   # windows multimedia for rt midi
-  target_link_libraries(${PROJECT_NAME} winmm)
+  target_link_libraries(${PROJECT_NAME} PUBLIC winmm)
   # more
-  target_link_libraries(${PROJECT_NAME} wsock32)
-  target_link_libraries(${PROJECT_NAME} dsound dinput8 dxguid)
+  target_link_libraries(${PROJECT_NAME} PUBLIC wsock32)
+  target_link_libraries(${PROJECT_NAME} PUBLIC dsound dinput8 dxguid)
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         "__MACOSX_CORE__;"
         "__APPLE__;"
         "__MACH__;"
     )
-    target_link_libraries(${PROJECT_NAME} "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
+    target_link_libraries(${PROJECT_NAME} PUBLIC "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio" "-framework IOKit" "-framework Carbon" "-framework AppKit" "-framework Foundation")
 endif()
 
 add_custom_command(TARGET ${PROJECT_NAME}
@@ -116,7 +117,7 @@ add_library(ChucKListenerCHOP SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CHOP_CPlusPlusBase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CPlusPlus_Common.h
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/GL_Extensions.h
@@ -132,7 +133,7 @@ target_include_directories(ChucKListenerCHOP PUBLIC
     $<INSTALL_INTERFACE:ChucKListenerCHOP>
     )
 
-target_link_libraries(${PROJECT_NAME} ChucKDesignerShared)
+target_link_libraries(${PROJECT_NAME} PUBLIC ChucKDesignerShared)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
@@ -155,19 +156,19 @@ if(WIN32)
         "_WINDOWS;"
     )
     # win sock 32
-    target_link_libraries(${PROJECT_NAME} ws2_32)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
     # windows multimedia for rt midi
-    target_link_libraries(${PROJECT_NAME} winmm)
+    target_link_libraries(${PROJECT_NAME} PUBLIC winmm)
     # more
-    target_link_libraries(${PROJECT_NAME} wsock32)
-    target_link_libraries(${PROJECT_NAME} dsound dinput8 dxguid)
+    target_link_libraries(${PROJECT_NAME} PUBLIC wsock32)
+    target_link_libraries(${PROJECT_NAME} PUBLIC dsound dinput8 dxguid)
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         "__MACOSX_CORE__;"
         "__APPLE__;"
         "__MACH__;"
     )
-    target_link_libraries(${PROJECT_NAME} "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
+    target_link_libraries(${PROJECT_NAME} PUBLIC "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
 endif()
 
 add_custom_command(TARGET ${PROJECT_NAME}
@@ -185,7 +186,7 @@ project(ChucKDesignerCHOP VERSION 0.0.1)
 add_library(ChucKDesignerCHOP SHARED
     ${CK_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKDesignerCHOP_plugin.cpp
@@ -204,7 +205,7 @@ target_include_directories(ChucKDesignerCHOP PUBLIC
     $<INSTALL_INTERFACE:ChucKDesignerCHOP>
     )
 
-target_link_libraries(${PROJECT_NAME} ChucKDesignerShared)
+target_link_libraries(${PROJECT_NAME} PUBLIC ChucKDesignerShared)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
@@ -227,19 +228,19 @@ if(WIN32)
         "_WINDOWS;"
     )
     # win sock 32
-    target_link_libraries(${PROJECT_NAME} ws2_32)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
     # windows multimedia for rt midi
-    target_link_libraries(${PROJECT_NAME} winmm)
+    target_link_libraries(${PROJECT_NAME} PUBLIC winmm)
     # more
-    target_link_libraries(${PROJECT_NAME} wsock32)
-    target_link_libraries(${PROJECT_NAME} dsound dinput8 dxguid)
+    target_link_libraries(${PROJECT_NAME} PUBLIC wsock32)
+    target_link_libraries(${PROJECT_NAME} PUBLIC dsound dinput8 dxguid)
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         "__MACOSX_CORE__;"
         "__APPLE__;"
         "__MACH__;"
     )
-    target_link_libraries(${PROJECT_NAME} "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
+    target_link_libraries(${PROJECT_NAME} PUBLIC "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
 endif()
 
 add_custom_command(TARGET ${PROJECT_NAME}

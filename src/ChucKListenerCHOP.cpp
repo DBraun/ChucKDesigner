@@ -92,21 +92,16 @@ vector<string> split(string s, string delimiter) {
 	return res;
 }
 
+
 ChucKListenerCHOP::ChucKListenerCHOP(const OP_NodeInfo* info) : myNodeInfo(info)
 {
 	myExecuteCount = 0;
 	myOffset = 0.0;
-
-    int sampleRate = 44100;
-
-    inbuffer = new float[sampleRate / 60. * 600.];
-    outbuffer = new float[sampleRate / 60. * 60.];
-
-    int chuckID = 0;
 }
 
 ChucKListenerCHOP::~ChucKListenerCHOP()
 {
+
 }
 
 void
@@ -186,9 +181,7 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 
 	std::string pluginFullPath(pluginCHOP->opPath);
 
-	if (!myChucKDesignerPlugin) {
-		myChucKDesignerPlugin = ChucKDesignerShared::getChuckPluginInstance(pluginFullPath);
-	}
+	myChucKDesignerPlugin = ChucKDesignerShared::getChuckPluginInstance(pluginFullPath);
 
     if (!myChucKDesignerPlugin)
     {
@@ -203,22 +196,13 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 
 		i += 1;
 
-		myChucKDesignerPlugin->getChuckFloat(0, varName.c_str(),
-			
-			[](const char * varStr, t_CKFLOAT val) {
-				myFloatVars[varStr] = val;
-			//	return nullptr;
-			}
-		);
+		myChucKDesignerPlugin->getChuckFloat(varName.c_str());
 	}
 
 	i = 0;
 	for (const std::string varName : myFloatVarNames)
 	{
-		if (myFloatVars.find(varName) != myFloatVars.end()) {
-			output->channels[i][0] = myFloatVars[varName];
-		}
-
+		output->channels[i][0] = ChucKDesignerShared::getFloat(varName.c_str());
 		i += 1;
 	}
 }
@@ -228,8 +212,6 @@ void ChucKListenerCHOP::getErrorString(OP_String* error, void* reserved1) {
     if (!myStatus) {
         error->setString(myError.str().c_str());
     }
-
-
 }
 
 int32_t
