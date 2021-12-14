@@ -13,7 +13,6 @@
 */
 
 #include "ChucKListenerCHOP.h"
-
 #include "ChucKDesignerShared.h"
 
 #include <stdio.h>
@@ -42,6 +41,7 @@ FillCHOPPluginInfo(CHOP_PluginInfo *info)
 
 	// The opLabel is the text that will show up in the OP Create Dialog
 	info->customOPInfo.opLabel->setString("ChucK Listener");
+	info->customOPInfo.opIcon->setString("CKL");
 
 	// Information about the author of this OP
 	info->customOPInfo.authorName->setString("David Braun");
@@ -101,7 +101,6 @@ ChucKListenerCHOP::ChucKListenerCHOP(const OP_NodeInfo* info) : myNodeInfo(info)
 
 ChucKListenerCHOP::~ChucKListenerCHOP()
 {
-
 }
 
 void
@@ -163,7 +162,6 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 							  const OP_Inputs* inputs,
 							  void* reserved)
 {
-
     myStatus = true;
     myError.str("");
 

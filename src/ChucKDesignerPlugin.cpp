@@ -266,8 +266,6 @@ ChucKDesignerPlugin::chuckManualAudioCallback(unsigned int chuckID, float* inBuf
     return true;
 }
 
-
-// on launch, reset all ids (necessary when relaunching a lot in unity editor)
 void
 ChucKDesignerPlugin::cleanRegisteredChucks() {
 
@@ -336,13 +334,7 @@ ChucKDesignerPlugin::RegisterChuckData(EffectData::Data* data, const unsigned in
         return false;
     }
 
-    // store id on data; note we might be replacing a non-zero id
-    //  in the case when unity is reusing an audio callback the next time
-    //  the scene is entered.
     data->myId = id;
-
-    // store the data pointer, for validation later.
-    // the chuck associated with id should only work with *this* data.
     data_instances[id] = data;
 
     return true;

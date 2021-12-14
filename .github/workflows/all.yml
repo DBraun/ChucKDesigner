@@ -41,22 +41,22 @@ jobs:
         cd build
         msbuild ChucKDesignerCHOP.sln /property:Configuration=Release
 
-  build-macos:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        python-version: [3.9]
-        os: [macos-10.15]
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
+  # build-macos:
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       python-version: [3.9]
+  #       os: [macos-10.15]
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #     with:
+  #       submodules: true
 
-    - name: Get CMake
-      uses: lukka/get-cmake@latest
+  #   - name: Get CMake
+  #     uses: lukka/get-cmake@latest
 
-    - name: Build MacOS (Release)
-      run: |
-        mkdir build
-        cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
-        make --directory=build
+  #   - name: Build MacOS (Release)
+  #     run: |
+  #       mkdir build
+  #       cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
+  #       make --directory=build

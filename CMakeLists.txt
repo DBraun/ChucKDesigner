@@ -111,13 +111,10 @@ add_custom_command(TARGET ${PROJECT_NAME}
 project(ChucKListenerCHOP VERSION 0.0.1)
 
 add_library(ChucKListenerCHOP SHARED
-    ${CK_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKListenerCHOP.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKListenerCHOP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.h
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CHOP_CPlusPlusBase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CPlusPlus_Common.h
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/GL_Extensions.h
@@ -184,7 +181,7 @@ add_custom_command(TARGET ${PROJECT_NAME}
 project(ChucKDesignerCHOP VERSION 0.0.1)
 
 add_library(ChucKDesignerCHOP SHARED
-    ${CK_SOURCES}
+    # ${CK_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.h
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
