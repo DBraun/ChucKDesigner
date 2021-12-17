@@ -38,6 +38,9 @@ else()
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.c")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/config.h")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/server.c")
+    list(FILTER CK_SOURCES EXCLUDE REGEX ".*core/regex/regexec.c")
+    list(FILTER CK_SOURCES EXCLUDE REGEX ".*core/regex/tre-compile.c")
+
 endif()
 
 message("CK_SOURCES: " ${CK_SOURCES})
