@@ -57,7 +57,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 target_include_directories(ChucKDesignerShared PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex>
+    # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner>
     $<INSTALL_INTERFACE:ChucKDesignerShared>
     )
