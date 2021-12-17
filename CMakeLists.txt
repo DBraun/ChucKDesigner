@@ -36,6 +36,7 @@ if(WIN32)
 else()
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.h")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.c")
+    list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/config.h")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/server.c")
 endif()
 
@@ -62,7 +63,8 @@ target_include_directories(ChucKDesignerShared PUBLIC
     )
 if(APPLE)
     target_include_directories(ChucKDesignerShared PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/lo>
+        # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/lo>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex>
         )
 else()
     target_include_directories(ChucKDesignerShared PUBLIC
