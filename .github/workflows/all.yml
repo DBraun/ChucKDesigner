@@ -48,7 +48,7 @@ jobs:
 
     - name: Some Setup
       run: |
-        cd thirdparty/chuck/src
+        cd thirdparty/chuck/src/core
         bison -dv -b chuck chuck.y
         flex -ochuck.yy.c chuck.lex
 
