@@ -34,7 +34,7 @@ if(WIN32)
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*server_thread.c")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/config.h")
 else()
-    list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/config.h")
+    # list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/config.h")
     # list(FILTER CK_SOURCES EXCLUDE REGEX ".*server_thread.c")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.h")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.c")
@@ -87,6 +87,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     ">"
     "NDEBUG"
     "_USRDLL"
+    "HAVE_CONFIG_H;"
     "CHUCKDESIGNERSHARED_EXPORTS"
 )
 
@@ -97,7 +98,6 @@ if(WIN32)
         "__WINDOWS_MODERN__;"
         "__WINDOWS_DS__;"
         "_WINDOWS;"
-        "HAVE_CONFIG_H;"
     )
   # win sock 32
   target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
@@ -157,6 +157,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         "NDEBUG"
     ">"
     "NDEBUG"
+    "HAVE_CONFIG_H;"
     "_USRDLL"
 )
 
@@ -167,7 +168,6 @@ if(WIN32)
         "__WINDOWS_MODERN__;"
         "__WINDOWS_DS__;"
         "_WINDOWS;"
-        "HAVE_CONFIG_H;"
     )
     # win sock 32
     target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
@@ -226,6 +226,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         "NDEBUG"
     ">"
     "NDEBUG"
+    "HAVE_CONFIG_H"
     "_USRDLL"
 )
 
@@ -236,7 +237,6 @@ if(WIN32)
         "__WINDOWS_MODERN__;"
         "__WINDOWS_DS__;"
         "_WINDOWS;"
-        "HAVE_CONFIG_H"
     )
     # win sock 32
     target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
