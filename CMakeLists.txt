@@ -78,7 +78,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     ">"
     "NDEBUG"
     "_USRDLL"
-    "HAVE_CONFIG_H"
     "CHUCKDESIGNERSHARED_EXPORTS"
 )
 
@@ -89,6 +88,7 @@ if(WIN32)
         "__WINDOWS_MODERN__;"
         "__WINDOWS_DS__;"
         "_WINDOWS;"
+        "HAVE_CONFIG_H;"
     )
   # win sock 32
   target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
@@ -149,7 +149,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     ">"
     "NDEBUG"
     "_USRDLL"
-    "HAVE_CONFIG_H"
 )
 
 if(WIN32)
@@ -159,6 +158,7 @@ if(WIN32)
         "__WINDOWS_MODERN__;"
         "__WINDOWS_DS__;"
         "_WINDOWS;"
+        "HAVE_CONFIG_H;"
     )
     # win sock 32
     target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
@@ -218,7 +218,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     ">"
     "NDEBUG"
     "_USRDLL"
-    "HAVE_CONFIG_H"
 )
 
 if(WIN32)
@@ -228,6 +227,7 @@ if(WIN32)
         "__WINDOWS_MODERN__;"
         "__WINDOWS_DS__;"
         "_WINDOWS;"
+        "HAVE_CONFIG_H"
     )
     # win sock 32
     target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
