@@ -76,15 +76,13 @@ jobs:
     needs: [build-windows, build-macos]
     runs-on: ubuntu-latest
     name: "Create Release on GitHub"
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          path: "dist"
 
-    - name: Download Artifacts
-      uses: actions/download-artifact@v2
-      with:
-        path: "dist"
-
-    - name: Upload Release to Github
-      uses: ncipollo/release-action@v1
-      with:
-        artifacts: "dist/*/*"
-        token: ${{ secrets.GITHUB_TOKEN }}
-        draft: true
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/*/*"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: true
