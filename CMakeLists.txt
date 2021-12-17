@@ -34,7 +34,6 @@ if(WIN32)
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*server_thread.c")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/config.h")
 else()
-    list(FILTER CK_SOURCES EXCLUDE REGEX ".*regex/config.h")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.h")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.c")
 endif()
@@ -57,10 +56,18 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 target_include_directories(ChucKDesignerShared PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core>
-    # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner>
     $<INSTALL_INTERFACE:ChucKDesignerShared>
     )
+if(APPLE)
+    target_include_directories(ChucKDesignerShared PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/lo>
+        )
+else()
+    target_include_directories(ChucKDesignerShared PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex>
+        )
+endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
