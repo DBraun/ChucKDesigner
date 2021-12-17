@@ -43,7 +43,7 @@ else()
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*core/regex/*")
     # list(FILTER CK_SOURCES EXCLUDE REGEX ".*core/regex/regexec.c")
     # list(FILTER CK_SOURCES EXCLUDE REGEX ".*core/regex/tre-compile.c")
-
+    list(APPEND CK_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/chuck.yy.c")
 endif()
 
 message("CK_SOURCES: " ${CK_SOURCES})

@@ -46,6 +46,12 @@ jobs:
     - name: Get CMake
       uses: lukka/get-cmake@latest
 
+    - name: Some Setup
+      run: |
+        cd thirdparty/chuck/src
+        bison -dv -b chuck chuck.y
+        flex -ochuck.yy.c chuck.lex
+
     - name: Build MacOS (Release)
       run: |
         mkdir build
