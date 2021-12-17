@@ -14,7 +14,6 @@ file(GLOB CK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/*.c
-    # ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex/*.c
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex/regcomp.c
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex/regerror.c
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex/regexec.c
@@ -39,6 +38,8 @@ else()
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.h")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.c")
 endif()
+
+message("CK_SOURCES: " ${CK_SOURCES})
 
 add_library(ChucKDesignerShared SHARED
     ${CK_SOURCES}
@@ -106,7 +107,7 @@ add_custom_command(TARGET ${PROJECT_NAME}
                  # "%USERPROFILE%/Documents/Derivative/Plugins"
                  )
 
-############ listener
+###################### ChucKListenerCHOP
 
 project(ChucKListenerCHOP VERSION 0.0.1)
 
@@ -176,16 +177,13 @@ add_custom_command(TARGET ${PROJECT_NAME}
                  # "%USERPROFILE%/Documents/Derivative/Plugins"
                  )
 
-######## touchdesigner project
+###################### ChucKDesignerCHOP
 
 project(ChucKDesignerCHOP VERSION 0.0.1)
 
 add_library(ChucKDesignerCHOP SHARED
-    # ${CK_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.h
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKDesignerCHOP_plugin.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CHOP_CPlusPlusBase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CPlusPlus_Common.h

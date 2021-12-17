@@ -8,25 +8,10 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
-
-    strategy:
-      matrix:
-        python-version: [3.9]
-
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
-
-    # - name: Setup Python ${{ matrix.python-version }}
-    #   uses: actions/setup-python@v2
-    #   with:
-    #     python-version: ${{ matrix.python-version }}
-
-    # - name: Install Python dependencies
-    #   run: |
-    #     python -m pip install --upgrade pip
-    #     pip install requests
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.3
@@ -41,22 +26,44 @@ jobs:
         cd build
         msbuild ChucKDesignerCHOP.sln /property:Configuration=Release
 
-  # build-macos:
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     matrix:
-  #       python-version: [3.9]
-  #       os: [macos-10.15]
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #     with:
-  #       submodules: true
+    - name: Upload Release to Github
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          ${{ github.workspace }}/Plugins/ChucK*.dll
 
-  #   - name: Get CMake
-  #     uses: lukka/get-cmake@latest
+  build-macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-10.15]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
 
-  #   - name: Build MacOS (Release)
-  #     run: |
-  #       mkdir build
-  #       cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
-  #       make --directory=build
+    - name: Get CMake
+      uses: lukka/get-cmake@latest
+
+    - name: Build MacOS (Release)
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --config Release
+        ls -r *
+#       make --directory=build
+        cd ../Release
+        ls -r *
+        mv ChucKDesignerCHOP.bundle ChucKDesignerCHOP.plugin
+        mv ChucKListenerCHOP.bundle ChucKListenerCHOP.plugin
+
+    - name: Upload Release to Github
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          ${{ github.workspace }}/build/Release/ChucKDesignerShared.dylib
+          ${{ github.workspace }}/Release/ChucKDesignerCHOP.plugin
+          ${{ github.workspace }}/Release/ChucKListenerCHOP.plugin
