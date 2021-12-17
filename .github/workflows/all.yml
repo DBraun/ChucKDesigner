@@ -76,10 +76,11 @@ jobs:
     needs: [build-windows, build-macos]
     runs-on: ubuntu-latest
     name: "Create Release on GitHub"
+
     - name: Download Artifacts
       uses: actions/download-artifact@v2
       with:
-        path: dist
+        path: "dist"
 
     - name: Upload Release to Github
       uses: ncipollo/release-action@v1
