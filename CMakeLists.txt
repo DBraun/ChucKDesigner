@@ -36,6 +36,7 @@ if(WIN32)
 else()
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.h")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.c")
+    list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/server.c")
 endif()
 
 message("CK_SOURCES: " ${CK_SOURCES})
