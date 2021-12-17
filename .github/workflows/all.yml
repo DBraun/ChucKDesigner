@@ -2,8 +2,6 @@ name: Compile
 on:
   pull_request: {}
   push:
-    branches:
-      - main
     tags:
     - 'v*'
 jobs:
@@ -68,7 +66,7 @@ jobs:
       with:
         name: my-artifact-macos
         path: |
-          ${{ github.workspace }}/build/ChucKDesignerShared.dylib
+          ${{ github.workspace }}/build/libChucKDesignerShared.dylib
           ${{ github.workspace }}/build/ChucKDesignerCHOP.plugin
           ${{ github.workspace }}/build/ChucKListenerCHOP.plugin
 
