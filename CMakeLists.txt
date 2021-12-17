@@ -69,7 +69,7 @@ target_include_directories(ChucKDesignerShared PUBLIC
 if(APPLE)
     target_include_directories(ChucKDesignerShared PUBLIC
         # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/lo>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/lo>
         )
 else()
     target_include_directories(ChucKDesignerShared PUBLIC
