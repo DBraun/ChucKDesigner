@@ -72,6 +72,11 @@ if(APPLE)
         # $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/lo>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/lo>
         )
+
+    # Link MultitouchSupport Apple framework
+    find_library( multitouchsupportlibs MultitouchSupport /System/Library/PrivateFrameworks )
+    message(STATUS "Found multitouchsupportlibs libs: ${multitouchsupportlibs}" )
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${multitouchsupportlibs})
 else()
     target_include_directories(ChucKDesignerShared PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex>
