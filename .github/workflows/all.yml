@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+    - 'v*'
 jobs:
 
   build-windows:
@@ -26,12 +28,11 @@ jobs:
         cd build
         msbuild ChucKDesignerCHOP.sln /property:Configuration=Release
 
-    - name: Upload Release to Github
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
       with:
-        files: |
-          ${{ github.workspace }}/Plugins/ChucK*.dll
+        name: my-artifact-windows
+        path: ${{ github.workspace }}/Plugins/ChucK*.dll
 
   build-macos:
     runs-on: ${{ matrix.os }}
@@ -62,11 +63,27 @@ jobs:
         mv libChucKDesignerCHOP.so ChucKDesignerCHOP.plugin
         mv libChucKListenerCHOP.so ChucKListenerCHOP.plugin
 
-    - name: Upload Release to Github
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
       with:
-        files: |
+        name: my-artifact-macos
+        path: |
           ${{ github.workspace }}/build/ChucKDesignerShared.dylib
           ${{ github.workspace }}/build/ChucKDesignerCHOP.plugin
           ${{ github.workspace }}/build/ChucKListenerCHOP.plugin
+
+  create-release:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    name: "Create Release on GitHub"
+    - name: Download Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: dist
+
+    - name: Upload Release to Github
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "dist/*/*"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        draft: true
