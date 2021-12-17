@@ -59,8 +59,6 @@ jobs:
         cmake .. -DCMAKE_BUILD_TYPE=Release
         cmake --build . --config Release
         ls -r *
-        cd ../Release
-        ls -r *
         mv ChucKDesignerCHOP.bundle ChucKDesignerCHOP.plugin
         mv ChucKListenerCHOP.bundle ChucKListenerCHOP.plugin
 
@@ -69,6 +67,6 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: |
-          ${{ github.workspace }}/build/Release/ChucKDesignerShared.dylib
-          ${{ github.workspace }}/Release/ChucKDesignerCHOP.plugin
-          ${{ github.workspace }}/Release/ChucKListenerCHOP.plugin
+          ${{ github.workspace }}/build/ChucKDesignerShared.dylib
+          ${{ github.workspace }}/build/ChucKDesignerCHOP.plugin
+          ${{ github.workspace }}/build/ChucKListenerCHOP.plugin

@@ -132,7 +132,7 @@ add_custom_command(TARGET ${PROJECT_NAME}
 
 project(ChucKListenerCHOP VERSION 0.0.1)
 
-add_library(ChucKListenerCHOP SHARED
+add_library(ChucKListenerCHOP MODULE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKListenerCHOP.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKListenerCHOP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
@@ -202,7 +202,7 @@ add_custom_command(TARGET ${PROJECT_NAME}
 
 project(ChucKDesignerCHOP VERSION 0.0.1)
 
-add_library(ChucKDesignerCHOP SHARED
+add_library(ChucKDesignerCHOP MODULE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKDesignerCHOP_plugin.cpp
