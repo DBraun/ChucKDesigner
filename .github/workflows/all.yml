@@ -1,11 +1,7 @@
 name: Compile
 on:
-  pull_request:
-    branches:
-      - main
+  pull_request: {}
   push:
-    branches:
-      - main
     tags:
     - 'v*'
 jobs:
@@ -82,10 +78,16 @@ jobs:
     steps:
       - uses: actions/download-artifact@v2
         with:
-          path: "dist"
+          name: my-artifact-macos
+          path: "dist/macos"
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: my-artifact-windows
+          path: "dist/windows"
 
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "dist/*/*"
+          artifacts: "dist"
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: true
