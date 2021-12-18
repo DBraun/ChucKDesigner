@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <mutex>
+#include <ChucKDesignerShared.h>
+
 // These functions are basic C function, which the DLL loader can find
 // much easier than finding a C++ Class.
 // The DLLEXPORT prefix is needed so the compile exports these functions from the .dll
@@ -23,15 +26,13 @@ extern "C"
 
 		// The opLabel is the text that will show up in the OP Create Dialog
 		info->customOPInfo.opLabel->setString("ChucK Audio");
+		info->customOPInfo.opIcon->setString("CKA");
 
 		// Information about the author of this OP
 		info->customOPInfo.authorName->setString("David Braun");
 		info->customOPInfo.authorEmail->setString("github.com/DBraun");
 
-		// This CHOP can work with 0 inputs
 		info->customOPInfo.minInputs = 0;
-
-		// It can accept up to 1 input though, which changes it's behavior
 		info->customOPInfo.maxInputs = 1;
 	}
 

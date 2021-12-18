@@ -21,35 +21,41 @@
 #include "ChucKDesignerShared.h"
 #include "chuck_globals.h"
 
+#define CHUCKDESIGNERCHOP_BUFFER_SIZE 256
 
-std::string
-ChucKDesignerPlugin::getNodeFullPath() const {
-
-    std::string pluginFullPath(myNodeInfo->opPath);
-
-    return pluginFullPath;
-}
 
 ChucKDesignerPlugin::ChucKDesignerPlugin(const OP_NodeInfo* info) : myNodeInfo(info)
 {
     ChucKDesignerShared::addChuckPluginInstance(this);
 
+    setStderrCallback(
+        [](const char* text) {
+            std::cerr << text << std::endl;
+        }
+    );
+
+    setStdoutCallback(
+        [](const char* text) {
+            std::cout << text << std::endl;
+        }
+    );
+
 	myExecuteCount = 0;
 	myOffset = 0.0;
 }
+
 
 ChucKDesignerPlugin::~ChucKDesignerPlugin()
 {
     ChucKDesignerShared::removeChuckPluginInstance(this);
 
-    int chuckID = 0;
-    //clearChuckInstance(chuckID);
-    //clearGlobals(chuckID);
-    //bool chuckManualAudioCallback(unsigned int chuckID, float* inBuffer, float* outBuffer, unsigned int numFrames, unsigned int inChannels, unsigned int outChannels);
+    clearGlobals(m_chuckID);
+    clearChuckInstance(m_chuckID);
+    cleanupChuckInstance(m_chuckID);
     //cleanRegisteredChucks();
-    //cleanupChuckInstance(chuckID);
 	//ChucK::globalCleanup();
 }
+
 
 void
 ChucKDesignerPlugin::getGeneralInfo(CHOP_GeneralInfo* ginfo, const OP_Inputs* inputs, void* reserved1)
@@ -57,24 +63,27 @@ ChucKDesignerPlugin::getGeneralInfo(CHOP_GeneralInfo* ginfo, const OP_Inputs* in
 	// This will cause the node to cook every frame
 	ginfo->cookEveryFrameIfAsked = true;
 
-	// Note: To disable timeslicing you'll need to turn this off, as well as ensure that
-	// getOutputInfo() returns true, and likely also set the info->numSamples to how many
-	// samples you want to generate for this CHOP. Otherwise it'll take on length of the
-	// input CHOP, which may be timesliced.
-	ginfo->timeslice = true;
+    if (!chuck_instances.count(m_chuckID)) {
+        // No ChucK instance, so don't timeslice.
+        ginfo->timeslice = false;
+    }
+    else {
+        ginfo->timeslice = true;
+    }
 
-	ginfo->inputMatchIndex = 0;
+	//ginfo->inputMatchIndex = 0;
 }
 
 bool
 ChucKDesignerPlugin::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs, void* reserved1)
 {	
-    if (chuck_instances.size() == 0) {
+    if (!chuck_instances.count(m_chuckID)) {
         info->numChannels = 0;
-        return false;
+        info->numSamples = 0;
+        return true;
     }
 
-    auto chuck_inst = chuck_instances[0];
+    auto chuck_inst = chuck_instances[m_chuckID];
     auto vm = chuck_inst->vm();
     info->numChannels = (int) vm->m_num_dac_channels;
     info->sampleRate = std::max(1.f, (float) vm->srate());
@@ -112,7 +121,7 @@ ChucKDesignerPlugin::runChuckCode(unsigned int chuckID, const char* code)
 
     // compile it!
     const std::string argsTogether = string("");
-    bool result = chuck_instances[chuckID]->compileCode(
+    bool result = chuck->compileCode(
         std::string(code), argsTogether);
 
     if (result) {
@@ -128,99 +137,6 @@ ChucKDesignerPlugin::runChuckCode(unsigned int chuckID, const char* code)
 
 
 bool
-ChucKDesignerPlugin::runChuckCodeWithReplacementDac(unsigned int chuckID, const char* code, const char* replacement_dac)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    // replace dac
-    chuck_instances[chuckID]->compiler()->setReplaceDac(TRUE,
-        std::string(replacement_dac));
-
-    // compile it!
-    bool ret = chuck_instances[chuckID]->compileCode(
-        std::string(code), std::string(""));
-
-    // don't replace dac for future compilations
-    chuck_instances[chuckID]->compiler()->setReplaceDac(FALSE, "");
-
-    return ret;
-}
-
-
-bool
-ChucKDesignerPlugin::runChuckFile(unsigned int chuckID, const char* filename)
-{
-    // run with empty args
-    return runChuckFileWithArgs(chuckID, filename, "");
-}
-
-
-bool
-ChucKDesignerPlugin::runChuckFileWithArgs(unsigned int chuckID, const char* filename, const char* args)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    // don't want to replace dac
-    // (a safeguard in case compiler got interrupted while replacing dac)
-    chuck_instances[chuckID]->compiler()->setReplaceDac(FALSE, "");
-
-    // compile it!
-    return chuck_instances[chuckID]->compileFile(
-        std::string(filename), std::string(args)
-    );
-}
-
-
-bool
-ChucKDesignerPlugin::runChuckFileWithReplacementDac(unsigned int chuckID, const char* filename, const char* replacement_dac)
-{
-    // run with empty args
-    return runChuckFileWithArgsWithReplacementDac(
-        chuckID, filename, "", replacement_dac
-    );
-}
-
-
-bool
-ChucKDesignerPlugin::runChuckFileWithArgsWithReplacementDac(unsigned int chuckID, const char* filename, const char* args, const char* replacement_dac)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    // replace dac
-    chuck_instances[chuckID]->compiler()->setReplaceDac(TRUE,
-        std::string(replacement_dac));
-
-    // compile it!
-    bool ret = chuck_instances[chuckID]->compileFile(
-        std::string(filename), std::string(args)
-    );
-
-    // don't replace dac for future compilations
-    chuck_instances[chuckID]->compiler()->setReplaceDac(FALSE, "");
-
-    return ret;
-}
-
-
-bool
-ChucKDesignerPlugin::setChuckInt(unsigned int chuckID, const char* name, t_CKINT val)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->setGlobalInt(name, val);
-}
-
-
-bool
-ChucKDesignerPlugin::getChuckInt(unsigned int chuckID, const char* name, void (*callback)(const char*, t_CKINT))
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->getGlobalInt(name, callback);
-}
-
-
-bool
 ChucKDesignerPlugin::setChuckFloat(unsigned int chuckID, const char* name, t_CKFLOAT val)
 {
     if (chuck_instances.count(chuckID) == 0) { return false; }
@@ -230,276 +146,15 @@ ChucKDesignerPlugin::setChuckFloat(unsigned int chuckID, const char* name, t_CKF
 
 
 bool
-ChucKDesignerPlugin::getChuckFloat(unsigned int chuckID, const char* name, void (*callback)(const char*, t_CKFLOAT))
+ChucKDesignerPlugin::getChuckFloat(const char* name)
 {
-    if (chuck_instances.count(chuckID) == 0) { return false; }
+    if (chuck_instances.count(m_chuckID) == 0) { return false; }
+    Chuck_Globals_Manager* gm = chuck_instances[m_chuckID]->globals();
+    if (gm == NULL) { return false; }
 
-    return chuck_instances[chuckID]->globals()->getGlobalFloat(name, callback);
+    return gm->getGlobalFloat(name, sharedFloatCallback);
 }
 
-
-bool
-ChucKDesignerPlugin::setChuckString(unsigned int chuckID, const char* name, const char* val)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->setGlobalString(name, val);
-}
-
-
-bool
-ChucKDesignerPlugin::getChuckString(unsigned int chuckID, const char* name, void (*callback)(const char*, const char*))
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->getGlobalString(name, callback);
-}
-
-
-bool
-ChucKDesignerPlugin::signalChuckEvent(unsigned int chuckID, const char* name)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->signalGlobalEvent(name);
-}
-
-
-bool
-ChucKDesignerPlugin::broadcastChuckEvent(unsigned int chuckID, const char* name)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->broadcastGlobalEvent(name);
-}
-
-
-bool
-ChucKDesignerPlugin::listenForChuckEventOnce(unsigned int chuckID, const char* name, void (*callback)(const char*))
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->listenForGlobalEvent(
-        name, callback, FALSE);
-}
-
-
-bool
-ChucKDesignerPlugin::startListeningForChuckEvent(unsigned int chuckID, const char* name, void (*callback)(const char*))
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->listenForGlobalEvent(
-        name, callback, TRUE);
-}
-
-
-bool
-ChucKDesignerPlugin::stopListeningForChuckEvent(unsigned int chuckID, const char* name, void (*callback)(const char*))
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->stopListeningForGlobalEvent(
-        name, callback);
-}
-
-
-bool
-ChucKDesignerPlugin::getGlobalUGenSamples(unsigned int chuckID,
-    const char* name, SAMPLE* buffer, int numSamples)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    if (!chuck_instances[chuckID]->globals()->getGlobalUGenSamples(
-        name, buffer, numSamples))
-    {
-        // failed. fill with zeroes.
-        memset(buffer, 0, sizeof(SAMPLE) * numSamples);
-        return false;
-    }
-
-    return true;
-}
-
-
-// int array methods
-bool
-ChucKDesignerPlugin::setGlobalIntArray(unsigned int chuckID,
-    const char* name, t_CKINT arrayValues[], unsigned int numValues)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->setGlobalIntArray(
-        name, arrayValues, numValues);
-}
-
-
-bool
-ChucKDesignerPlugin::getGlobalIntArray(unsigned int chuckID,
-    const char* name, void (*callback)(const char*, t_CKINT[], t_CKUINT))
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->getGlobalIntArray(
-        name, callback);
-}
-
-
-bool
-ChucKDesignerPlugin::setGlobalIntArrayValue(unsigned int chuckID,
-    const char* name, unsigned int index, t_CKINT value)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->setGlobalIntArrayValue(
-        name, index, value);
-}
-
-
-bool
-ChucKDesignerPlugin::getGlobalIntArrayValue(unsigned int chuckID,
-    const char* name, unsigned int index, void (*callback)(const char*, t_CKINT))
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->getGlobalIntArrayValue(
-        name, index, callback);
-}
-
-
-bool
-ChucKDesignerPlugin::setGlobalAssociativeIntArrayValue(
-    unsigned int chuckID, const char* name, char* key, t_CKINT value)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->setGlobalAssociativeIntArrayValue(
-        name, key, value);
-}
-
-
-bool
-ChucKDesignerPlugin::getGlobalAssociativeIntArrayValue(
-    unsigned int chuckID, const char* name, char* key,
-    void (*callback)(const char*, t_CKINT))
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->getGlobalAssociativeIntArrayValue(
-        name, key, callback);
-}
-
-
-// float array methods
-bool
-ChucKDesignerPlugin::setGlobalFloatArray(unsigned int chuckID,
-    const char* name, t_CKFLOAT arrayValues[], unsigned int numValues)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->setGlobalFloatArray(
-        name, arrayValues, numValues);
-}
-
-
-bool
-ChucKDesignerPlugin::getGlobalFloatArray(unsigned int chuckID,
-    const char* name, void (*callback)(const char*, t_CKFLOAT[], t_CKUINT))
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->getGlobalFloatArray(
-        name, callback);
-}
-
-
-bool
-ChucKDesignerPlugin::setGlobalFloatArrayValue(unsigned int chuckID,
-    const char* name, unsigned int index, t_CKFLOAT value)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->setGlobalFloatArrayValue(
-        name, index, value);
-}
-
-
-bool
-ChucKDesignerPlugin::getGlobalFloatArrayValue(unsigned int chuckID,
-    const char* name, unsigned int index, void (*callback)(const char*, t_CKFLOAT))
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->getGlobalFloatArrayValue(
-        name, index, callback);
-}
-
-
-bool
-ChucKDesignerPlugin::setGlobalAssociativeFloatArrayValue(
-    unsigned int chuckID, const char* name, char* key, t_CKFLOAT value)
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->setGlobalAssociativeFloatArrayValue(
-        name, key, value);
-}
-
-
-bool
-ChucKDesignerPlugin::getGlobalAssociativeFloatArrayValue(
-    unsigned int chuckID, const char* name, char* key,
-    void (*callback)(const char*, t_CKFLOAT))
-{
-    if (chuck_instances.count(chuckID) == 0) { return false; }
-
-    return chuck_instances[chuckID]->globals()->getGlobalAssociativeFloatArrayValue(
-        name, key, callback);
-}
-
-
-bool
-ChucKDesignerPlugin::setChoutCallback(unsigned int chuckID, void (*callback)(const char*))
-{
-    return chuck_instances[chuckID]->setChoutCallback(callback);
-}
-
-
-bool
-ChucKDesignerPlugin::setCherrCallback(unsigned int chuckID, void (*callback)(const char*))
-{
-    return chuck_instances[chuckID]->setCherrCallback(callback);
-}
-
-
-bool
-ChucKDesignerPlugin::setStdoutCallback(void (*callback)(const char*))
-{
-    return ChucK::setStdoutCallback(callback);
-}
-
-
-bool
-ChucKDesignerPlugin::setStderrCallback(void (*callback)(const char*))
-{
-    return ChucK::setStderrCallback(callback);
-}
-
-
-bool
-ChucKDesignerPlugin::setDataDir(const char* dir)
-{
-    chuck_global_data_dir = std::string(dir);
-    return true;
-}
-
-
-bool
-ChucKDesignerPlugin::setLogLevel(unsigned int level)
-{
-    EM_setlog(level);
-    return true;
-}
 
 bool
 ChucKDesignerPlugin::initChuckInstance(unsigned int chuckID, unsigned int sampleRate, unsigned int numInChans, unsigned int numOutChans)
@@ -600,7 +255,7 @@ ChucKDesignerPlugin::cleanupChuckInstance(unsigned int chuckID)
         }
 
         // wait a bit
-        usleep(30000);
+        //usleep(30000);
 
         // cleanup this chuck early
         delete chuck;
@@ -611,28 +266,6 @@ ChucKDesignerPlugin::cleanupChuckInstance(unsigned int chuckID)
 }
 
 
-bool
-ChucKDesignerPlugin::chuckManualAudioCallback(unsigned int chuckID, float* inBuffer, float* outBuffer, unsigned int numFrames, unsigned int inChannels, unsigned int outChannels)
-{
-    if (chuck_instances.count(chuckID) > 0)
-    {
-        // zero out the output buffer, in case chuck isn't running
-        for (unsigned int n = 0; n < numFrames * outChannels; n++)
-        {
-            outBuffer[n] = 0;
-        }
-
-        // call callback
-        // TODO: check inChannels, outChannels
-        //chuck_instances[chuckID]->run(inBuffer, outBuffer, numFrames);
-
-    }
-
-    return true;
-}
-
-
-// on launch, reset all ids (necessary when relaunching a lot in unity editor)
 void
 ChucKDesignerPlugin::cleanRegisteredChucks() {
 
@@ -645,7 +278,7 @@ ChucKDesignerPlugin::cleanRegisteredChucks() {
     }
 
     // wait for callbacks to finish their current run
-    usleep(30000);
+    //usleep(30000);
 
     // next, delete chucks
     for (std::map< unsigned int, ChucK* >::iterator it =
@@ -666,6 +299,30 @@ ChucKDesignerPlugin::cleanRegisteredChucks() {
 }
 
 
+bool ChucKDesignerPlugin::setStdoutCallback(void (*callback)(const char*))
+{
+    return ChucK::setStdoutCallback(callback);
+}
+
+
+bool ChucKDesignerPlugin::setStderrCallback(void (*callback)(const char*))
+{
+    return ChucK::setStderrCallback(callback);
+}
+
+bool ChucKDesignerPlugin::setDataDir(const char* dir)
+{
+    chuck_global_data_dir = std::string(dir);
+    return true;
+}
+
+
+bool ChucKDesignerPlugin::setLogLevel(unsigned int level)
+{
+    EM_setlog(level);
+    return true;
+}
+
 bool
 ChucKDesignerPlugin::RegisterChuckData(EffectData::Data* data, const unsigned int id)
 {
@@ -675,16 +332,21 @@ ChucKDesignerPlugin::RegisterChuckData(EffectData::Data* data, const unsigned in
         return false;
     }
 
-    // store id on data; note we might be replacing a non-zero id
-    //  in the case when unity is reusing an audio callback the next time
-    //  the scene is entered.
     data->myId = id;
-
-    // store the data pointer, for validation later.
-    // the chuck associated with id should only work with *this* data.
     data_instances[id] = data;
 
     return true;
+}
+
+void
+ChucKDesignerPlugin::reset() {
+    if (chuck_instances.count(m_chuckID)) {
+        clearGlobals(m_chuckID);
+        clearChuckInstance(m_chuckID);
+        //cleanupChuckInstance(m_chuckID);  // todo: enable this one
+        //cleanRegisteredChucks();
+        m_chuckID++;
+    }
 }
 
 
@@ -696,76 +358,47 @@ ChucKDesignerPlugin::execute(CHOP_Output* output,
 
     mySampleRateRequest = inputs->getParDouble("Samplerate");
 
-    unsigned int numOutChannels = inputs->getParInt("Outchannels");
-    unsigned int numInChannels = 2;
+    int numOutChannels = inputs->getParInt("Outchannels");
+    int numInChannels = 2;
 
 	myExecuteCount++;
 
     if (needCompile) {
 
-        if (chuck_instances.size() == 0) {
+        ChucKDesignerPlugin::reset();
 
-            mySampleRate = mySampleRateRequest;
+        chuck_global_data_dir = inputs->getParString("Workingdirectory");
 
-            inbuffer = new float[mySampleRate / 60. * 600.];
-            outbuffer = new float[mySampleRate / 60. * 60.];
+        mySampleRate = mySampleRateRequest;
 
-            double videoFramesPerSec = 60.;
-            float typicalSamplesPerFrame = mySampleRate / videoFramesPerSec;
-            typicalSamplesPerFrame *= 4.; // quadruple to be safe for dropped frames
-            outbuffer = new float[typicalSamplesPerFrame * numOutChannels];
+        delete[] inbuffer;
+        delete[] outbuffer;
 
-            int chuckID = 0;
+        outbuffer = new float[(int)CHUCKDESIGNERCHOP_BUFFER_SIZE * numOutChannels];
+        inbuffer = new float[(int)CHUCKDESIGNERCHOP_BUFFER_SIZE * numInChannels];
 
-            initChuckInstance(0, mySampleRate, numInChannels, numOutChannels);
-
-//            const char* code = R"V0G0N(
-//
-//SinOsc foo => dac;
-//
-//300. => global float freq => foo.freq;
-//
-//global float otherSineGlobal;
-//
-//SinOsc blackholeSine => blackhole;
-//1. => blackholeSine.freq;
-//
-//while( true )
-//{
-//	freq => foo.freq;
-//
-//    blackholeSine.last() => otherSineGlobal;
-//
-//	10::ms => now;
-//}
-//    )V0G0N";
-//            myStatus = runChuckCode(chuckID, code);
-        }
+        initChuckInstance(m_chuckID, mySampleRate, numInChannels, numOutChannels);
 
         const OP_DATInput* input = inputs->getParDAT("Code");
         const char* code = *(input->cellData);
-        std::cout << "code: " << code << std::endl;
 
-        if (chuck_instances.size()) {
-
-            ChucK* chuck = chuck_instances[0];
-            clearChuckInstance(0);
-            myStatus = runChuckCode(0, code);
+        if (chuck_instances.count(m_chuckID)) {
+            myStatus = runChuckCode(m_chuckID, code);
         }
 
         needCompile = false;
     }
-
-    if (chuck_instances.size())
+ 
+    if (chuck_instances.count(m_chuckID))
     {
-        ChucK* chuck = chuck_instances[0];
+        ChucK* chuck = chuck_instances[m_chuckID];
 
-        const OP_CHOPInput* Infloat_CHOPInput = inputs->getParCHOP("Infloat");
-        if (Infloat_CHOPInput) {
-            for (size_t chanIndex = 0; chanIndex < Infloat_CHOPInput->numChannels; chanIndex++)
+        const OP_CHOPInput* Globalfloat_CHOPInput = inputs->getParCHOP("Globalfloat");
+        if (Globalfloat_CHOPInput) {
+            for (size_t chanIndex = 0; chanIndex < Globalfloat_CHOPInput->numChannels; chanIndex++)
             {
-                const char* chanName = Infloat_CHOPInput->getChannelName(chanIndex);
-                float chanVal = Infloat_CHOPInput->channelData[chanIndex][0];
+                const char* chanName = Globalfloat_CHOPInput->getChannelName(chanIndex);
+                float chanVal = Globalfloat_CHOPInput->channelData[chanIndex][0];
                 auto result = chuck->globals()->setGlobalFloat(chanName, chanVal);
             }
         }
@@ -775,17 +408,35 @@ ChucKDesignerPlugin::execute(CHOP_Output* output,
             return;
         }
 
-        // chuck->run(inbuffer, *output->channels, output->numSamples); // this doesn't work because of interleaved samples.
-        // Chuck returns LRLRLRLR but for touchdesigner we want LLLLRRRR.
-        // Therefore we must use an intermediate buffer
+        int numSamples;
+        auto chopInput = inputs->getInputCHOP(0);
 
-        chuck->run(inbuffer, outbuffer, output->numSamples);
+        for (int i = 0; i < output->numSamples; i += CHUCKDESIGNERCHOP_BUFFER_SIZE) {
 
-        float* ptr = outbuffer;
-        for (int i = 0; i < output->numSamples; i++) {
-            for (int chan = 0; chan < numOutChans; chan++) {
-                output->channels[chan][i] = *ptr++;
+            // chuck->run(inbuffer, *output->channels, output->numSamples); // this doesn't work because of interleaved samples.
+            // Chuck returns LRLRLRLR but for touchdesigner we want LLLLRRRR.
+            // Therefore we must use an intermediate buffer
+            float* inPtr = inbuffer;
+
+            numSamples = min(CHUCKDESIGNERCHOP_BUFFER_SIZE, output->numSamples-i);
+
+            if (chopInput) {
+                for (int samp = i; samp < std::min(chopInput->numSamples, i+ CHUCKDESIGNERCHOP_BUFFER_SIZE); samp++) {
+                    for (int chan = 0; chan < std::min(chopInput->numChannels, numInChannels); chan++) {
+                        *(inPtr++) = chopInput->getChannelData(chan)[samp];
+                    }
+                }
             }
+            float* outPtr = outbuffer;
+
+            chuck->run(inbuffer, outbuffer, numSamples);
+
+            for (int samp = 0; samp < numSamples; samp++) {
+                for (int chan = 0; chan < numOutChans; chan++) {
+                    output->channels[chan][i+samp] = *outPtr++;
+                }
+            }
+
         }
     }
 }
@@ -967,6 +618,18 @@ ChucKDesignerPlugin::setupParameters(OP_ParameterManager* manager, void *reserve
         assert(res == OP_ParAppendResult::Success);
     }
 
+    // Working directory path
+    {
+        OP_NumericParameter	np;
+        OP_StringParameter sp;
+
+        sp.name = "Workingdirectory";
+        sp.label = "Working Directory";
+
+        OP_ParAppendResult res = manager->appendFolder(sp);
+        assert(res == OP_ParAppendResult::Success);
+    }
+
     // pulse
     {
         OP_NumericParameter	np;
@@ -978,12 +641,23 @@ ChucKDesignerPlugin::setupParameters(OP_ParameterManager* manager, void *reserve
         assert(res == OP_ParAppendResult::Success);
     }
 
+    // Reset
+    {
+        OP_NumericParameter	np;
+
+        np.name = "Reset";
+        np.label = "Reset";
+
+        OP_ParAppendResult res = manager->appendPulse(np);
+        assert(res == OP_ParAppendResult::Success);
+    }
+
     // Global In Float CHOP
     {
         OP_StringParameter	sp;
 
-        sp.name = "Infloat";
-        sp.label = "In Float";
+        sp.name = "Globalfloat";
+        sp.label = "Global Float";
 
         sp.defaultValue = "";
 
@@ -999,4 +673,9 @@ ChucKDesignerPlugin::pulsePressed(const char* name, void* reserved1)
 	{
         needCompile = true;
 	}
+
+    if (!strcmp(name, "Reset"))
+    {
+        ChucKDesignerPlugin::reset();
+    }
 }
