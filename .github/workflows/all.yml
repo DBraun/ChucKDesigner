@@ -72,8 +72,8 @@ jobs:
       run: |
         mkdir chuckdesigner_dist
         cp ${{ github.workspace }}/build/Release/libChucKDesignerShared.dylib chuckdesigner_dist
-        cp ${{ github.workspace }}/build/Release/ChucKDesignerCHOP.plugin chuckdesigner_dist
-        cp ${{ github.workspace }}/build/Release/ChucKListenerCHOP.plugin chuckdesigner_dist
+        mv ${{ github.workspace }}/build/Release/ChucKDesignerCHOP.plugin chuckdesigner_dist
+        mv ${{ github.workspace }}/build/Release/ChucKListenerCHOP.plugin chuckdesigner_dist
         zip -r ${{ matrix.os }}.zip chuckdesigner_dist
 
     - name: Upload artifact
