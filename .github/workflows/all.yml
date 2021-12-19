@@ -2,31 +2,19 @@ name: Compile
 on:
   pull_request: {}
   push:
-    branches:
-      - main
+    tags:
+    - '*'
 jobs:
 
   build-windows:
     runs-on: windows-latest
-
     strategy:
       matrix:
-        python-version: [3.9]
-
+        os: [windows-latest]
     steps:
-    # - uses: actions/checkout@v2
-    #   with:
-    #     submodules: true
-
-    # - name: Setup Python ${{ matrix.python-version }}
-    #   uses: actions/setup-python@v2
-    #   with:
-    #     python-version: ${{ matrix.python-version }}
-
-    # - name: Install Python dependencies
-    #   run: |
-    #     python -m pip install --upgrade pip
-    #     pip install requests
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.3
@@ -36,17 +24,28 @@ jobs:
 
     - name: Build Windows (Release)
       run: |
-        mkdir build_release
-        cmake -DCMAKE_BUILD_TYPE=Release -Bbuild_release
-        cd build_release
+        mkdir build
+        cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
+        cd build
         msbuild ChucKDesignerCHOP.sln /property:Configuration=Release
+
+    - name: Make distribution
+      run: |
+        mkdir chuckdesigner_dist
+        move ${{ github.workspace }}/Plugins/ChucK*.dll chuckdesigner_dist
+        tar.exe -c -f ${{ matrix.os }}.zip chuckdesigner_dist
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: my-artifact-${{ matrix.os }}
+        path: ${{ matrix.os }}.zip
 
   build-macos:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.9]
-        os: [macos-10.15]
+        os: [macos-10.15, macos-11]
     steps:
     - uses: actions/checkout@v2
       with:
@@ -55,18 +54,48 @@ jobs:
     - name: Get CMake
       uses: lukka/get-cmake@latest
 
-    - name: Build libsamplerate
+    - name: Some Setup
       run: |
-        cd thirdparty/libsamplerate
-        mkdir build_release
-        cmake -DCMAKE_BUILD_TYPE=Release -Bbuild_release
-        make --directory=build_release
+        cd thirdparty/chuck/src/core
+        bison -dv -b chuck chuck.y
+        flex -ochuck.yy.c chuck.lex
 
     - name: Build MacOS (Release)
-      # the Projucer refers to PYTHONMAJOR
-      env:
-        PYTHONMAJOR: ${{ matrix.python-version }} 
       run: |
-        mkdir build_release
-        cmake -DCMAKE_BUILD_TYPE=Release -Bbuild_release
-        make --directory=build_release
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --config Release
+        ls -r *
+        mv libChucKDesignerCHOP.so ChucKDesignerCHOP.plugin
+        mv libChucKListenerCHOP.so ChucKListenerCHOP.plugin
+
+    - name: Make distribution
+      run: |
+        mkdir chuckdesigner_dist
+        cp ${{ github.workspace }}/build/libChucKDesignerShared.dylib chuckdesigner_dist
+        cp ${{ github.workspace }}/build/ChucKDesignerCHOP.plugin chuckdesigner_dist
+        cp ${{ github.workspace }}/build/ChucKListenerCHOP.plugin chuckdesigner_dist
+        zip -r ${{ matrix.os }}.zip chuckdesigner_dist
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: my-artifact-${{ matrix.os }}
+        path: ${{ matrix.os }}.zip
+
+  create-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    name: "Create Release on GitHub"
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          path: "dist"
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/*/*"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: true

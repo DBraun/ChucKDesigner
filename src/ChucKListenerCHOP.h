@@ -21,11 +21,6 @@
 #include <map>
 #include <mutex>
 
-static std::map<std::string, double> myFloatVars;
-static std::vector<std::string> myFloatVarNames;
-
-static ChucKDesignerPlugin* myChucKDesignerPlugin;
-
 // To get more help about these functions, look at CHOP_CPlusPlusBase.h
 class ChucKListenerCHOP : public CHOP_CPlusPlusBase
 {
@@ -74,11 +69,12 @@ private:
     bool myStatus = false;
     bool needCompile = false;
 
-    float* inbuffer;
-    float* outbuffer;
-
     std::stringstream myError;
     int myNumOutfloat = 0;
     float* myOutfloatValBuffer = nullptr;
     char** myOutfloatNameBuffer = nullptr;
+
+    std::vector<std::string> myFloatVarNames;
+
+    ChucKDesignerPlugin* myChucKDesignerPlugin = nullptr;
 };

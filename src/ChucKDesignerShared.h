@@ -24,17 +24,31 @@
 #include <string>
 #include <mutex>
 
+#ifdef WIN32
+
 #ifdef CHUCKDESIGNERSHARED_EXPORTS
 #define CHUCKDESIGNERSHARED_API __declspec(dllexport)
 #else
 #define CHUCKDESIGNERSHARED_API __declspec(dllimport)
 #endif
 
+#else
+#define CHUCKDESIGNERSHARED_API
+#endif
+
 class ChucKDesignerPlugin;
+
+typedef std::lock_guard<std::mutex> ScopedLock;
+
+void sharedFloatCallback(const char* varName, t_CKFLOAT val);
+static std::map<std::string, double> myFloatVars;
+static mutex plugin_access_mutex;
 
 // thread-safe class for sharing data between CHOPs and TOPs
 class ChucKDesignerShared {
 public:
+	CHUCKDESIGNERSHARED_API static float getFloat(const char* varStr);
+
 	CHUCKDESIGNERSHARED_API static void addChuckPluginInstance(ChucKDesignerPlugin* top);
 	CHUCKDESIGNERSHARED_API static void removeChuckPluginInstance(ChucKDesignerPlugin* top);
 	CHUCKDESIGNERSHARED_API static ChucKDesignerPlugin* getChuckPluginInstance(const std::string& chucKNodeName);
