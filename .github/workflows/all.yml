@@ -67,8 +67,6 @@ jobs:
         cmake .. -DCMAKE_BUILD_TYPE=Release
         cmake --build . --config Release
         ls -r *
-        mv libChucKDesignerCHOP.so ChucKDesignerCHOP.plugin
-        mv libChucKListenerCHOP.so ChucKListenerCHOP.plugin
 
     - name: Make distribution
       run: |

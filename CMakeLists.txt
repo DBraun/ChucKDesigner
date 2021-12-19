@@ -113,6 +113,7 @@ else()
     target_link_libraries(${PROJECT_NAME} PUBLIC "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio" "-framework IOKit" "-framework Carbon" "-framework AppKit" "-framework Foundation")
 endif()
 
+if (MSVC)
 add_custom_command(TARGET ${PROJECT_NAME}
                  POST_BUILD
                  COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -120,6 +121,7 @@ add_custom_command(TARGET ${PROJECT_NAME}
                  ${CMAKE_SOURCE_DIR}/Plugins
                  # "%USERPROFILE%/Documents/Derivative/Plugins"
                  )
+endif()
 
 ###################### ChucKListenerCHOP
 
@@ -135,6 +137,7 @@ add_library(ChucKListenerCHOP MODULE
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/GL_Extensions.h
     )
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
+set_target_properties(${PROJECT_NAME} PROPERTIES BUNDLE true BUNDLE_EXTENSION "plugin")
 
 # Include header directories
 target_include_directories(ChucKListenerCHOP PUBLIC
@@ -183,6 +186,7 @@ else()
     target_link_libraries(${PROJECT_NAME} PUBLIC "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
 endif()
 
+if(MSVC)
 add_custom_command(TARGET ${PROJECT_NAME}
                  POST_BUILD
                  COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -190,6 +194,7 @@ add_custom_command(TARGET ${PROJECT_NAME}
                  ${CMAKE_SOURCE_DIR}/Plugins
                  # "%USERPROFILE%/Documents/Derivative/Plugins"
                  )
+endif()
 
 ###################### ChucKDesignerCHOP
 
@@ -204,6 +209,7 @@ add_library(ChucKDesignerCHOP MODULE
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/GL_Extensions.h
     )
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
+set_target_properties(${PROJECT_NAME} PROPERTIES BUNDLE true BUNDLE_EXTENSION "plugin")
 
 # Include header directories
 target_include_directories(ChucKDesignerCHOP PUBLIC
@@ -252,6 +258,7 @@ else()
     target_link_libraries(${PROJECT_NAME} PUBLIC "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
 endif()
 
+if(MSVC)
 add_custom_command(TARGET ${PROJECT_NAME}
                  POST_BUILD
                  COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -259,6 +266,7 @@ add_custom_command(TARGET ${PROJECT_NAME}
                  ${CMAKE_SOURCE_DIR}/Plugins
                  # "%USERPROFILE%/Documents/Derivative/Plugins"
                  )
+endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
                       VS_DEBUGGER_COMMAND "C:\\Program Files\\Derivative\\TouchDesigner\\bin\\TouchDesigner.exe"
