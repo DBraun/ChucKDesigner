@@ -64,16 +64,16 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --config Release
+        cmake .. -G "Xcode"
+        xcodebuild -configuration Release -project ChucKDesignerCHOP.xcodeproj
         ls -r *
 
     - name: Make distribution
       run: |
         mkdir chuckdesigner_dist
-        cp ${{ github.workspace }}/build/libChucKDesignerShared.dylib chuckdesigner_dist
-        cp ${{ github.workspace }}/build/ChucKDesignerCHOP.plugin chuckdesigner_dist
-        cp ${{ github.workspace }}/build/ChucKListenerCHOP.plugin chuckdesigner_dist
+        cp ${{ github.workspace }}/build/Release/libChucKDesignerShared.dylib chuckdesigner_dist
+        cp ${{ github.workspace }}/build/Release/ChucKDesignerCHOP.plugin chuckdesigner_dist
+        cp ${{ github.workspace }}/build/Release/ChucKListenerCHOP.plugin chuckdesigner_dist
         zip -r ${{ matrix.os }}.zip chuckdesigner_dist
 
     - name: Upload artifact
