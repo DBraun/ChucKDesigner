@@ -13,7 +13,7 @@
 */
 
 #include "ChucKListenerCHOP.h"
-#include "ChucKDesignerShared.h"
+#include "Plugin_ChucK.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -170,42 +170,28 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 		return;
 	}
 
-	ScopedLock lock(plugin_access_mutex);
-    const OP_CHOPInput* pluginCHOP = inputs->getParCHOP("Chuck");
+    const OP_CHOPInput* chuckDesignerCHOP = inputs->getParCHOP("Chuck");
 
-	if (!pluginCHOP) {
+	if (!chuckDesignerCHOP) {
 		myStatus = false;
 		myError << "Please select a ChucK instance.";
 		return;
 	}
 
-	std::string pluginFullPath(pluginCHOP->opPath);
-
-	myChucKDesignerPlugin = ChucKDesignerShared::getChuckPluginInstance(pluginFullPath);
-
-    if (!myChucKDesignerPlugin)
-    {
-        myStatus = false;
-        myError << "Unable to get instance.";
-        return;
-    }
-
-	int i = 0;
+	int chuck_id = ChucK_For_TouchDesigner::getChucKIDForOpID(chuckDesignerCHOP->opId);
 
 	for (const std::string varName : myFloatVarNames) {
 
-		i += 1;
-
-		myChucKDesignerPlugin->getChuckFloat(varName.c_str());
+		ChucK_For_TouchDesigner::getNamedChuckFloat(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedFloatCallback);
 	}
 
-	i = 0;
+	int i = 0;
 	for (const std::string varName : myFloatVarNames)
 	{
 		if (i >= output->numChannels) {
 			break;
 		}
-		output->channels[i][0] = ChucKDesignerShared::getFloat(varName.c_str());
+		output->channels[i][0] = ChucK_For_TouchDesigner::getFloat(varName.c_str());
 		i += 1;
 	}
 }
@@ -222,7 +208,7 @@ ChucKListenerCHOP::getNumInfoCHOPChans(void * reserved1)
 {
 	// We return the number of channel we want to output to any Info CHOP
 	// connected to the CHOP. In this example we are just going to send one channel.
-	return 2 + myNumOutfloat;
+	return 2;
 }
 
 void
@@ -244,16 +230,6 @@ ChucKListenerCHOP::getInfoCHOPChan(int32_t index,
 		chan->name->setString("offset");
 		chan->value = (float)myOffset;
 	}
-
-    else {
-
-        index -= 2;
-
-        if (index < myNumOutfloat) {
-            chan->name->setString(myOutfloatNameBuffer[index]);
-            chan->value = myOutfloatValBuffer[index];
-        }
-    }
 }
 
 bool		

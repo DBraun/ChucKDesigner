@@ -20,21 +20,6 @@
 #include <functional>
 #include <map>
 
-/*
-
-This example file implements a class that does 2 different things depending on
-if a CHOP is connected to the CPlusPlus CHOPs input or not.
-The example is timesliced, which is the more complex way of working.
-
-If an input is connected the node will output the same number of channels as the
-input and divide the first 'N' samples in the input channel by 2. 'N' being the current
-timeslice size. This is noteworthy because if the input isn't changing then the output
-will look wierd since depending on the timeslice size some number of the first samples
-of the input will get used.
-
-If no input is connected then the node will output a smooth sine wave at 120hz.
-*/
-
 #ifdef WIN32
 
 #ifdef CHUCKDESIGNERSHARED_EXPORTS
@@ -69,11 +54,11 @@ struct EffectData
 };
 
 // To get more help about these functions, look at CHOP_CPlusPlusBase.h
-class ChucKDesignerPlugin : public CHOP_CPlusPlusBase
+class ChucKDesignerCHOP : public CHOP_CPlusPlusBase
 {
 public:
-    CHUCKDESIGNERSHARED_API ChucKDesignerPlugin(const OP_NodeInfo* info);
-	virtual ~ChucKDesignerPlugin();
+    CHUCKDESIGNERSHARED_API ChucKDesignerCHOP(const OP_NodeInfo* info);
+	virtual ~ChucKDesignerCHOP();
 
 	virtual void		getGeneralInfo(CHOP_GeneralInfo*, const OP_Inputs*, void* ) override;
 	virtual bool		getOutputInfo(CHOP_OutputInfo*, const OP_Inputs*, void*) override;
@@ -107,33 +92,6 @@ public:
         return pluginFullPath;
     }
 
-    bool runChuckCode(unsigned int chuckID, const char* code);
-    bool runChuckCodeWithReplacementDac(unsigned int chuckID, const char* code, const char* replacement_dac);
-    bool runChuckFile(unsigned int chuckID, const char* filename);
-    bool runChuckFileWithReplacementDac(unsigned int chuckID, const char* filename, const char* replacement_dac);
-
-    bool setChuckInt(unsigned int chuckID, const char* name, t_CKINT val);
-    bool getChuckInt(unsigned int chuckID, const char* name, void (*callback)(const char*, t_CKINT));
-
-    bool setChuckFloat(unsigned int chuckID, const char* name, t_CKFLOAT val);
-    CHUCKDESIGNERSHARED_API bool getChuckFloat(const char* name);
-
-    bool initChuckInstance(unsigned int chuckID, unsigned int sampleRate, unsigned int numInChans, unsigned int numOutChans);
-    bool clearChuckInstance(unsigned int chuckID);
-    bool clearGlobals(unsigned int chuckID);
-    bool cleanupChuckInstance(unsigned int chuckID);
-    void cleanRegisteredChucks();
-
-    bool setChoutCallback(unsigned int chuckID, void (*callback)(const char*));
-    bool setCherrCallback(unsigned int chuckID, void (*callback)(const char*));
-    bool setStdoutCallback(void (*callback)(const char*));
-    bool setStderrCallback(void (*callback)(const char*));
-
-    bool setDataDir(const char* dir);
-
-    bool setLogLevel(unsigned int level);
-
-    bool RegisterChuckData(EffectData::Data* data, const unsigned int id);
 
 private:
 
@@ -148,19 +106,13 @@ private:
 
 	void reset();
 
-	double				myOffset;
-    double mySampleRate = 0;
-    double mySampleRateRequest = 0;
-
-	std::map< unsigned int, ChucK* > chuck_instances;
-	std::map< unsigned int, EffectData::Data* > data_instances;
-	std::string chuck_global_data_dir;
+	double myOffset;
 
     bool myStatus = false;
     bool needCompile = false;
 
-    float* inbuffer = new float[1];
-    float* outbuffer = new float[1];
+    float* inChucKBuffer = new float[1];
+    float* outChucKBuffer = new float[1];
 
     std::stringstream myError;
 

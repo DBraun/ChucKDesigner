@@ -42,15 +42,13 @@ endif()
 
 message("CK_SOURCES: " ${CK_SOURCES})
 
+file(GLOB TOUCHDESIGNER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/*)
+
 add_library(ChucKDesignerShared SHARED
     ${CK_SOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CHOP_CPlusPlusBase.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CPlusPlus_Common.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/GL_Extensions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Plugin_ChucK.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Plugin_ChucK.cpp
+    ${TOUCHDESIGNER_SOURCES}
     )
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 
@@ -130,11 +128,7 @@ project(ChucKListenerCHOP VERSION 0.0.1)
 add_library(ChucKListenerCHOP MODULE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKListenerCHOP.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKListenerCHOP.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CHOP_CPlusPlusBase.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CPlusPlus_Common.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/GL_Extensions.h
+    ${TOUCHDESIGNER_SOURCES}
     )
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 set_target_properties(${PROJECT_NAME} PROPERTIES BUNDLE true BUNDLE_EXTENSION "plugin")
@@ -201,12 +195,9 @@ endif()
 project(ChucKDesignerCHOP VERSION 0.0.1)
 
 add_library(ChucKDesignerCHOP MODULE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerPlugin.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerShared.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKDesignerCHOP_plugin.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CHOP_CPlusPlusBase.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/CPlusPlus_Common.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/GL_Extensions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerCHOP.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKDesignerCHOP.cpp
+    ${TOUCHDESIGNER_SOURCES}
     )
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 set_target_properties(${PROJECT_NAME} PROPERTIES BUNDLE true BUNDLE_EXTENSION "plugin")

@@ -15,7 +15,6 @@
 #pragma once
 #include "CHOP_CPlusPlusBase.h"
 #include "chuck.h"
-#include "ChucKDesignerPlugin.h"
 
 #include <functional>
 #include <map>
@@ -67,14 +66,7 @@ private:
     double				myOffset;
 
     bool myStatus = false;
-    bool needCompile = false;
 
     std::stringstream myError;
-    int myNumOutfloat = 0;
-    float* myOutfloatValBuffer = nullptr;
-    char** myOutfloatNameBuffer = nullptr;
-
     std::vector<std::string> myFloatVarNames;
-
-    ChucKDesignerPlugin* myChucKDesignerPlugin = nullptr;
 };
