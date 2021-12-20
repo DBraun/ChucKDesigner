@@ -762,7 +762,7 @@ namespace ChucK_For_TouchDesigner
     }
 
 
-    CHUCKDESIGNERSHARED_API bool processBuffers(unsigned int chuckID, const float** inBuffer, int inBufferNumChannels, int inBufferNumSamples, float* inChucKBuffer, float* outChucKBuffer, float** outBuffer, int numOutSamples, int numOutChannels) {
+    CHUCKDESIGNERSHARED_API bool processBlock(unsigned int chuckID, const float** inBuffer, int inBufferNumChannels, int inBufferNumSamples, float* inChucKBuffer, float* outChucKBuffer, float** outBuffer, int numOutSamples, int numOutChannels) {
 
         if (chuck_instances.count(chuckID) == 0) {
             return false;

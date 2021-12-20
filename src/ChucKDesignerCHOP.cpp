@@ -137,9 +137,6 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
 							  const OP_Inputs* inputs,
 							  void* reserved)
 {
-    int numOutChannels = inputs->getParInt("Outchannels");
-    int numInChannels = 2; // todo
-
 	myExecuteCount++;
 
     if (needCompile) {
@@ -153,12 +150,15 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
         delete[] inChucKBuffer;
         delete[] outChucKBuffer;
 
-        inChucKBuffer = new float[(int)CHUCKDESIGNERCHOP_BUFFER_SIZE * numInChannels];
-        outChucKBuffer = new float[(int)CHUCKDESIGNERCHOP_BUFFER_SIZE * numOutChannels];
+        m_inChannels = inputs->getParInt("Inchannels");
+        m_outChannels = inputs->getParInt("Outchannels");
+
+        inChucKBuffer = new float[CHUCKDESIGNERCHOP_BUFFER_SIZE * m_inChannels];
+        outChucKBuffer = new float[CHUCKDESIGNERCHOP_BUFFER_SIZE * m_outChannels];
 
         m_chuckID = ChucK_For_TouchDesigner::getNextValidID(myNodeInfo->opId);
 
-        ChucK_For_TouchDesigner::initChuckInstance(m_chuckID, sample_rate, numInChannels, numOutChannels, globalDir);
+        ChucK_For_TouchDesigner::initChuckInstance(m_chuckID, sample_rate, m_inChannels, m_outChannels, globalDir);
 
         const OP_DATInput* input = inputs->getParDAT("Code");
         const char* code = *(input->cellData);
@@ -196,7 +196,7 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
         inBufferNumSamples = chopInput->numSamples;
     }
     
-    ChucK_For_TouchDesigner::processBuffers(m_chuckID, inBuffer, inBufferNumChannels, inBufferNumSamples, inChucKBuffer, outChucKBuffer, output->channels, output->numSamples, output->numChannels);
+    ChucK_For_TouchDesigner::processBlock(m_chuckID, inBuffer, inBufferNumChannels, inBufferNumSamples, inChucKBuffer, outChucKBuffer, output->channels, output->numSamples, output->numChannels);
 
 }
 
@@ -310,6 +310,22 @@ ChucKDesignerCHOP::setupParameters(OP_ParameterManager* manager, void *reserved1
     	assert(res == OP_ParAppendResult::Success);
     }
 
+    // Num in channels
+    {
+        OP_NumericParameter	np;
+
+        np.name = "Inchannels";
+        np.label = "In Channels";
+        np.defaultValues[0] = 2;
+        np.minSliders[0] = 2;
+        np.maxSliders[0] = 2;
+        np.minValues[0] = 0;
+        np.clampMins[0] = true;
+
+        OP_ParAppendResult res = manager->appendInt(np);
+        assert(res == OP_ParAppendResult::Success);
+    }
+
     // Num out channels
     {
         OP_NumericParameter	np;
@@ -317,8 +333,8 @@ ChucKDesignerCHOP::setupParameters(OP_ParameterManager* manager, void *reserved1
         np.name = "Outchannels";
         np.label = "Out Channels";
         np.defaultValues[0] = 2;
-        np.minSliders[0] = 1;
-        np.maxSliders[0] = 16;
+        np.minSliders[0] = 2;
+        np.maxSliders[0] = 2;
         np.minValues[0] = 0;
         np.clampMins[0] = true;
 

@@ -110,7 +110,7 @@ extern "C" {
 
         CHUCKDESIGNERSHARED_API bool getInstanceInfo(unsigned int chuckID, int& numChannels, int& numSamples, float& sampleRate);
 
-        CHUCKDESIGNERSHARED_API bool processBuffers(unsigned int chuckID, const float** inBuffer, int inBufferNumChannels, int inBufferNumSamples, float* inChucKBuffer, float* outChucKBuffer, float** outBuffer, int numOutSamples, int numOutChannels);
+        CHUCKDESIGNERSHARED_API bool processBlock(unsigned int chuckID, const float** inBuffer, int inBufferNumChannels, int inBufferNumSamples, float* inChucKBuffer, float* outChucKBuffer, float** outBuffer, int numOutSamples, int numOutChannels);
         CHUCKDESIGNERSHARED_API float getFloat(const char* varStr);
 
         CHUCKDESIGNERSHARED_API void sharedFloatCallback(const char* varName, t_CKFLOAT val);

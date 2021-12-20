@@ -117,5 +117,7 @@ private:
     std::stringstream myError;
 
     int m_chuckID = 0;
+	int m_inChannels = 0;
+	int m_outChannels = 0;
 
 };
