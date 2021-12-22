@@ -20,44 +20,11 @@
 #include <functional>
 #include <map>
 
-#ifdef WIN32
-
-#ifdef CHUCKDESIGNERSHARED_EXPORTS
-#define CHUCKDESIGNERSHARED_API __declspec(dllexport)
-#else
-#define CHUCKDESIGNERSHARED_API __declspec(dllimport)
-#endif
-
-#else
-#define CHUCKDESIGNERSHARED_API
-#endif
-
-enum Param
-{
-	P_CHUCKID,
-	P_NUM
-};
-
-struct EffectData
-{
-	struct Data
-	{
-		float p[P_NUM];
-		t_CKINT myId;
-		bool initialized;
-	};
-	union
-	{
-		Data data;
-		unsigned char pad[(sizeof(Data) + 15) & ~15]; // This entire structure must be a multiple of 16 bytes (and and instance 16 byte aligned) for PS3 SPU DMA requirements
-	};
-};
-
 // To get more help about these functions, look at CHOP_CPlusPlusBase.h
 class ChucKDesignerCHOP : public CHOP_CPlusPlusBase
 {
 public:
-    CHUCKDESIGNERSHARED_API ChucKDesignerCHOP(const OP_NodeInfo* info);
+    ChucKDesignerCHOP(const OP_NodeInfo* info);
 	virtual ~ChucKDesignerCHOP();
 
 	virtual void		getGeneralInfo(CHOP_GeneralInfo*, const OP_Inputs*, void* ) override;
@@ -85,14 +52,6 @@ public:
 
     virtual void getErrorString(OP_String* error, void* reserved1);
 
-    std::string getNodeFullPath() const {
-
-        std::string pluginFullPath(myNodeInfo->opPath);
-
-        return pluginFullPath;
-    }
-
-
 private:
 
 	// We don't need to store this pointer, but we do for the example.
@@ -106,8 +65,6 @@ private:
 
 	void reset();
 
-	double myOffset;
-
     bool myStatus = false;
     bool needCompile = false;
 
@@ -119,5 +76,4 @@ private:
     int m_chuckID = 0;
 	int m_inChannels = 0;
 	int m_outChannels = 0;
-
 };

@@ -45,7 +45,6 @@ namespace ChucK_For_TouchDesigner
 
     std::map< unsigned int, ChucK* > chuck_instances;
     std::map< unsigned int, EffectData::Data* > data_instances;
-    std::string chuck_global_data_dir;
     unsigned int _nextValidID = 0;
     std::map< unsigned int, unsigned int> op_ids_to_chuck_ids;
     static std::map<std::string, double> myFloatVars;
@@ -712,14 +711,6 @@ namespace ChucK_For_TouchDesigner
         return ChucK::setStderrCallback(callback);
     }
 
-
-    CHUCKDESIGNERSHARED_API bool setDataDir(const char* dir)
-    {
-        chuck_global_data_dir = std::string(dir);
-        return true;
-    }
-
-
     CHUCKDESIGNERSHARED_API bool setLogLevel(unsigned int level)
     {
         EM_setlog(level);
@@ -812,6 +803,7 @@ namespace ChucK_For_TouchDesigner
     CHUCKDESIGNERSHARED_API void sharedFloatCallback(const char* varName, t_CKFLOAT val) {
         myFloatVars[varName] = val;
     }
+
 
     CHUCKDESIGNERSHARED_API float getFloat(const char* varName) {
         if (myFloatVars.find(varName) != myFloatVars.end()) {

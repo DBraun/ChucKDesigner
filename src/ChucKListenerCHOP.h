@@ -63,8 +63,6 @@ private:
     // function is called, then passes back to the CHOP 
     int32_t				myExecuteCount;
 
-    double				myOffset;
-
     bool myStatus = false;
 
     std::stringstream myError;

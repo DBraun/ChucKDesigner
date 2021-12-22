@@ -87,7 +87,6 @@ ChucKDesignerCHOP::ChucKDesignerCHOP(const OP_NodeInfo* info) : myNodeInfo(info)
     );
 
 	myExecuteCount = 0;
-	myOffset = 0.0;
 }
 
 
@@ -213,7 +212,7 @@ ChucKDesignerCHOP::getNumInfoCHOPChans(void * reserved1)
 {
 	// We return the number of channel we want to output to any Info CHOP
 	// connected to the CHOP. In this example we are just going to send one channel.
-	return 3;
+	return 2;
 }
 
 void
@@ -230,23 +229,17 @@ ChucKDesignerCHOP::getInfoCHOPChan(int32_t index,
 		chan->value = (float)myExecuteCount;
 	}
 
-	else if (index == 1)
-	{
-		chan->name->setString("offset");
-		chan->value = (float)myOffset;
-	}
-
-    else if (index == 2)
+    else if (index == 1)
     {
         chan->name->setString("chuck_id");
-        chan->value = m_chuckID;
+        chan->value = (float)m_chuckID;
     }
 }
 
 bool		
 ChucKDesignerCHOP::getInfoDATSize(OP_InfoDATSize* infoSize, void* reserved1)
 {
-	infoSize->rows = 2;
+	infoSize->rows = 1;
 	infoSize->cols = 2;
 	// Setting this to false means we'll be assigning values to the table
 	// one row at a time. True means we'll do it one column at a time.
@@ -274,20 +267,6 @@ ChucKDesignerCHOP::getInfoDATEntries(int32_t index,
         snprintf(tempBuffer, sizeof(tempBuffer), "%d", myExecuteCount);
 #endif
 		entries->values[1]->setString(tempBuffer);
-	}
-
-	if (index == 1)
-	{
-		// Set the value for the first column
-		entries->values[0]->setString("offset");
-
-		// Set the value for the second column
-#ifdef _WIN32
-        sprintf_s(tempBuffer, "%g", myOffset);
-#else // macOS
-        snprintf(tempBuffer, sizeof(tempBuffer), "%g", myOffset);
-#endif
-		entries->values[1]->setString( tempBuffer);
 	}
 }
 

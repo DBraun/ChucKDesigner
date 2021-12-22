@@ -100,8 +100,6 @@ extern "C" {
         CHUCKDESIGNERSHARED_API bool setStdoutCallback(void (*callback)(const char*));
         CHUCKDESIGNERSHARED_API bool setStderrCallback(void (*callback)(const char*));
 
-        CHUCKDESIGNERSHARED_API bool setDataDir(const char* dir);
-
         CHUCKDESIGNERSHARED_API bool setLogLevel(unsigned int level);
 
         CHUCKDESIGNERSHARED_API unsigned int getNextValidID(uint32_t opID);
