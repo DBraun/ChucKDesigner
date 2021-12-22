@@ -33,13 +33,13 @@ jobs:
       run: |
         mkdir chuckdesigner_dist
         move ${{ github.workspace }}/Plugins/ChucK*.dll chuckdesigner_dist
-        tar.exe -c -f ${{ matrix.os }}.zip chuckdesigner_dist
+        tar.exe -c -f ChucKDesigner-${{ matrix.os }}.zip chuckdesigner_dist
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: my-artifact-${{ matrix.os }}
-        path: ${{ matrix.os }}.zip
+        path: ChucKDesigner-${{ matrix.os }}.zip
 
   build-macos:
     runs-on: ${{ matrix.os }}
@@ -64,7 +64,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -G "Xcode"
+        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=x86_64
         xcodebuild -configuration Release -project ChucKDesignerCHOP.xcodeproj
         ls -r *
 
@@ -74,13 +74,13 @@ jobs:
         cp ${{ github.workspace }}/build/Release/libChucKDesignerShared.dylib chuckdesigner_dist
         mv ${{ github.workspace }}/build/Release/ChucKDesignerCHOP.plugin chuckdesigner_dist
         mv ${{ github.workspace }}/build/Release/ChucKListenerCHOP.plugin chuckdesigner_dist
-        zip -r ${{ matrix.os }}.zip chuckdesigner_dist
+        zip -r ChucKDesigner-${{ matrix.os }}.zip chuckdesigner_dist
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: my-artifact-${{ matrix.os }}
-        path: ${{ matrix.os }}.zip
+        path: ChucKDesigner-${{ matrix.os }}.zip
 
   create-release:
     if: startsWith(github.ref, 'refs/tags/v')
