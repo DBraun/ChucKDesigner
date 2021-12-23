@@ -10,6 +10,10 @@ ChucKDesigner is an integration of the ChucK music/audio programming language wi
 
 Please use the [issues](https://github.com/DBraun/ChucKDesigner/issues) and [discussions](https://github.com/DBraun/ChucKDesigner/discussions) pages on GitHub.
 
+Demo:
+
+[![Demo Video Screenshot](https://img.youtube.com/vi/TmJQh1lWXso/0.jpg)](https://www.youtube.com/watch?v=TmJQh1lWXso "ChucKDesigner - Music Programming in TouchDesigner")
+
 ## Installation
 
 ### ChucK
