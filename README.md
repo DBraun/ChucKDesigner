@@ -22,7 +22,15 @@ Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKD
 
 ### MacOS
 
-Download and unzip the latest macOS [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.plugin` and `.dylib` files to this project's `Plugins` folder or `~/Library/Application Support/Derivative/TouchDesigner099/Plugins`.
+Due to some difficulties with codesigning, for the moment you must compile ChucKDesigner on your own computer.
+
+1. Install Xcode.
+2. [Install CMake](https://cmake.org/download/) and confirm that it's installed by running `cmake --version` in Terminal.
+3. Find your Development Profile. Open Keychain Access, go to 'login' on the left, and look for something like `Apple Development: example@example.com (ABCDE12345)`. Then in Terminal, run `export CODESIGN_IDENTITY="Apple Development: example@example.com (ABCDE12345)"` with your own info substituted.
+4. In the same Terminal window, navigate to the root of this repository and run `sh build_macos.sh`
+5. Open `ChucKDesigner.toe`
+
+<!-- Download and unzip the latest macOS [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.plugin` and `.dylib` files to this project's `Plugins` folder or `~/Library/Application Support/Derivative/TouchDesigner099/Plugins`. -->
 
 ## The Future
 
