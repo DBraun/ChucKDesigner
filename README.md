@@ -26,7 +26,7 @@ Due to some difficulties with codesigning, for the moment you must compile ChucK
 
 1. Install Xcode.
 2. [Install CMake](https://cmake.org/download/) and confirm that it's installed by running `cmake --version` in Terminal.
-3. Find your Development Profile. Open Keychain Access, go to 'login' on the left, and look for something like `Apple Development: example@example.com (ABCDE12345)`. Then in Terminal, run `export CODESIGN_IDENTITY="Apple Development: example@example.com (ABCDE12345)"` with your own info substituted.
+3. Find your Development Profile. Open Keychain Access, go to 'login' on the left, and look for something like `Apple Development: example@example.com (ABCDE12345)`. Then in Terminal, run `export CODESIGN_IDENTITY="Apple Development: example@example.com (ABCDE12345)"` with your own info substituted. If you weren't able to find your profile, you need to create one. Open Xcode, go to "Accounts", add your Apple ID, click "Manage Certificates", and use the plus icon to add a profile. Then check Keychain Access again.
 4. In the same Terminal window, navigate to the root of this repository and run `sh build_macos.sh`
 5. Open `ChucKDesigner.toe`
 
