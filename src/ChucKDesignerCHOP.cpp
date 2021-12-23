@@ -125,11 +125,12 @@ ChucKDesignerCHOP::getChannelName(int32_t index, OP_String *name, const OP_Input
 
 void
 ChucKDesignerCHOP::reset() {
-    ChucK_For_TouchDesigner::cleanupChuckInstance(m_chuckID, myNodeInfo->opId);
     ChucK_For_TouchDesigner::clearGlobals(m_chuckID);
     ChucK_For_TouchDesigner::clearChuckInstance(m_chuckID);
-}
+    ChucK_For_TouchDesigner::cleanupChuckInstance(m_chuckID, myNodeInfo->opId);
 
+    m_chuckID = ChucK_For_TouchDesigner::getNextValidID(myNodeInfo->opId);
+}
 
 void
 ChucKDesignerCHOP::execute(CHOP_Output* output,
@@ -139,8 +140,6 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
 	myExecuteCount++;
 
     if (needCompile) {
-
-        reset();
 
         string globalDir = inputs->getParString("Workingdirectory");
 
@@ -155,7 +154,7 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
         inChucKBuffer = new float[CHUCKDESIGNERCHOP_BUFFER_SIZE * m_inChannels];
         outChucKBuffer = new float[CHUCKDESIGNERCHOP_BUFFER_SIZE * m_outChannels];
 
-        m_chuckID = ChucK_For_TouchDesigner::getNextValidID(myNodeInfo->opId);
+        //m_chuckID = ChucK_For_TouchDesigner::getNextValidID(myNodeInfo->opId);
 
         ChucK_For_TouchDesigner::initChuckInstance(m_chuckID, sample_rate, m_inChannels, m_outChannels, globalDir);
 
@@ -394,8 +393,18 @@ ChucKDesignerCHOP::setupParameters(OP_ParameterManager* manager, void *reserved1
     {
         OP_NumericParameter	np;
 
-        np.name = "Compile";
-        np.label = "Compile";
+        np.name = "Addchuckcode";
+        np.label = "Add ChucK Code";
+
+        OP_ParAppendResult res = manager->appendPulse(np);
+        assert(res == OP_ParAppendResult::Success);
+    }
+
+    {
+        OP_NumericParameter	np;
+
+        np.name = "Replacechuckcode";
+        np.label = "Replace ChucK Code";
 
         OP_ParAppendResult res = manager->appendPulse(np);
         assert(res == OP_ParAppendResult::Success);
@@ -429,10 +438,16 @@ ChucKDesignerCHOP::setupParameters(OP_ParameterManager* manager, void *reserved1
 void 
 ChucKDesignerCHOP::pulsePressed(const char* name, void* reserved1)
 {
-	if (!strcmp(name, "Compile"))
+	if (!strcmp(name, "Addchuckcode"))
 	{
         needCompile = true;
 	}
+
+    if (!strcmp(name, "Replacechuckcode"))
+    {
+        ChucKDesignerCHOP::reset();
+        needCompile = true;
+    }
 
     if (!strcmp(name, "Reset"))
     {
