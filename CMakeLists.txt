@@ -40,8 +40,6 @@ else()
     list(APPEND CK_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/chuck.yy.c")
 endif()
 
-message("CK_SOURCES: " ${CK_SOURCES})
-
 file(GLOB TOUCHDESIGNER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/*)
 
 add_library(ChucKDesignerShared SHARED
@@ -134,13 +132,15 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 set_target_properties(${PROJECT_NAME} PROPERTIES
     BUNDLE true
     BUNDLE_EXTENSION "plugin"
-    MACOSX_BUNDLE_GUI_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
+    # PRODUCT_BUNDLE_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
+    # MACOSX_BUNDLE_GUI_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
     MACOSX_BUNDLE_INFO_STRING ${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
     MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
     MACOSX_BUNDLE_COPYRIGHT "David Braun"
-    # MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/src/Info.plist
+    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/src/Info.plist
+    XCODE_ATTRIBUTE_FRAMEWORK_SEARCH_PATHS "/System/Library/PrivateFrameworks /Library/Frameworks"
     )
 
 # Include header directories
@@ -151,6 +151,9 @@ target_include_directories(ChucKListenerCHOP PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner>
     $<INSTALL_INTERFACE:ChucKListenerCHOP>
     )
+
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
+target_link_libraries(${PROJECT_NAME} PUBLIC Python::Python)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ChucKDesignerShared)
 
@@ -205,7 +208,7 @@ endif()
 project(ChucKDesignerCHOP VERSION 0.0.1)
 
 add_library(ChucKDesignerCHOP MODULE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChuckDesignerCHOP.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKDesignerCHOP.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKDesignerCHOP.cpp
     ${TOUCHDESIGNER_SOURCES}
     )
@@ -213,13 +216,15 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 set_target_properties(${PROJECT_NAME} PROPERTIES
     BUNDLE true
     BUNDLE_EXTENSION "plugin"
-    MACOSX_BUNDLE_GUI_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
+    # PRODUCT_BUNDLE_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
+    # MACOSX_BUNDLE_GUI_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
     MACOSX_BUNDLE_INFO_STRING ${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
     MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
     MACOSX_BUNDLE_COPYRIGHT "David Braun"
-    # MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/src/Info.plist
+    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/src/Info.plist
+    XCODE_ATTRIBUTE_FRAMEWORK_SEARCH_PATHS "/System/Library/PrivateFrameworks /Library/Frameworks"
     )
 
 # Include header directories
@@ -230,6 +235,9 @@ target_include_directories(ChucKDesignerCHOP PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner>
     $<INSTALL_INTERFACE:ChucKDesignerCHOP>
     )
+
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
+target_link_libraries(${PROJECT_NAME} PUBLIC Python::Python)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ChucKDesignerShared)
 

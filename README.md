@@ -20,6 +20,10 @@ Demo:
 
 [Downloading ChucK](https://chuck.stanford.edu/release/) is optional but highly encouraged! Use miniAudicle and the examples that come with the installation to learn ChucK. More educational resources are available from the [ChucK homepage](https://chuck.stanford.edu/).
 
+### Python
+
+Install Python 3.9. It is necessary because ChucKDesigner uses the new Custom Operator API for communicating between C++ and Python.
+
 ### Windows
 
 Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.dll` files to this project's `Plugins` folder or `%USERPROFILE%/Documents/Derivative/Plugins`.

@@ -64,7 +64,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=x86_64
+        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
         xcodebuild -configuration Release -project ChucKDesignerCHOP.xcodeproj
         ls -r *
 

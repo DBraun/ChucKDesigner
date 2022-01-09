@@ -19,7 +19,55 @@
 #include <cmath>
 #include <assert.h>
 #include "chuck_globals.h"
-#include "Plugin_ChucK.h"
+
+#ifdef _WIN32
+    #include <Python.h>
+    #include <structmember.h>
+    #include <unicodeobject.h>
+#else
+    #include <Python/Python.h>
+    #include <Python/structmember.h>
+    #include <Python/unicodeobject.h>
+#endif
+
+static PyObject*
+pySetGlobalFloat(PyObject* self, PyObject* name, PyObject* val, void*)
+{
+    PY_Struct* me = (PY_Struct*)self;
+
+    PY_GetInfo info;
+    // We don't want to cook the node before we set this, since it doesn't depend on its current state
+    info.autoCook = false; // todo: which value to use?
+    ChucKDesignerCHOP* inst = (ChucKDesignerCHOP*)me->context->getNodeInstance(info);
+    // It's possible the instance will be nullptr, such as if the node has been deleted
+    // while the Python class is still being held on and used elsewhere.
+    if (inst)
+    {
+
+//        const char* castName = new char[1];
+//        const char* err = new char[1];
+//        PyUnicode_DecodeLocale(castName)
+        PyObject * ascii_mystring=PyUnicode_AsASCIIString(name);
+        
+        const char* castName = PyBytes_AsString(ascii_mystring);
+        double castVal = PyFloat_AsDouble(val);
+        
+        inst->setGlobalFloat(castName, castVal);
+        // Make the node dirty so it will cook an output a newly reset filter when asked next
+        me->context->makeNodeDirty();
+    }
+
+    // We need to inc-ref the None object if we are going to return it.
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyMethodDef methods[] =
+{
+    {"set_global_float", (PyCFunction)pySetGlobalFloat, METH_VARARGS, "Set a ChucK global float variable."},
+    {0}
+};
+
 
 extern "C"
 {
@@ -46,6 +94,22 @@ extern "C"
 
         info->customOPInfo.minInputs = 0;
         info->customOPInfo.maxInputs = 1;
+            
+        info->customOPInfo.pythonVersion->setString(PY_VERSION);
+        info->customOPInfo.pythonMethods = methods;
+        //info->customOPInfo.pythonGetSets = getSets; // todo:
+            
+        ChucK_For_TouchDesigner::setStderrCallback(
+            [](const char* text) {
+                std::cerr << text << std::endl;
+            }
+        );
+
+        ChucK_For_TouchDesigner::setStdoutCallback(
+            [](const char* text) {
+                std::cout << text << std::endl;
+            }
+        );
     }
 
     DLLEXPORT
@@ -73,18 +137,6 @@ extern "C"
 ChucKDesignerCHOP::ChucKDesignerCHOP(const OP_NodeInfo* info) : myNodeInfo(info)
 {
     m_chuckID = ChucK_For_TouchDesigner::getNextValidID(myNodeInfo->opId);
-
-    ChucK_For_TouchDesigner::setStderrCallback(
-        [](const char* text) {
-            std::cerr << text << std::endl;
-        }
-    );
-
-    ChucK_For_TouchDesigner::setStdoutCallback(
-        [](const char* text) {
-            std::cout << text << std::endl;
-        }
-    );
 
 	myExecuteCount = 0;
 }

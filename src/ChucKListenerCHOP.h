@@ -14,6 +14,8 @@
 
 #pragma once
 #include "CHOP_CPlusPlusBase.h"
+using namespace TD;
+
 #include "chuck.h"
 
 #include <functional>

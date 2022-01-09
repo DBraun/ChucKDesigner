@@ -12,7 +12,7 @@ flex -ochuck.yy.c chuck.lex
 cd ../../../..
 mkdir build
 cd build
-cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=x86_64
+cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
 xcodebuild -configuration Release -project ChucKDesignerCHOP.xcodeproj
 
 # Steps so that libChucKDesignerShared.dylib is found as a dependency
@@ -30,8 +30,8 @@ codesign -vvvv Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
 codesign -vvvv Release/ChucKListenerCHOP.plugin/Contents/MacOS/ChucKListenerCHOP
 
 # Copy to Plugins directory
-mv Release/libChucKDesignerShared.dylib ../Plugins
-mv Release/ChucKDesignerCHOP.plugin  ../Plugins
-mv Release/ChucKListenerCHOP.plugin  ../Plugins
+cp Release/libChucKDesignerShared.dylib ../Plugins
+cp -R Release/ChucKDesignerCHOP.plugin  ../Plugins
+cp -R Release/ChucKListenerCHOP.plugin  ../Plugins
 
 echo "All Done!"

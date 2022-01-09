@@ -20,6 +20,24 @@
 #include <cmath>
 #include <assert.h>
 
+#ifdef _WIN32
+    #include <Python.h>
+    #include <structmember.h>
+#else
+    #include <Python/Python.h>
+    #include <Python/structmember.h>
+#endif
+
+const char* PythonCallbacksDATStubs =
+"# This is an example callbacks DAT.\n"
+"\n"
+"# op - The OP that is doing the callback.\n"
+"# curSpeed - The current speed value the node will be using.\n"
+"#\n"
+"# Do something with a ChucK global float.\n"
+"def getGlobalFloat(op, val):\n"
+"    return val\n";
+
 // These functions are basic C function, which the DLL loader can find
 // much easier than finding a C++ Class.
 // The DLLEXPORT prefix is needed so the compile exports these functions from the .dll
@@ -50,6 +68,11 @@ FillCHOPPluginInfo(CHOP_PluginInfo *info)
 
 	info->customOPInfo.minInputs = 0;
 	info->customOPInfo.maxInputs = 0;
+    
+    info->customOPInfo.pythonVersion->setString(PY_VERSION);
+    //info->customOPInfo.pythonMethods = methods;
+    //info->customOPInfo.pythonGetSets = getSets;
+    info->customOPInfo.pythonCallbacksDAT = PythonCallbacksDATStubs;
 }
 
 DLLEXPORT
@@ -190,8 +213,21 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 		if (i >= output->numChannels) {
 			break;
 		}
-		output->channels[i][0] = ChucK_For_TouchDesigner::getFloat(varName.c_str());
+        float val = ChucK_For_TouchDesigner::getFloat(varName.c_str());
+        output->channels[i][0] = val;
 		i += 1;
+        
+        // We'll only be adding one extra argument
+        PyObject* args = myNodeInfo->context->createArgumentsTuple(1, nullptr);
+        // The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+        PyTuple_SET_ITEM(args, 1, PyFloat_FromDouble(val));
+
+        PyObject *result = myNodeInfo->context->callPythonCallback("getGlobalFloat", args, nullptr, nullptr);
+        // callPythonCallback doesn't take ownership of the argts
+        Py_DECREF(args);
+
+        // We own result now, so we need to Py_DECREF it unless we want to hold onto it
+        if (result) { Py_DECREF(result); }
 	}
 }
 
