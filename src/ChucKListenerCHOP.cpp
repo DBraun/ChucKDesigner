@@ -19,6 +19,7 @@
 #include <string.h>
 #include <cmath>
 #include <assert.h>
+//#include <vector>
 
 #ifdef _WIN32
     #include <Python.h>
@@ -35,8 +36,11 @@ const char* PythonCallbacksDATStubs =
 "# curSpeed - The current speed value the node will be using.\n"
 "#\n"
 "# Do something with a ChucK global float.\n"
-"def getGlobalFloat(op, val):\n"
-"    return val\n";
+"def getGlobalFloat(op, name, val):\n"
+"    pass\n"
+"\n\n"
+"def getGlobalFloatArray(op, name, vals):\n"
+"    pass\n";
 
 // These functions are basic C function, which the DLL loader can find
 // much easier than finding a C++ Class.
@@ -145,17 +149,28 @@ bool
 ChucKListenerCHOP::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs, void* reserved1)
 {
 	std::string Floatvars = inputs->getParString("Floatvars");
+    std::string Floatarrayvars = inputs->getParString("Floatarrayvars");
 
 	auto Floatvarstrings = split(Floatvars, " ");
+    auto Floatarrayvarstrings = split(Floatarrayvars, " ");
 
 	myFloatVarNames.clear();
-	  
+    myFloatArrayVarNames.clear();
+
 	if (Floatvarstrings.size() == 0 || (Floatvars.compare("") == 0)) {
 
 		info->numChannels = 0;
 		info->numSamples = 0;
 		return true;	
 	}
+    
+    if (Floatarrayvarstrings.size() == 0 || Floatarrayvars.compare("") == 0) {
+        
+    } else {
+        for (auto& str : Floatarrayvarstrings) {
+            myFloatArrayVarNames.push_back(str);
+        }
+    }
 
 	for (auto& str : Floatvarstrings) {
 		myFloatVarNames.push_back(str);
@@ -203,24 +218,28 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 	int chuck_id = ChucK_For_TouchDesigner::getChucKIDForOpID(chuckDesignerCHOP->opId);
 
 	for (const std::string varName : myFloatVarNames) {
-
 		ChucK_For_TouchDesigner::getNamedChuckFloat(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedFloatCallback);
 	}
+//    for (const std::string varName : myFloatArrayVarNames) {
+//        ChucK_For_TouchDesigner::getNamedGlobalFloatArray(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedFloatArrayCallback);
+//    }
 
 	int i = 0;
 	for (const std::string varName : myFloatVarNames)
 	{
-		if (i >= output->numChannels) {
-			break;
-		}
-        float val = ChucK_For_TouchDesigner::getFloat(varName.c_str());
-        output->channels[i][0] = val;
+        auto name = varName.c_str();
+        float val = ChucK_For_TouchDesigner::getFloat(name);
+        if (i < output->numChannels) {
+            output->channels[i][0] = val;
+        }
+        
 		i += 1;
         
         // We'll only be adding one extra argument
-        PyObject* args = myNodeInfo->context->createArgumentsTuple(1, nullptr);
+        PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
         // The first argument is already set to the 'op' variable, so we set the second argument to our speed value
-        PyTuple_SET_ITEM(args, 1, PyFloat_FromDouble(val));
+        PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+        PyTuple_SET_ITEM(args, 2, PyFloat_FromDouble(val));
 
         PyObject *result = myNodeInfo->context->callPythonCallback("getGlobalFloat", args, nullptr, nullptr);
         // callPythonCallback doesn't take ownership of the argts
@@ -229,6 +248,33 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
         // We own result now, so we need to Py_DECREF it unless we want to hold onto it
         if (result) { Py_DECREF(result); }
 	}
+    
+//    for (const std::string varName : myFloatArrayVarNames)
+//    {
+//        auto name = varName.c_str();
+//        auto vec = ChucK_For_TouchDesigner::getFloatArray(name);
+//
+//        // We'll only be adding one extra argument
+//        PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
+//        // The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+//        PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+//
+//        // todo: return a numpy array
+//        PyObject *lst = PyList_New(vec.size());
+//        for (i = 0; i < vec.size(); i++) {
+//            PyList_SET_ITEM(lst, i, PyFloat_FromDouble(vec.at(i)));
+//        }
+//
+//        PyTuple_SET_ITEM(args, 2, lst);
+//
+//        PyObject *result = myNodeInfo->context->callPythonCallback("getGlobalFloatArray", args, nullptr, nullptr);
+//        // callPythonCallback doesn't take ownership of the argts
+//        Py_DECREF(args);
+//
+//        // We own result now, so we need to Py_DECREF it unless we want to hold onto it
+//        if (result) { Py_DECREF(result); }
+//    }
+    
 }
 
 void ChucKListenerCHOP::getErrorString(OP_String* error, void* reserved1) {
@@ -322,10 +368,22 @@ ChucKListenerCHOP::setupParameters(OP_ParameterManager* manager, void *reserved1
         OP_ParAppendResult res = manager->appendString(sp);
         assert(res == OP_ParAppendResult::Success);
     }
+    
+    {
+        OP_StringParameter    sp;
+
+        sp.name = "Floatarrayvars";
+        sp.label = "Float Array Variables";
+
+        sp.defaultValue = "";
+
+        OP_ParAppendResult res = manager->appendString(sp);
+        assert(res == OP_ParAppendResult::Success);
+    }
 }
 
 void 
 ChucKListenerCHOP::pulsePressed(const char* name, void* reserved1)
 {
-}
 
+}

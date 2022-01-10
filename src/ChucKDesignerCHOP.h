@@ -67,23 +67,23 @@ public:
         ChucK_For_TouchDesigner::setChuckInt(m_chuckID, name, val);
     }
     
-    void
-    setGlobalString(const char* name, const char* val)
-    {
-        ChucK_For_TouchDesigner::setChuckString(m_chuckID, name, val);
-    }
+//    void
+//    setGlobalString(const char* name, const char* val)
+//    {
+//        ChucK_For_TouchDesigner::setChuckString(m_chuckID, name, val);
+//    }
     
-    void
-    setGlobalIntArray(const char* name, t_CKINT arrayValues[], unsigned int numValues)
-    {
-        ChucK_For_TouchDesigner::setGlobalIntArray(m_chuckID, name, arrayValues, numValues);
-    }
-    
-    void
-    setGlobalFloatArray(const char* name, t_CKFLOAT arrayValues[], unsigned int numValues)
-    {
-        ChucK_For_TouchDesigner::setGlobalFloatArray(m_chuckID, name, arrayValues, numValues);
-    }
+//    void
+//    setGlobalIntArray(const char* name, t_CKINT arrayValues[], unsigned int numValues)
+//    {
+//        ChucK_For_TouchDesigner::setGlobalIntArray(m_chuckID, name, arrayValues, numValues);
+//    }
+//    
+//    void
+//    setGlobalFloatArray(const char* name, t_CKFLOAT arrayValues[], unsigned int numValues)
+//    {
+//        ChucK_For_TouchDesigner::setGlobalFloatArray(m_chuckID, name, arrayValues, numValues);
+//    }
 
 private:
 
