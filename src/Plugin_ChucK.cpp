@@ -48,7 +48,7 @@ namespace ChucK_For_TouchDesigner
     unsigned int _nextValidID = 0;
     std::map< unsigned int, unsigned int> op_ids_to_chuck_ids;
     static std::map<std::string, double> myFloatVars;
-    static std::map<std::string, float> myFloatArrayVars;
+    static std::map<std::string, t_CKFLOAT*> myFloatArrayVars;
     static std::map<std::string, int> myFloatArrayVarSizes;
 
 
@@ -807,15 +807,19 @@ namespace ChucK_For_TouchDesigner
         myFloatVars[varName] = val;
     }
 
-//    CHUCKDESIGNERSHARED_API void sharedFloatArrayCallback(const char* varName, t_CKFLOAT* vals, t_CKUINT numItems) {
-//        auto vec = new float[numItems];
-//        for (int i=0; i< numItems; i++) {
-//            vec[i] = vals[i];
-//        }
-//
-//        myFloatArrayVars[varName] = vec;
-//        myFloatArrayVarSizes[varName] = numItems;
-//    }
+    CHUCKDESIGNERSHARED_API void sharedFloatArrayCallback(const char* varName, t_CKFLOAT vals[], t_CKUINT numItems) {
+        auto vec = new t_CKFLOAT[numItems];
+        for (int i=0; i< numItems; i++) {
+            vec[i] = vals[i];
+        }
+
+        if (myFloatArrayVars.find(varName) != myFloatArrayVars.end()) {
+            delete[] myFloatArrayVars[varName];
+        }
+
+        myFloatArrayVars[varName] = vec;
+        myFloatArrayVarSizes[varName] = numItems;
+    }
 
     CHUCKDESIGNERSHARED_API float getFloat(const char* varName) {
         if (myFloatVars.find(varName) != myFloatVars.end()) {
@@ -824,14 +828,19 @@ namespace ChucK_For_TouchDesigner
         return 0.f;
     }
 
-//    CHUCKDESIGNERSHARED_API void getFloatArray(const char* varName, t_CKFLOAT* vals, int& numItems) {
-//        if (myFloatArrayVars.find(varName) != myFloatArrayVars.end()) {
-//            numItems = myFloatArrayVarSizes[varName];
-//            // todo:
-//            //*vals = &myFloatArrayVars[varName];
-//        }
-//        numItems = 0;
-//    }
+    CHUCKDESIGNERSHARED_API t_CKFLOAT* getFloatArray(const char* varName, int& numItems) {
+        if (
+            (myFloatArrayVars.find(varName) != myFloatArrayVars.end()) &&
+            (myFloatArrayVarSizes.find(varName) != myFloatArrayVarSizes.end())
+            ) {
+            numItems = myFloatArrayVarSizes[varName];
+            return myFloatArrayVars[varName];
+            // todo:
+            //*vals = &myFloatArrayVars[varName];
+        }
+        numItems = 0;
+        return nullptr;
+    }
 
     
     CHUCKDESIGNERSHARED_API bool initChuckInstance( unsigned int chuckID, unsigned int sampleRate, unsigned int numInChannels, unsigned int numOutChannels, string globalDir )

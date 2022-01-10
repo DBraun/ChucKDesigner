@@ -220,9 +220,9 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 	for (const std::string varName : myFloatVarNames) {
 		ChucK_For_TouchDesigner::getNamedChuckFloat(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedFloatCallback);
 	}
-//    for (const std::string varName : myFloatArrayVarNames) {
-//        ChucK_For_TouchDesigner::getNamedGlobalFloatArray(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedFloatArrayCallback);
-//    }
+    for (const std::string varName : myFloatArrayVarNames) {
+        ChucK_For_TouchDesigner::getNamedGlobalFloatArray(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedFloatArrayCallback);
+    }
 
 	int i = 0;
 	for (const std::string varName : myFloatVarNames)
@@ -249,31 +249,32 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
         if (result) { Py_DECREF(result); }
 	}
     
-//    for (const std::string varName : myFloatArrayVarNames)
-//    {
-//        auto name = varName.c_str();
-//        auto vec = ChucK_For_TouchDesigner::getFloatArray(name);
-//
-//        // We'll only be adding one extra argument
-//        PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
-//        // The first argument is already set to the 'op' variable, so we set the second argument to our speed value
-//        PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
-//
-//        // todo: return a numpy array
-//        PyObject *lst = PyList_New(vec.size());
-//        for (i = 0; i < vec.size(); i++) {
-//            PyList_SET_ITEM(lst, i, PyFloat_FromDouble(vec.at(i)));
-//        }
-//
-//        PyTuple_SET_ITEM(args, 2, lst);
-//
-//        PyObject *result = myNodeInfo->context->callPythonCallback("getGlobalFloatArray", args, nullptr, nullptr);
-//        // callPythonCallback doesn't take ownership of the argts
-//        Py_DECREF(args);
-//
-//        // We own result now, so we need to Py_DECREF it unless we want to hold onto it
-//        if (result) { Py_DECREF(result); }
-//    }
+    for (const std::string varName : myFloatArrayVarNames)
+    {
+        auto name = varName.c_str();
+		int numItems = 0;
+        auto vec = ChucK_For_TouchDesigner::getFloatArray(name, numItems);
+
+        // We'll only be adding one extra argument
+        PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
+        // The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+        PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+
+        // todo: return a numpy array
+        PyObject *lst = PyList_New(numItems);
+        for (i = 0; i < numItems; i++) {
+            PyList_SET_ITEM(lst, i, PyFloat_FromDouble(*(vec++)));
+        }
+
+        PyTuple_SET_ITEM(args, 2, lst);
+
+        PyObject *result = myNodeInfo->context->callPythonCallback("getGlobalFloatArray", args, nullptr, nullptr);
+        // callPythonCallback doesn't take ownership of the argts
+        Py_DECREF(args);
+
+        // We own result now, so we need to Py_DECREF it unless we want to hold onto it
+        if (result) { Py_DECREF(result); }
+    }
     
 }
 
