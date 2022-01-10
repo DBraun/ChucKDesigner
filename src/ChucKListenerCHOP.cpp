@@ -192,7 +192,7 @@ ChucKListenerCHOP::getChannelName(int32_t index, OP_String *name, const OP_Input
 		return;
 	}
 
-	name->setString("chan1");	
+	name->setString("chan1");
 }
 
 void

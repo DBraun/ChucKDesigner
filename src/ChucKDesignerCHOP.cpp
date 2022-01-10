@@ -31,7 +31,7 @@
 #endif
 
 static PyObject*
-pySetGlobalFloat(PyObject* self, PyObject* name, PyObject* val, void*)
+pySetGlobalFloat(PyObject* self, PyObject* args, void*)
 {
     PY_Struct* me = (PY_Struct*)self;
 
@@ -43,15 +43,22 @@ pySetGlobalFloat(PyObject* self, PyObject* name, PyObject* val, void*)
     // while the Python class is still being held on and used elsewhere.
     if (inst)
     {
+        PyObject* name;
+        PyObject* val;
 
-//        const char* castName = new char[1];
-//        const char* err = new char[1];
-//        PyUnicode_DecodeLocale(castName)
+        if (!PyArg_UnpackTuple(args, "ref", 2, 2, &name, &val)) {
+            // error
+            std::cerr << "unpack tuple error." << std::endl;
+            Py_INCREF(Py_None);
+            return Py_None;
+        }
+
         PyObject * ascii_mystring=PyUnicode_AsASCIIString(name);
         
         const char* castName = PyBytes_AsString(ascii_mystring);
         double castVal = PyFloat_AsDouble(val);
         
+        std::cerr << "name: " << castName << " =" << castVal << std::endl;
         inst->setGlobalFloat(castName, castVal);
         // Make the node dirty so it will cook an output a newly reset filter when asked next
         me->context->makeNodeDirty();
