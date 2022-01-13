@@ -56,13 +56,13 @@ public:
     virtual void getErrorString(OP_String* error, void* reserved1);
     
     void
-    setGlobalFloat(const char* name, double val)
+    setGlobalFloat(const char* name, t_CKFLOAT val)
     {
         ChucK_For_TouchDesigner::setChuckFloat(m_chuckID, name, val);
     }
     
     void
-    setGlobalInt(const char* name, int val)
+    setGlobalInt(const char* name, t_CKINT val)
     {
         ChucK_For_TouchDesigner::setChuckInt(m_chuckID, name, val);
     }
@@ -83,6 +83,36 @@ public:
     setGlobalFloatArray(const char* name, t_CKFLOAT arrayValues[], unsigned int numValues)
     {
         ChucK_For_TouchDesigner::setGlobalFloatArray(m_chuckID, name, arrayValues, numValues);
+    }
+
+    void
+    setGlobalFloatArrayValue(const char* name, unsigned int index, t_CKFLOAT value)
+    {
+        ChucK_For_TouchDesigner::setGlobalFloatArrayValue(m_chuckID, name, index, value);
+    }
+
+    void
+    setGlobalIntArrayValue(const char* name, unsigned int index, t_CKINT value)
+    {
+        ChucK_For_TouchDesigner::setGlobalIntArrayValue(m_chuckID, name, index, value);
+    }
+
+    void
+    setGlobalAssociativeFloatArrayValue(const char* name, char* key, t_CKFLOAT value)
+    {
+        ChucK_For_TouchDesigner::setGlobalAssociativeFloatArrayValue(m_chuckID, name, key, value);
+    }
+
+    void
+    setGlobalAssociativeIntArrayValue(const char* name, char* key, t_CKINT value)
+    {
+        ChucK_For_TouchDesigner::setGlobalAssociativeIntArrayValue(m_chuckID, name, key, value);
+    }
+
+    void
+    setLogLevel(unsigned int level)
+    {
+        ChucK_For_TouchDesigner::setLogLevel(level);
     }
 
 private:

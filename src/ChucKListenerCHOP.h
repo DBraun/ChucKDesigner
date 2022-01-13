@@ -69,6 +69,11 @@ private:
 
     std::stringstream myError;
     std::vector<std::string> myFloatVarNames;
+    std::vector<std::string> myIntVarNames;
+    std::vector<std::string> myStringVarNames;
     std::vector<std::string> myFloatArrayVarNames;
+    std::vector<std::string> myIntArrayVarNames;
 
+    std::vector<std::string> myAssociativeFloatArrayVarNames;
+    std::vector<std::string> myAssociativeIntArrayVarNames;
 };

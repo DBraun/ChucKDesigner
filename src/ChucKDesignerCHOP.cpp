@@ -91,9 +91,42 @@ pySetGlobalInt(PyObject* self, PyObject* args, void*)
         PyObject* ascii_mystring = PyUnicode_AsASCIIString(name);
 
         const char* castName = PyBytes_AsString(ascii_mystring);
-        int castVal = (int) PyFloat_AsDouble(val);
+        int castVal = _PyLong_AsInt(val);
 
         inst->setGlobalInt(castName, castVal);
+        // Make the node dirty so it will cook an output a newly reset filter when asked next
+        me->context->makeNodeDirty();
+    }
+
+    // We need to inc-ref the None object if we are going to return it.
+    FAIL_IN_CUSTOM_OPERATOR_METHOD
+}
+
+static PyObject*
+pySetGlobalString(PyObject* self, PyObject* args, void*)
+{
+    PY_Struct* me = (PY_Struct*)self;
+
+    PY_GetInfo info;
+    // We don't want to cook the node before we set this, since it doesn't depend on its current state
+    info.autoCook = false; // todo: which value to use?
+    ChucKDesignerCHOP* inst = (ChucKDesignerCHOP*)me->context->getNodeInstance(info);
+    // It's possible the instance will be nullptr, such as if the node has been deleted
+    // while the Python class is still being held on and used elsewhere.
+    if (inst)
+    {
+        PyObject* name;
+        PyObject* val;
+
+        if (!PyArg_UnpackTuple(args, "ref", 2, 2, &name, &val)) {
+            // error
+            FAIL_IN_CUSTOM_OPERATOR_METHOD
+        }
+
+        const char* castName = PyBytes_AsString(PyUnicode_AsASCIIString(name));
+        const char* castVal = PyBytes_AsString(PyUnicode_AsASCIIString(val));
+
+        inst->setGlobalString(castName, castVal);
         // Make the node dirty so it will cook an output a newly reset filter when asked next
         me->context->makeNodeDirty();
     }
@@ -144,11 +177,240 @@ pySetGlobalFloatArray(PyObject* self, PyObject* args, void*)
     FAIL_IN_CUSTOM_OPERATOR_METHOD
 }
 
+static PyObject*
+pySetGlobalIntArray(PyObject* self, PyObject* args, void*)
+{
+    PY_Struct* me = (PY_Struct*)self;
+
+    PY_GetInfo info;
+    // We don't want to cook the node before we set this, since it doesn't depend on its current state
+    info.autoCook = false; // todo: which value to use?
+    ChucKDesignerCHOP* inst = (ChucKDesignerCHOP*)me->context->getNodeInstance(info);
+    // It's possible the instance will be nullptr, such as if the node has been deleted
+    // while the Python class is still being held on and used elsewhere.
+    if (inst)
+    {
+        PyObject* name;
+        PyObject* vals;
+
+        if (!PyArg_UnpackTuple(args, "ref", 2, 2, &name, &vals)) {
+            // error
+            FAIL_IN_CUSTOM_OPERATOR_METHOD
+        }
+
+        PyObject* ascii_mystring = PyUnicode_AsASCIIString(name);
+
+        const char* castName = PyBytes_AsString(ascii_mystring);
+
+        Py_ssize_t numValues = PyList_Size(vals);
+
+        auto nums = new t_CKINT[numValues];
+        for (int i = 0; i < numValues; i++) {
+            nums[i] = PyLong_AsLongLong(PyList_GetItem(vals, i));;
+        }
+
+        inst->setGlobalIntArray(castName, nums, numValues);
+        delete[] nums;
+        // Make the node dirty so it will cook an output a newly reset filter when asked next
+        me->context->makeNodeDirty();
+    }
+
+    // We need to inc-ref the None object if we are going to return it.
+    FAIL_IN_CUSTOM_OPERATOR_METHOD
+}
+
+static PyObject*
+pySetGlobalFloatArrayValue(PyObject* self, PyObject* args, void*)
+{
+    PY_Struct* me = (PY_Struct*)self;
+
+    PY_GetInfo info;
+    // We don't want to cook the node before we set this, since it doesn't depend on its current state
+    info.autoCook = false; // todo: which value to use?
+    ChucKDesignerCHOP* inst = (ChucKDesignerCHOP*)me->context->getNodeInstance(info);
+    // It's possible the instance will be nullptr, such as if the node has been deleted
+    // while the Python class is still being held on and used elsewhere.
+    if (inst)
+    {
+        PyObject* name;
+        PyObject* index;
+        PyObject* value;
+
+        if (!PyArg_UnpackTuple(args, "ref", 3, 3, &name, &index, &value)) {
+            // error
+            FAIL_IN_CUSTOM_OPERATOR_METHOD
+        }
+
+        const char* castName = PyBytes_AsString(PyUnicode_AsASCIIString(name));
+
+        int castIndex = _PyLong_AsInt(index);
+        t_CKFLOAT castValue = PyLong_AsDouble(value);
+
+        inst->setGlobalFloatArrayValue(castName, castIndex, castValue);
+        // Make the node dirty so it will cook an output a newly reset filter when asked next
+        me->context->makeNodeDirty();
+    }
+
+    // We need to inc-ref the None object if we are going to return it.
+    FAIL_IN_CUSTOM_OPERATOR_METHOD
+}
+
+static PyObject*
+pySetGlobalIntArrayValue(PyObject* self, PyObject* args, void*)
+{
+    PY_Struct* me = (PY_Struct*)self;
+
+    PY_GetInfo info;
+    // We don't want to cook the node before we set this, since it doesn't depend on its current state
+    info.autoCook = false; // todo: which value to use?
+    ChucKDesignerCHOP* inst = (ChucKDesignerCHOP*)me->context->getNodeInstance(info);
+    // It's possible the instance will be nullptr, such as if the node has been deleted
+    // while the Python class is still being held on and used elsewhere.
+    if (inst)
+    {
+        PyObject* name;
+        PyObject* index;
+        PyObject* value;
+
+        if (!PyArg_UnpackTuple(args, "ref", 3, 3, &name, &index, &value)) {
+            // error
+            FAIL_IN_CUSTOM_OPERATOR_METHOD
+        }
+
+        const char* castName = PyBytes_AsString(PyUnicode_AsASCIIString(name));
+
+        int castIndex = _PyLong_AsInt(index);
+        t_CKINT castValue = PyLong_AsLongLong(value);
+
+        inst->setGlobalIntArrayValue(castName, castIndex, castValue);
+        // Make the node dirty so it will cook an output a newly reset filter when asked next
+        me->context->makeNodeDirty();
+    }
+
+    // We need to inc-ref the None object if we are going to return it.
+    FAIL_IN_CUSTOM_OPERATOR_METHOD
+}
+
+static PyObject*
+pySetGlobalAssociativeFloatArrayValue(PyObject* self, PyObject* args, void*)
+{
+    PY_Struct* me = (PY_Struct*)self;
+
+    PY_GetInfo info;
+    // We don't want to cook the node before we set this, since it doesn't depend on its current state
+    info.autoCook = false; // todo: which value to use?
+    ChucKDesignerCHOP* inst = (ChucKDesignerCHOP*)me->context->getNodeInstance(info);
+    // It's possible the instance will be nullptr, such as if the node has been deleted
+    // while the Python class is still being held on and used elsewhere.
+    if (inst)
+    {
+        PyObject* name;
+        PyObject* key;
+        PyObject* value;
+
+        if (!PyArg_UnpackTuple(args, "ref", 3, 3, &name, &key, &value)) {
+            // error
+            FAIL_IN_CUSTOM_OPERATOR_METHOD
+        }
+
+        const char* castName = PyBytes_AsString(PyUnicode_AsASCIIString(name));
+
+        char* castKey = PyBytes_AsString(PyUnicode_AsASCIIString(key));
+
+        t_CKFLOAT castValue = PyLong_AsDouble(value);
+
+        inst->setGlobalAssociativeFloatArrayValue(castName, castKey, castValue);
+        // Make the node dirty so it will cook an output a newly reset filter when asked next
+        me->context->makeNodeDirty();
+    }
+
+    // We need to inc-ref the None object if we are going to return it.
+    FAIL_IN_CUSTOM_OPERATOR_METHOD
+}
+
+static PyObject*
+pySetGlobalAssociativeIntArrayValue(PyObject* self, PyObject* args, void*)
+{
+    PY_Struct* me = (PY_Struct*)self;
+
+    PY_GetInfo info;
+    // We don't want to cook the node before we set this, since it doesn't depend on its current state
+    info.autoCook = false; // todo: which value to use?
+    ChucKDesignerCHOP* inst = (ChucKDesignerCHOP*)me->context->getNodeInstance(info);
+    // It's possible the instance will be nullptr, such as if the node has been deleted
+    // while the Python class is still being held on and used elsewhere.
+    if (inst)
+    {
+        PyObject* name;
+        PyObject* key;
+        PyObject* value;
+
+        if (!PyArg_UnpackTuple(args, "ref", 3, 3, &name, &key, &value)) {
+            // error
+            FAIL_IN_CUSTOM_OPERATOR_METHOD
+        }
+
+        const char* castName = PyBytes_AsString(PyUnicode_AsASCIIString(name));
+
+        char* castKey = PyBytes_AsString(PyUnicode_AsASCIIString(key));
+
+        t_CKINT castValue = PyLong_AsLongLong(value);
+
+        inst->setGlobalAssociativeIntArrayValue(castName, castKey, castValue);
+        // Make the node dirty so it will cook an output a newly reset filter when asked next
+        me->context->makeNodeDirty();
+    }
+
+    // We need to inc-ref the None object if we are going to return it.
+    FAIL_IN_CUSTOM_OPERATOR_METHOD
+}
+
+static PyObject*
+pySetLogLevel(PyObject* self, PyObject* args, void*)
+{
+    PY_Struct* me = (PY_Struct*)self;
+
+    PY_GetInfo info;
+    // We don't want to cook the node before we set this, since it doesn't depend on its current state
+    info.autoCook = false; // todo: which value to use?
+    ChucKDesignerCHOP* inst = (ChucKDesignerCHOP*)me->context->getNodeInstance(info);
+    // It's possible the instance will be nullptr, such as if the node has been deleted
+    // while the Python class is still being held on and used elsewhere.
+    if (inst)
+    {
+        PyObject* level;
+
+        if (!PyArg_UnpackTuple(args, "ref", 1, 1, &level)) {
+            // error
+            FAIL_IN_CUSTOM_OPERATOR_METHOD
+        }
+
+        inst->setLogLevel(_PyLong_AsInt(level));
+        // Make the node dirty so it will cook an output a newly reset filter when asked next
+        me->context->makeNodeDirty();
+    }
+
+    // We need to inc-ref the None object if we are going to return it.
+    FAIL_IN_CUSTOM_OPERATOR_METHOD
+}
+
 static PyMethodDef methods[] =
 {
     {"set_global_float", (PyCFunction)pySetGlobalFloat, METH_VARARGS, "Set a ChucK global float variable."},
     {"set_global_int", (PyCFunction)pySetGlobalInt, METH_VARARGS, "Set a ChucK global float variable."},
+    {"set_global_string", (PyCFunction)pySetGlobalString, METH_VARARGS, "Set a ChucK global string variable."},
+    
     {"set_global_float_array", (PyCFunction)pySetGlobalFloatArray, METH_VARARGS, "Set a ChucK global float array variable."},
+    {"set_global_int_array", (PyCFunction)pySetGlobalIntArray, METH_VARARGS, "Set a ChucK global int array variable."},
+    
+    {"set_global_float_array_value", (PyCFunction)pySetGlobalFloatArrayValue, METH_VARARGS, "Set a single value in a ChucK global float array variable."},
+    {"set_global_float_int_value", (PyCFunction)pySetGlobalIntArrayValue, METH_VARARGS, "Set a single value in a ChucK global int array variable."},
+
+    {"set_global_associative_float_array_value", (PyCFunction)pySetGlobalAssociativeFloatArrayValue, METH_VARARGS, "Set a single value in an associative ChucK global float array variable."},
+    {"set_global_associative_float_int_value", (PyCFunction)pySetGlobalAssociativeIntArrayValue, METH_VARARGS, "Set a single value in an associative ChucK global int array variable."},
+
+    {"set_log_level", (PyCFunction)pySetLogLevel, METH_VARARGS, "Set ChucK's log level."},
+
     {0}
 };
 

@@ -30,17 +30,25 @@
 #endif
 
 const char* PythonCallbacksDATStubs =
-"# This is an example callbacks DAT.\n"
-"\n"
-"# op - The OP that is doing the callback.\n"
-"# curSpeed - The current speed value the node will be using.\n"
-"#\n"
+"# This is an example callbacks DAT for a ChucK Audio Operator.\n"
+"# In all callback methods, \"op\" is the ChucK Listener operator doing the callback.\n"
+"\n\n"
 "# Do something with a ChucK global float.\n"
 "def getGlobalFloat(op, name, val):\n"
 "    pass\n"
 "\n\n"
+"def getGlobalInt(op, name, val):\n"
+"    pass\n"
+"\n\n"
+"def getGlobalString(op, name, val):\n"
+"    pass\n"
+"\n\n"
 "def getGlobalFloatArray(op, name, vals):\n"
-"    pass\n";
+"    pass\n"
+"\n\n"
+"def getGlobalIntArray(op, name, vals):\n"
+"    pass\n"
+;
 
 // These functions are basic C function, which the DLL loader can find
 // much easier than finding a C++ Class.
@@ -149,37 +157,51 @@ bool
 ChucKListenerCHOP::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs, void* reserved1)
 {
 	std::string Floatvars = inputs->getParString("Floatvars");
+	std::string Intvars = inputs->getParString("Intvars");
+	std::string Stringvars = inputs->getParString("Stringvars");
     std::string Floatarrayvars = inputs->getParString("Floatarrayvars");
+	std::string Intarrayvars = inputs->getParString("Intarrayvars");
 
 	auto Floatvarstrings = split(Floatvars, " ");
+	auto Intvarstrings = split(Intvars, " ");
+	auto Stringvarstrings = split(Stringvars, " ");
     auto Floatarrayvarstrings = split(Floatarrayvars, " ");
+	auto Intarrayvarstrings = split(Intarrayvars, " ");
 
 	myFloatVarNames.clear();
+	myIntVarNames.clear();
+	myStringVarNames.clear();
     myFloatArrayVarNames.clear();
+	myIntArrayVarNames.clear();
 
-	if (Floatvarstrings.size() == 0 || (Floatvars.compare("") == 0)) {
-
-		info->numChannels = 0;
-		info->numSamples = 0;
-		return true;	
-	}
+	//std::vector<std::string> myAssociativeFloatArrayVarNames;
+	//std::vector<std::string> myAssociativeIntArrayVarNames;
     
-    if (Floatarrayvarstrings.size() == 0 || Floatarrayvars.compare("") == 0) {
-        
-    } else {
-        for (auto& str : Floatarrayvarstrings) {
-            myFloatArrayVarNames.push_back(str);
-        }
-    }
-
 	for (auto& str : Floatvarstrings) {
 		myFloatVarNames.push_back(str);
 	}
 
+	for (auto& str : Intvarstrings) {
+		myIntVarNames.push_back(str);
+	}
+
+	for (auto& str : Stringvarstrings) {
+		myStringVarNames.push_back(str);
+	}
+
+	for (auto& str : Floatarrayvarstrings) {
+		myFloatArrayVarNames.push_back(str);
+	}
+
+	for (auto& str : Intarrayvarstrings) {
+		myIntArrayVarNames.push_back(str);
+	}
+
 	//info->sampleRate = 44100.;
-	//info->numSamples = 1;
-	info->numChannels = Floatvarstrings.size();
+	info->numSamples = 1;
     info->startIndex = 0;
+	info->numChannels = myFloatVarNames.size() + myIntVarNames.size();
+	
 	return true;
 }
 
@@ -203,10 +225,6 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
     myStatus = true;
     myError.str("");
 
-	if (myFloatVarNames.size() == 0) {
-		return;
-	}
-
     const OP_CHOPInput* chuckDesignerCHOP = inputs->getParCHOP("Chuck");
 
 	if (!chuckDesignerCHOP) {
@@ -220,15 +238,24 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 	for (const std::string varName : myFloatVarNames) {
 		ChucK_For_TouchDesigner::getNamedChuckFloat(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedFloatCallback);
 	}
+	for (const std::string varName : myIntVarNames) {
+		ChucK_For_TouchDesigner::getNamedChuckInt(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedIntCallback);
+	}
+	for (const std::string varName : myStringVarNames) {
+		ChucK_For_TouchDesigner::getNamedChuckString(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedStringCallback);
+	}
     for (const std::string varName : myFloatArrayVarNames) {
         ChucK_For_TouchDesigner::getNamedGlobalFloatArray(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedFloatArrayCallback);
     }
+	for (const std::string varName : myIntArrayVarNames) {
+		ChucK_For_TouchDesigner::getNamedGlobalIntArray(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedIntArrayCallback);
+	}
 
 	int i = 0;
 	for (const std::string varName : myFloatVarNames)
 	{
         auto name = varName.c_str();
-        float val = ChucK_For_TouchDesigner::getFloat(name);
+        t_CKFLOAT val = ChucK_For_TouchDesigner::getFloat(name);
         if (i < output->numChannels) {
             output->channels[i][0] = val;
         }
@@ -239,7 +266,8 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
         PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
         // The first argument is already set to the 'op' variable, so we set the second argument to our speed value
         PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
-        PyTuple_SET_ITEM(args, 2, PyFloat_FromDouble(val));
+        PyTuple_SET_ITEM(args, 2, PyLong_FromDouble(val));
+		
 
         PyObject *result = myNodeInfo->context->callPythonCallback("getGlobalFloat", args, nullptr, nullptr);
         // callPythonCallback doesn't take ownership of the argts
@@ -247,6 +275,49 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 
         // We own result now, so we need to Py_DECREF it unless we want to hold onto it
         if (result) { Py_DECREF(result); }
+	}
+
+	for (const std::string varName : myIntVarNames)
+	{
+		auto name = varName.c_str();
+		t_CKINT val = ChucK_For_TouchDesigner::getInt(name);
+		if (i < output->numChannels) {
+			output->channels[i][0] = val;
+		}
+
+		i += 1;
+
+		// We'll only be adding one extra argument
+		PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
+		// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+		PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+		PyTuple_SET_ITEM(args, 2, PyLong_FromLongLong(val));
+
+		PyObject* result = myNodeInfo->context->callPythonCallback("getGlobalInt", args, nullptr, nullptr);
+		// callPythonCallback doesn't take ownership of the argts
+		Py_DECREF(args);
+
+		// We own result now, so we need to Py_DECREF it unless we want to hold onto it
+		if (result) { Py_DECREF(result); }
+	}
+
+	for (const std::string varName : myStringVarNames)
+	{
+		auto name = varName.c_str();
+		auto str = ChucK_For_TouchDesigner::getString(name);
+
+		// We'll only be adding one extra argument
+		PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
+		// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+		PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+		PyTuple_SET_ITEM(args, 2, PyUnicode_FromString(str));
+
+		PyObject* result = myNodeInfo->context->callPythonCallback("getGlobalString", args, nullptr, nullptr);
+		// callPythonCallback doesn't take ownership of the argts
+		Py_DECREF(args);
+
+		// We own result now, so we need to Py_DECREF it unless we want to hold onto it
+		if (result) { Py_DECREF(result); }
 	}
     
     for (const std::string varName : myFloatArrayVarNames)
@@ -275,6 +346,33 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
         // We own result now, so we need to Py_DECREF it unless we want to hold onto it
         if (result) { Py_DECREF(result); }
     }
+
+	for (const std::string varName : myIntArrayVarNames)
+	{
+		auto name = varName.c_str();
+		int numItems = 0;
+		auto vec = ChucK_For_TouchDesigner::getIntArray(name, numItems);
+
+		// We'll only be adding one extra argument
+		PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
+		// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+		PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+
+		// todo: return a numpy array
+		PyObject* lst = PyList_New(numItems);
+		for (i = 0; i < numItems; i++) {
+			PyList_SET_ITEM(lst, i, PyLong_FromLongLong(*(vec++)));
+		}
+
+		PyTuple_SET_ITEM(args, 2, lst);
+
+		PyObject* result = myNodeInfo->context->callPythonCallback("getGlobalIntArray", args, nullptr, nullptr);
+		// callPythonCallback doesn't take ownership of the argts
+		Py_DECREF(args);
+
+		// We own result now, so we need to Py_DECREF it unless we want to hold onto it
+		if (result) { Py_DECREF(result); }
+	}
     
 }
 
@@ -369,6 +467,30 @@ ChucKListenerCHOP::setupParameters(OP_ParameterManager* manager, void *reserved1
         OP_ParAppendResult res = manager->appendString(sp);
         assert(res == OP_ParAppendResult::Success);
     }
+
+	{
+		OP_StringParameter	sp;
+
+		sp.name = "Intvars";
+		sp.label = "Int Variables";
+
+		sp.defaultValue = "";
+
+		OP_ParAppendResult res = manager->appendString(sp);
+		assert(res == OP_ParAppendResult::Success);
+	}
+
+	{
+		OP_StringParameter	sp;
+
+		sp.name = "Stringvars";
+		sp.label = "String Variables";
+
+		sp.defaultValue = "";
+
+		OP_ParAppendResult res = manager->appendString(sp);
+		assert(res == OP_ParAppendResult::Success);
+	}
     
     {
         OP_StringParameter    sp;
@@ -381,6 +503,18 @@ ChucKListenerCHOP::setupParameters(OP_ParameterManager* manager, void *reserved1
         OP_ParAppendResult res = manager->appendString(sp);
         assert(res == OP_ParAppendResult::Success);
     }
+
+	{
+		OP_StringParameter    sp;
+
+		sp.name = "Intarrayvars";
+		sp.label = "Int Array Variables";
+
+		sp.defaultValue = "";
+
+		OP_ParAppendResult res = manager->appendString(sp);
+		assert(res == OP_ParAppendResult::Success);
+	}
 }
 
 void 
