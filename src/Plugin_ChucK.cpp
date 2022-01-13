@@ -994,6 +994,20 @@ namespace ChucK_For_TouchDesigner
 
             op_ids_to_chuck_ids.erase(opId);
 
+            // todo: is this dangerous?
+            // todo: design consideration, do we even want to clear them?
+            // clear all global vars
+            //myFloatArrayVars.clear();
+            //myFloatVars.clear();
+            //myIntVars.clear();
+            //myStringVars.clear();
+
+            //myFloatArrayVars.clear();
+            //myFloatArrayVarSizes.clear();
+
+            //myIntArrayVars.clear();
+            //myIntArrayVarSizes.clear();
+
             // wait a bit
             usleep( 30000 );
 

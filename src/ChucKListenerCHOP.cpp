@@ -31,22 +31,27 @@
 
 const char* PythonCallbacksDATStubs =
 "# This is an example callbacks DAT for a ChucK Audio Operator.\n"
-"# In all callback methods, \"op\" is the ChucK Listener operator doing the callback.\n"
+"# In all callback methods, \"listener\" is the ChucK Listener operator doing the callback.\n"
 "\n\n"
 "# Do something with a ChucK global float.\n"
-"def getGlobalFloat(op, name, val):\n"
+"def getGlobalFloat(listener, name, val):\n"
+"    # print(f'getGlobalFloat(name={name}, val={val})')\n"
 "    pass\n"
 "\n\n"
-"def getGlobalInt(op, name, val):\n"
+"def getGlobalInt(listener, name, val):\n"
+"    # print(f'getGlobalInt(name={name}, val={val})')\n"
 "    pass\n"
 "\n\n"
-"def getGlobalString(op, name, val):\n"
+"def getGlobalString(listener, name, val):\n"
+"    # print(f'getGlobalString(name={name}, val={val})')\n"
 "    pass\n"
 "\n\n"
-"def getGlobalFloatArray(op, name, vals):\n"
+"def getGlobalFloatArray(listener, name, vals):\n"
+"    # print(f'getGlobalFloatArray(name={name}, vals={vals})')\n"
 "    pass\n"
 "\n\n"
-"def getGlobalIntArray(op, name, vals):\n"
+"def getGlobalIntArray(listener, name, vals):\n"
+"    # print(f'getGlobalIntArray(name={name}, vals={vals})')\n"
 "    pass\n"
 ;
 
@@ -108,24 +113,18 @@ DestroyCHOPInstance(CHOP_CPlusPlusBase* instance)
 
 };
 
-#define __STDC_WANT_LIB_EXT1__ 1
-#include <string.h>
-#include <stdio.h>
+vector<string> split(const string& s, char delim) {
+	vector<string> result;
+	stringstream ss(s);
+	string item;
 
-// for string delimiter
-vector<string> split(string s, string delimiter) {
-	size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-	string token;
-	vector<string> res;
-
-	while ((pos_end = s.find(delimiter, pos_start)) != string::npos) {
-		token = s.substr(pos_start, pos_end - pos_start);
-		pos_start = pos_end + delim_len;
-		res.push_back(token);
+	while (getline(ss, item, delim)) {
+		if (item.compare("") != 0) {
+			result.push_back(item);
+		}
 	}
 
-	res.push_back(s.substr(pos_start));
-	return res;
+	return result;
 }
 
 
@@ -162,11 +161,11 @@ ChucKListenerCHOP::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs,
     std::string Floatarrayvars = inputs->getParString("Floatarrayvars");
 	std::string Intarrayvars = inputs->getParString("Intarrayvars");
 
-	auto Floatvarstrings = split(Floatvars, " ");
-	auto Intvarstrings = split(Intvars, " ");
-	auto Stringvarstrings = split(Stringvars, " ");
-    auto Floatarrayvarstrings = split(Floatarrayvars, " ");
-	auto Intarrayvarstrings = split(Intarrayvars, " ");
+	auto Floatvarstrings = split(Floatvars, ' ');
+	auto Intvarstrings = split(Intvars, ' ');
+	auto Stringvarstrings = split(Stringvars, ' ');
+    auto Floatarrayvarstrings = split(Floatarrayvars, ' ');
+	auto Intarrayvarstrings = split(Intarrayvars, ' ');
 
 	myFloatVarNames.clear();
 	myIntVarNames.clear();
@@ -234,6 +233,10 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 	}
 
 	int chuck_id = ChucK_For_TouchDesigner::getChucKIDForOpID(chuckDesignerCHOP->opId);
+
+	if (chuck_id < 0) {
+		return;
+	}
 
 	for (const std::string varName : myFloatVarNames) {
 		ChucK_For_TouchDesigner::getNamedChuckFloat(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedFloatCallback);
