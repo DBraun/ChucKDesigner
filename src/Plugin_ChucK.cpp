@@ -881,8 +881,6 @@ namespace ChucK_For_TouchDesigner
             ) {
             numItems = myFloatArrayVarSizes[varName];
             return myFloatArrayVars[varName];
-            // todo:
-            //*vals = &myFloatArrayVars[varName];
         }
         numItems = 0;
         return nullptr;
@@ -895,8 +893,6 @@ namespace ChucK_For_TouchDesigner
             ) {
             numItems = myIntArrayVarSizes[varName];
             return myIntArrayVars[varName];
-            // todo:
-            //*vals = &myFloatArrayVars[varName];
         }
         numItems = 0;
         return nullptr;
