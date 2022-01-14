@@ -110,6 +110,12 @@ public:
     }
 
     void
+    broadcastChuckEvent(const char* name)
+    {
+        ChucK_For_TouchDesigner::broadcastChuckEvent(m_chuckID, name);
+    }
+
+    void
     setLogLevel(unsigned int level)
     {
         ChucK_For_TouchDesigner::setLogLevel(level);

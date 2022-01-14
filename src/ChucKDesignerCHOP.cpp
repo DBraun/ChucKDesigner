@@ -366,6 +366,37 @@ pySetGlobalAssociativeIntArrayValue(PyObject* self, PyObject* args, void*)
 }
 
 static PyObject*
+pyBroadcastChuckEvent(PyObject* self, PyObject* args, void*)
+{
+    PY_Struct* me = (PY_Struct*)self;
+
+    PY_GetInfo info;
+    // We don't want to cook the node before we set this, since it doesn't depend on its current state
+    info.autoCook = false; // todo: which value to use?
+    ChucKDesignerCHOP* inst = (ChucKDesignerCHOP*)me->context->getNodeInstance(info);
+    // It's possible the instance will be nullptr, such as if the node has been deleted
+    // while the Python class is still being held on and used elsewhere.
+    if (inst)
+    {
+        PyObject* name;
+
+        if (!PyArg_UnpackTuple(args, "ref", 1, 1, &name)) {
+            // error
+            FAIL_IN_CUSTOM_OPERATOR_METHOD
+        }
+
+        const char* castName = PyBytes_AsString(PyUnicode_AsASCIIString(name));
+
+        inst->broadcastChuckEvent(castName);
+        // Make the node dirty so it will cook an output a newly reset filter when asked next
+        me->context->makeNodeDirty();
+    }
+
+    // We need to inc-ref the None object if we are going to return it.
+    FAIL_IN_CUSTOM_OPERATOR_METHOD
+}
+
+static PyObject*
 pySetLogLevel(PyObject* self, PyObject* args, void*)
 {
     PY_Struct* me = (PY_Struct*)self;
@@ -408,6 +439,8 @@ static PyMethodDef methods[] =
 
     {"set_global_associative_float_array_value", (PyCFunction)pySetGlobalAssociativeFloatArrayValue, METH_VARARGS, "Set a single value in an associative ChucK global float array variable."},
     {"set_global_associative_float_int_value", (PyCFunction)pySetGlobalAssociativeIntArrayValue, METH_VARARGS, "Set a single value in an associative ChucK global int array variable."},
+
+    {"broadcast_event", (PyCFunction)pyBroadcastChuckEvent, METH_VARARGS, "Broadcast an event to ChucK."},
 
     {"set_log_level", (PyCFunction)pySetLogLevel, METH_VARARGS, "Set ChucK's log level."},
 
