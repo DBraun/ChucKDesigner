@@ -56,7 +56,7 @@ pySetGlobalFloat(PyObject* self, PyObject* args, void*)
         PyObject * ascii_mystring=PyUnicode_AsASCIIString(name);
         
         const char* castName = PyBytes_AsString(ascii_mystring);
-        double castVal = PyFloat_AsDouble(val);
+        t_CKFLOAT castVal = PyFloat_AsDouble(val);
         
         inst->setGlobalFloat(castName, castVal);
         // Make the node dirty so it will cook an output a newly reset filter when asked next
@@ -91,7 +91,7 @@ pySetGlobalInt(PyObject* self, PyObject* args, void*)
         PyObject* ascii_mystring = PyUnicode_AsASCIIString(name);
 
         const char* castName = PyBytes_AsString(ascii_mystring);
-        int castVal = _PyLong_AsInt(val);
+        t_CKINT castVal = _PyLong_AsInt(val);
 
         inst->setGlobalInt(castName, castVal);
         // Make the node dirty so it will cook an output a newly reset filter when asked next
@@ -243,7 +243,7 @@ pySetGlobalFloatArrayValue(PyObject* self, PyObject* args, void*)
 
         const char* castName = PyBytes_AsString(PyUnicode_AsASCIIString(name));
 
-        int castIndex = _PyLong_AsInt(index);
+        unsigned int castIndex = _PyLong_AsInt(index);
         t_CKFLOAT castValue = PyLong_AsDouble(value);
 
         inst->setGlobalFloatArrayValue(castName, castIndex, castValue);
@@ -279,7 +279,7 @@ pySetGlobalIntArrayValue(PyObject* self, PyObject* args, void*)
 
         const char* castName = PyBytes_AsString(PyUnicode_AsASCIIString(name));
 
-        int castIndex = _PyLong_AsInt(index);
+        unsigned int castIndex = _PyLong_AsInt(index);
         t_CKINT castValue = PyLong_AsLongLong(value);
 
         inst->setGlobalIntArrayValue(castName, castIndex, castValue);
@@ -585,6 +585,9 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
         inChucKBuffer = new float[CHUCKDESIGNERCHOP_BUFFER_SIZE * m_inChannels];
         outChucKBuffer = new float[CHUCKDESIGNERCHOP_BUFFER_SIZE * m_outChannels];
 
+        memset(inChucKBuffer, 0.f, sizeof(float) * CHUCKDESIGNERCHOP_BUFFER_SIZE * m_inChannels);
+        memset(outChucKBuffer, 0.f, sizeof(float) * CHUCKDESIGNERCHOP_BUFFER_SIZE * m_outChannels);
+
         //m_chuckID = ChucK_For_TouchDesigner::getNextValidID(myNodeInfo->opId);
 
         ChucK_For_TouchDesigner::initChuckInstance(m_chuckID, sample_rate, m_inChannels, m_outChannels, globalDir);
@@ -614,18 +617,23 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
         }
     }
 
-    auto chopInput = inputs->getInputCHOP(0);
-
     const float** inBuffer = nullptr;
     int inBufferNumChannels = 0;
     int inBufferNumSamples = 0;
-    if (chopInput) {
+
+    if (auto chopInput = inputs->getInputCHOP(0)) {
         inBuffer = chopInput->channelData;
         inBufferNumChannels = chopInput->numChannels;
         inBufferNumSamples = chopInput->numSamples;
     }
     
-    ChucK_For_TouchDesigner::processBlock(m_chuckID, inBuffer, inBufferNumChannels, inBufferNumSamples, inChucKBuffer, outChucKBuffer, output->channels, output->numSamples, output->numChannels);
+    bool result = ChucK_For_TouchDesigner::processBlock(m_chuckID, inBuffer, inBufferNumChannels, inBufferNumSamples, inChucKBuffer, outChucKBuffer, output->channels, output->numSamples, output->numChannels);
+    if (!result) {
+        // fill zeros
+        for (int chan = 0; chan < output->numChannels; chan++) {
+            memset(output->channels[chan], 0.f, sizeof(float) * output->numSamples);
+        }
+    }
 
 }
 

@@ -58,6 +58,8 @@ namespace ChucK_For_TouchDesigner
     static std::map<std::string, t_CKINT*> myIntArrayVars;
     static std::map<std::string, int> myIntArrayVarSizes;
 
+    static std::map<std::string, int> myVoidEventCallbacks;
+
     // C# "string" corresponds to passing char *
     CHUCKDESIGNERSHARED_API bool runChuckCode(unsigned int chuckID, const char* code)
     {

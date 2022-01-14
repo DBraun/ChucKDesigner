@@ -162,6 +162,8 @@ ChucKListenerCHOP::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs,
 	std::string Intarrayvars = inputs->getParString("Intarrayvars");
 	std::string Eventvars = inputs->getParString("Eventvars");
 
+	inputs->enablePar("Eventvars", false);
+
 	auto Floatvarstrings = split(Floatvars, ' ');
 	auto Intvarstrings = split(Intvars, ' ');
 	auto Stringvarstrings = split(Stringvars, ' ');
@@ -223,7 +225,28 @@ ChucKListenerCHOP::getChannelName(int32_t index, OP_String *name, const OP_Input
 	name->setString("chan1");
 }
 
+class MyCallback {
+public:
+	MyCallback(const char* newName, void (*callback)(const char*)) : m_name{ newName }, m_callback{ callback } {
 
+	};
+	~MyCallback() {
+
+	};
+
+	void update() {
+		while (m_numTimesCalled > 0)
+		{
+			m_callback(m_name);
+			m_numTimesCalled--;
+		}
+	}
+
+private:
+	const char* m_name;
+	int m_numTimesCalled = 0;
+	void (*m_callback)(const char*);
+};
 
 void
 ChucKListenerCHOP::execute(CHOP_Output* output,
@@ -264,6 +287,8 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 	}
 	for (const std::string varName : myEventVarNames) {
 		// todo: prevent duplicate listens
+		//string internalKey = std::to_string(this->myNodeInfo->opId) + "$" + varName;
+		//MyCallback* myCallback = new MyCallback("blah", nullptr);
 		//ChucK_For_TouchDesigner::startListeningForNamedChuckEvent(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedEventCallback);
 	}
 
@@ -439,6 +464,8 @@ ChucKListenerCHOP::getInfoCHOPChan(int32_t index,
 		chan->name->setString("executeCount");
 		chan->value = (float)myExecuteCount;
 	}
+
+	// todo: show number of shreds here
 }
 
 bool		
