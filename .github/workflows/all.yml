@@ -16,6 +16,11 @@ jobs:
       with:
         submodules: true
 
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.3
 
@@ -45,11 +50,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-10.15, macos-11]
+        os: [macos-latest]
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
 
     - name: Get CMake
       uses: lukka/get-cmake@latest
@@ -64,9 +74,11 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
+        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
         xcodebuild -configuration Release -project ChucKDesignerCHOP.xcodeproj
         ls -r *
+        install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib  Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
+        install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib  Release/ChucKListenerCHOP.plugin/Contents/MacOS/ChucKListenerCHOP
 
     - name: Make distribution
       run: |
