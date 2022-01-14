@@ -160,18 +160,21 @@ ChucKListenerCHOP::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs,
 	std::string Stringvars = inputs->getParString("Stringvars");
     std::string Floatarrayvars = inputs->getParString("Floatarrayvars");
 	std::string Intarrayvars = inputs->getParString("Intarrayvars");
+	std::string Eventvars = inputs->getParString("Eventvars");
 
 	auto Floatvarstrings = split(Floatvars, ' ');
 	auto Intvarstrings = split(Intvars, ' ');
 	auto Stringvarstrings = split(Stringvars, ' ');
     auto Floatarrayvarstrings = split(Floatarrayvars, ' ');
 	auto Intarrayvarstrings = split(Intarrayvars, ' ');
+	auto Eventvarstrings = split(Eventvars, ' ');
 
 	myFloatVarNames.clear();
 	myIntVarNames.clear();
 	myStringVarNames.clear();
     myFloatArrayVarNames.clear();
 	myIntArrayVarNames.clear();
+	myEventVarNames.clear();
 
 	//std::vector<std::string> myAssociativeFloatArrayVarNames;
 	//std::vector<std::string> myAssociativeIntArrayVarNames;
@@ -196,6 +199,10 @@ ChucKListenerCHOP::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs,
 		myIntArrayVarNames.push_back(str);
 	}
 
+	for (auto& str : myEventVarNames) {
+		myEventVarNames.push_back(str);
+	}
+
 	//info->sampleRate = 44100.;
 	info->numSamples = 1;
     info->startIndex = 0;
@@ -215,6 +222,8 @@ ChucKListenerCHOP::getChannelName(int32_t index, OP_String *name, const OP_Input
 
 	name->setString("chan1");
 }
+
+
 
 void
 ChucKListenerCHOP::execute(CHOP_Output* output,
@@ -252,6 +261,10 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
     }
 	for (const std::string varName : myIntArrayVarNames) {
 		ChucK_For_TouchDesigner::getNamedGlobalIntArray(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedIntArrayCallback);
+	}
+	for (const std::string varName : myEventVarNames) {
+		// todo: prevent duplicate listens
+		//ChucK_For_TouchDesigner::startListeningForNamedChuckEvent(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedEventCallback);
 	}
 
 	int i = 0;
@@ -375,6 +388,25 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 
 		// We own result now, so we need to Py_DECREF it unless we want to hold onto it
 		if (result) { Py_DECREF(result); }
+	}
+
+	for (const std::string varName : myEventVarNames)
+	{
+		// todo:
+		//auto event_queue = ChucK_For_TouchDesigner::getEventQueue(chuck_id, varName);
+
+
+		//// We'll only be adding one extra argument
+		//PyObject* args = myNodeInfo->context->createArgumentsTuple(1, nullptr);
+		//// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+		//PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(varName.c_str()));
+
+		//PyObject* result = myNodeInfo->context->callPythonCallback("getEvent", args, nullptr, nullptr);
+		//// callPythonCallback doesn't take ownership of the argts
+		//Py_DECREF(args);
+
+		//// We own result now, so we need to Py_DECREF it unless we want to hold onto it
+		//if (result) { Py_DECREF(result); }
 	}
     
 }
@@ -512,6 +544,18 @@ ChucKListenerCHOP::setupParameters(OP_ParameterManager* manager, void *reserved1
 
 		sp.name = "Intarrayvars";
 		sp.label = "Int Array Variables";
+
+		sp.defaultValue = "";
+
+		OP_ParAppendResult res = manager->appendString(sp);
+		assert(res == OP_ParAppendResult::Success);
+	}
+
+	{
+		OP_StringParameter    sp;
+
+		sp.name = "Eventvars";
+		sp.label = "Event Variables";
 
 		sp.defaultValue = "";
 

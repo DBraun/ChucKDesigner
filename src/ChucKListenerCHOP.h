@@ -73,6 +73,7 @@ private:
     std::vector<std::string> myStringVarNames;
     std::vector<std::string> myFloatArrayVarNames;
     std::vector<std::string> myIntArrayVarNames;
+    std::vector<std::string> myEventVarNames;
 
     std::vector<std::string> myAssociativeFloatArrayVarNames;
     std::vector<std::string> myAssociativeIntArrayVarNames;

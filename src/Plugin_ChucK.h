@@ -122,5 +122,7 @@ extern "C" {
 
         CHUCKDESIGNERSHARED_API void sharedFloatArrayCallback(const char* varName, t_CKFLOAT vals[], t_CKUINT numItems);
         CHUCKDESIGNERSHARED_API void sharedIntArrayCallback(const char* varName, t_CKINT vals[], t_CKUINT numItems);
+
+        CHUCKDESIGNERSHARED_API void sharedEventCallback(const char* varName);
     }
 };

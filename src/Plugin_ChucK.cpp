@@ -50,6 +50,7 @@ namespace ChucK_For_TouchDesigner
     static std::map<std::string, t_CKFLOAT> myFloatVars;
     static std::map<std::string, t_CKINT> myIntVars;
     static std::map<std::string, std::string> myStringVars;
+    static std::map<std::string, std::string> myEventVars;
 
     static std::map<std::string, t_CKFLOAT*> myFloatArrayVars;
     static std::map<std::string, int> myFloatArrayVarSizes;
@@ -847,6 +848,11 @@ namespace ChucK_For_TouchDesigner
         myIntArrayVarSizes[varName] = numItems;
     }
 
+    CHUCKDESIGNERSHARED_API void sharedEventCallback(const char* varName) {
+        // todo: add to a queue that involves the listener opID as an additional key
+        myEventVars;
+    }
+
     CHUCKDESIGNERSHARED_API t_CKFLOAT getFloat(const char* varName) {
         if (myFloatVars.find(varName) != myFloatVars.end()) {
             return myFloatVars[varName];
@@ -865,7 +871,7 @@ namespace ChucK_For_TouchDesigner
         if (myStringVars.find(varName) != myStringVars.end()) {
             return myStringVars[varName].c_str();
         }
-        return nullptr;
+        return "";
     }
 
     CHUCKDESIGNERSHARED_API t_CKFLOAT* getFloatArray(const char* varName, int& numItems) {
