@@ -28,6 +28,16 @@ Install Python 3.9. It is necessary because ChucKDesigner uses the new Custom Op
 
 Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.dll` files to this project's `Plugins` folder or `%USERPROFILE%/Documents/Derivative/Plugins`.
 
+<details>
+<summary>Building on Windows</summary>
+<br>
+In this repository,
+<code>
+cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
+</code>
+Then open `build/ChucKDesignerCHOP.sln`
+</details>
+
 ### MacOS
 
 Due to some difficulties with codesigning, for the moment you must compile ChucKDesigner on your own computer.
