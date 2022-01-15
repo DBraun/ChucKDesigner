@@ -74,6 +74,10 @@ while(true) {
 }
 ```
 
+This can be seen in the following image:
+
+![Float Example TouchDesigner Screenshot](docs/float_example.png?raw=true "Float Example TouchDesigner Screenshot")
+
 In TouchDesigner, we can execute the python code
 `op('chuckaudio1').set_global_float("freq", 880.)`
 This will set the global float variable named "freq" to 880. The code has been written to update the sine oscillator's frequency every 10 milliseconds, so you will immediately hear a change in the frequency. Note that the code below would **not** have led to a change in sound.
@@ -92,7 +96,7 @@ The reason is that global variables are not `UGen`. Although `freq` has been chu
 
 ### Streaming global floats and integers in ChucK Listener CHOP
 
-The ChucK Listener has a custom parameter for the ChucK Audio CHOP to which it should listen. Again, suppose we had used a ChucK Audio CHOP to compile this:
+The ChucK Listener has a custom parameter for the ChucK Audio CHOP to which it should listen. Suppose we had used a ChucK Audio CHOP to compile this:
 
 ```chuck
 440. => global float freq;
@@ -107,11 +111,11 @@ while(true) {
 }
 ```
 
-On the ChucK Audio Listener, there is a custom parameter for "Float Variables". In this field you can type any number of global variables, each separated by a single space. In this example, there's just one global float, so you can type "freq". Similarly, in the "Int Variables" custom parameter, you can type "randInt". The ChucK Listener will then output as ordinary CHOP information a single-sample named with one channel named "freq" and another named "randInt". The ordinary CHOP behavior of the Listener CHOP is only for global floats and global integers. However, all variable types can be received as Python callbacks. 
+On the ChucK Audio Listener, there is a custom parameter for "Float Variables". In this field you can type any number of global variables, each separated by a single space. In this example, there's just one global float, so you can type "freq". Similarly, in the "Int Variables" custom parameter, you can type "randInt". The ChucK Listener will then output as ordinary CHOP information a single-sample with one channel named "freq" and another channel named "randInt". The ordinary CHOP output of the Listener CHOP is only for global floats and global integers. However, all variable types can be received as Python callbacks, as explained in the next section.
 
 ### Python Callbacks in ChucK Listener CHOP
 
-Every video-rate frame of TouchDesigner is an opportunity to receive global variables from ChucK. In the example above, we used a `global float freq` and a `global int randInt`. These variables would show up in the callbacks `getGlobalFloat` and `getGlobalInt` respectively.
+In the example above, we used a `global float freq` and a `global int randInt`. Find the `Float Variables` and `Int Variables` custom parameters on the ChucK Listener CHOP and set them to `freq` and `randInt` respectively. Now `freq` will appear in the `getGlobalFloat` callback, and `randInt` will appear in the `getGlobalInt` callback. 
 
 ```python
 # This is an example callbacks DAT for a ChucK Audio Operator.
@@ -139,9 +143,7 @@ def getGlobalEvent(listener, name):
     print(f'getGlobalEvent(name="{name}")')
 ```
 
-For each callback method, you simply need to put the global variable name in the ChucK Listener's custom parameter list for that variable type.
-
-The `Event` type syntax is worth discussing. Let this be the compiled code:
+Most of these callbacks are straightforward to understand, but the `Event` type syntax is worth discussing. Let this be the compiled ChucK code:
 
 ```chuck
 global Event pulse;
@@ -169,4 +171,4 @@ At the beginning, there will be 2 channels of output by default. In TouchDesigne
 op('chuckaudio1').broadcast_event('pulse')
 ```
 
-This will spork a shred of `playImpact()`, which will play a short sound. After 1 second of playing the sound, ChucK will broadcast an event named "notifier" back to TouchDesigner. This event will show up in the `getGlobalEvent()` method, if "notifier" is in the list of events.
+This will spork a shred of `playImpact()`, which will play a short sound. After 1 second of playing the sound, ChucK will broadcast an event named "notifier" back to TouchDesigner. This event will show up in the `getGlobalEvent()` method, if "notifier" is in custom parameter `Event Variables`.
