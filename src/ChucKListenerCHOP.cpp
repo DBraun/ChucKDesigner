@@ -19,6 +19,7 @@
 #include <string.h>
 #include <cmath>
 #include <assert.h>
+
 //#include <vector>
 
 #ifdef _WIN32
@@ -44,6 +45,10 @@ const char* PythonCallbacksDATStubs =
 "\n\n"
 "def getGlobalString(listener, name, val):\n"
 "    # print(f'getGlobalString(name={name}, val={val})')\n"
+"    pass\n"
+"\n\n"
+"def getGlobalEvent(listener, name):\n"
+"    # print(f'getGlobalEvent(name={name})')\n"
 "    pass\n"
 "\n\n"
 "def getGlobalFloatArray(listener, name, vals):\n"
@@ -135,6 +140,9 @@ ChucKListenerCHOP::ChucKListenerCHOP(const OP_NodeInfo* info) : myNodeInfo(info)
 
 ChucKListenerCHOP::~ChucKListenerCHOP()
 {
+	for (auto varName : myEventVarNames) {
+		ChucK_For_TouchDesigner::removeListenerCHOP(varName.c_str(), this->myNodeInfo->opId);
+	}
 }
 
 void
@@ -160,23 +168,19 @@ ChucKListenerCHOP::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs,
 	std::string Stringvars = inputs->getParString("Stringvars");
     std::string Floatarrayvars = inputs->getParString("Floatarrayvars");
 	std::string Intarrayvars = inputs->getParString("Intarrayvars");
-	std::string Eventvars = inputs->getParString("Eventvars");
 
-	inputs->enablePar("Eventvars", false);
 
 	auto Floatvarstrings = split(Floatvars, ' ');
 	auto Intvarstrings = split(Intvars, ' ');
 	auto Stringvarstrings = split(Stringvars, ' ');
     auto Floatarrayvarstrings = split(Floatarrayvars, ' ');
 	auto Intarrayvarstrings = split(Intarrayvars, ' ');
-	auto Eventvarstrings = split(Eventvars, ' ');
 
 	myFloatVarNames.clear();
 	myIntVarNames.clear();
 	myStringVarNames.clear();
     myFloatArrayVarNames.clear();
 	myIntArrayVarNames.clear();
-	myEventVarNames.clear();
 
 	//std::vector<std::string> myAssociativeFloatArrayVarNames;
 	//std::vector<std::string> myAssociativeIntArrayVarNames;
@@ -199,10 +203,6 @@ ChucKListenerCHOP::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs,
 
 	for (auto& str : Intarrayvarstrings) {
 		myIntArrayVarNames.push_back(str);
-	}
-
-	for (auto& str : myEventVarNames) {
-		myEventVarNames.push_back(str);
 	}
 
 	//info->sampleRate = 44100.;
@@ -248,6 +248,7 @@ private:
 	void (*m_callback)(const char*);
 };
 
+
 void
 ChucKListenerCHOP::execute(CHOP_Output* output,
 							  const OP_Inputs* inputs,
@@ -265,6 +266,13 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 	}
 
 	int chuck_id = ChucK_For_TouchDesigner::getChucKIDForOpID(chuckDesignerCHOP->opId);
+
+	if (chuck_id != m_chuckID) {
+		// stop all listeners
+		myEventVarNames.clear();
+
+		m_chuckID = chuck_id;
+	}
 
 	if (chuck_id < 0) {
 		return;
@@ -285,12 +293,37 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 	for (const std::string varName : myIntArrayVarNames) {
 		ChucK_For_TouchDesigner::getNamedGlobalIntArray(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedIntArrayCallback);
 	}
-	for (const std::string varName : myEventVarNames) {
-		// todo: prevent duplicate listens
-		//string internalKey = std::to_string(this->myNodeInfo->opId) + "$" + varName;
-		//MyCallback* myCallback = new MyCallback("blah", nullptr);
-		//ChucK_For_TouchDesigner::startListeningForNamedChuckEvent(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedEventCallback);
+
+	// << event stuff
+	std::string Eventvars = inputs->getParString("Eventvars");
+
+	auto Eventvarstrings = split(Eventvars, ' ');
+
+	std::set<std::string> newEventStrings, eventsToStartListening, eventsToStopListening;
+
+	for (auto& str : Eventvarstrings) {
+		newEventStrings.insert(str);
 	}
+
+	set_difference(newEventStrings.begin(), newEventStrings.end(), myEventVarNames.begin(), myEventVarNames.end(), inserter(eventsToStartListening, eventsToStartListening.end()));
+	set_difference(myEventVarNames.begin(), myEventVarNames.end(), newEventStrings.begin(), newEventStrings.end(), inserter(eventsToStopListening, eventsToStopListening.end()));
+
+	for (const std::string varName : eventsToStopListening) {
+		bool result = ChucK_For_TouchDesigner::stopListeningForNamedChuckEvent(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedEventNonCallback);
+		if (result) {
+			ChucK_For_TouchDesigner::removeListenerCHOP(varName.c_str(), this->myNodeInfo->opId);
+		}
+	}
+
+	for (const std::string varName : eventsToStartListening) {
+		bool result = ChucK_For_TouchDesigner::startListeningForNamedChuckEvent(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedEventCallback);
+		if (result) {
+			ChucK_For_TouchDesigner::addListenerCHOP(varName.c_str(), this->myNodeInfo->opId);
+
+			myEventVarNames.insert(varName);
+		}
+	}
+	// end event stuff >>
 
 	int i = 0;
 	for (const std::string varName : myFloatVarNames)
@@ -417,21 +450,22 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 
 	for (const std::string varName : myEventVarNames)
 	{
-		// todo:
-		//auto event_queue = ChucK_For_TouchDesigner::getEventQueue(chuck_id, varName);
+		auto name = varName.c_str();
+		int count = ChucK_For_TouchDesigner::queryEvent(name, this->myNodeInfo->opId);
+		for (int i = 0; i < count; i++ ) {
+			// We'll only be adding one extra argument
+			PyObject* args = myNodeInfo->context->createArgumentsTuple(1, nullptr);
+			// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+			PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
 
+			PyObject* result = myNodeInfo->context->callPythonCallback("getGlobalEvent", args, nullptr, nullptr);
+			// callPythonCallback doesn't take ownership of the argts
+			Py_DECREF(args);
 
-		//// We'll only be adding one extra argument
-		//PyObject* args = myNodeInfo->context->createArgumentsTuple(1, nullptr);
-		//// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
-		//PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(varName.c_str()));
+			// We own result now, so we need to Py_DECREF it unless we want to hold onto it
+			if (result) { Py_DECREF(result); }
+		}
 
-		//PyObject* result = myNodeInfo->context->callPythonCallback("getEvent", args, nullptr, nullptr);
-		//// callPythonCallback doesn't take ownership of the argts
-		//Py_DECREF(args);
-
-		//// We own result now, so we need to Py_DECREF it unless we want to hold onto it
-		//if (result) { Py_DECREF(result); }
 	}
     
 }

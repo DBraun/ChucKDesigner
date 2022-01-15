@@ -124,5 +124,10 @@ extern "C" {
         CHUCKDESIGNERSHARED_API void sharedIntArrayCallback(const char* varName, t_CKINT vals[], t_CKUINT numItems);
 
         CHUCKDESIGNERSHARED_API void sharedEventCallback(const char* varName);
+        CHUCKDESIGNERSHARED_API void sharedEventNonCallback(const char* varName);
+
+        CHUCKDESIGNERSHARED_API void addListenerCHOP(const char* varName, uint32_t opID);
+        CHUCKDESIGNERSHARED_API void removeListenerCHOP(const char* varName, uint32_t opID);
+        CHUCKDESIGNERSHARED_API int queryEvent(const char* varName, uint32_t opID);
     }
 };

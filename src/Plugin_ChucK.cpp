@@ -19,7 +19,6 @@
 
 #include <cmath>
 
-
 namespace ChucK_For_TouchDesigner
 {
     enum Param
@@ -50,7 +49,6 @@ namespace ChucK_For_TouchDesigner
     static std::map<std::string, t_CKFLOAT> myFloatVars;
     static std::map<std::string, t_CKINT> myIntVars;
     static std::map<std::string, std::string> myStringVars;
-    static std::map<std::string, std::string> myEventVars;
 
     static std::map<std::string, t_CKFLOAT*> myFloatArrayVars;
     static std::map<std::string, int> myFloatArrayVarSizes;
@@ -59,6 +57,10 @@ namespace ChucK_For_TouchDesigner
     static std::map<std::string, int> myIntArrayVarSizes;
 
     static std::map<std::string, int> myVoidEventCallbacks;
+
+    static std::map<std::string, std::map<std::uint32_t, bool>> myEventToListenerIDs;
+
+    static std::map<std::string, std::map<std::uint32_t, unsigned int>> myEventToListenerIDCount;
 
     // C# "string" corresponds to passing char *
     CHUCKDESIGNERSHARED_API bool runChuckCode(unsigned int chuckID, const char* code)
@@ -851,8 +853,37 @@ namespace ChucK_For_TouchDesigner
     }
 
     CHUCKDESIGNERSHARED_API void sharedEventCallback(const char* varName) {
-        // todo: add to a queue that involves the listener opID as an additional key
-        myEventVars;
+        auto name = std::string(varName);
+        if ((myEventToListenerIDs.find(name) == myEventToListenerIDs.end()) ||
+            (myEventToListenerIDCount.find(name) == myEventToListenerIDCount.end())) {
+            return;
+        }
+
+        auto id_map = myEventToListenerIDs[name];
+        // For each listener, add to its queue.
+        for (const auto& myPair : id_map) {
+            auto listenerID = myPair.first;
+            myEventToListenerIDCount[name][listenerID] = myEventToListenerIDCount[name][listenerID] + 1;
+        }
+    }
+
+    CHUCKDESIGNERSHARED_API void sharedEventNonCallback(const char* varName) {
+
+    }
+
+    CHUCKDESIGNERSHARED_API int queryEvent(const char* varName, uint32_t opID) {
+
+        auto name = std::string(varName);
+        if ((myEventToListenerIDs.find(name) == myEventToListenerIDs.end()) ||
+            (myEventToListenerIDCount.find(name) == myEventToListenerIDCount.end())) {
+            return 0;
+        }
+
+        int count = myEventToListenerIDCount[name][opID];
+
+        myEventToListenerIDCount[name][opID] = 0;
+
+        return count;
     }
 
     CHUCKDESIGNERSHARED_API t_CKFLOAT getFloat(const char* varName) {
@@ -1095,5 +1126,23 @@ namespace ChucK_For_TouchDesigner
         data_instances[id] = data;
         
         return true;
+    }
+
+    void addListenerCHOP(const char* varName, uint32_t opID) {
+        auto name = std::string(varName);
+        myEventToListenerIDs[name][opID] = true;
+        myEventToListenerIDCount[name][opID] = 0;
+    }
+    void removeListenerCHOP(const char* varName, uint32_t opID) {
+
+        auto name = std::string(varName);
+
+        if (myEventToListenerIDs.find(name) != myEventToListenerIDs.end()) {
+            myEventToListenerIDs[name].erase(opID);
+        }
+
+        if (myEventToListenerIDCount.find(name) != myEventToListenerIDCount.end()) {
+            myEventToListenerIDCount[name].erase(opID);
+        }
     }
 }

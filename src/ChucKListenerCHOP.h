@@ -21,6 +21,7 @@ using namespace TD;
 #include <functional>
 #include <map>
 #include <mutex>
+#include <set>
 
 // To get more help about these functions, look at CHOP_CPlusPlusBase.h
 class ChucKListenerCHOP : public CHOP_CPlusPlusBase
@@ -73,8 +74,10 @@ private:
     std::vector<std::string> myStringVarNames;
     std::vector<std::string> myFloatArrayVarNames;
     std::vector<std::string> myIntArrayVarNames;
-    std::vector<std::string> myEventVarNames;
+    std::set<std::string> myEventVarNames;
 
     std::vector<std::string> myAssociativeFloatArrayVarNames;
     std::vector<std::string> myAssociativeIntArrayVarNames;
+
+    unsigned int m_chuckID = -1;
 };
