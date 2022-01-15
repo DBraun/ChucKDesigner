@@ -50,7 +50,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [macos-11]
     steps:
     - uses: actions/checkout@v2
       with:
@@ -60,7 +60,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-        architecture: 'x86_64'
 
     - name: Get CMake
       uses: lukka/get-cmake@latest
@@ -73,6 +72,7 @@ jobs:
 
     - name: Build MacOS (Release)
       run: |
+        export PATH=$pythonLocation:$PATH
         mkdir build
         cd build
         cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
