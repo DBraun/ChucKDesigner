@@ -58,7 +58,7 @@ jobs:
 
     - name: Setup Python
       run: |
-        cd ./github
+        cd install_script
         python macos_install_python.py
         which python
         python --version
