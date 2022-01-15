@@ -31,11 +31,17 @@ Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKD
 <details>
 <summary>Building on Windows</summary>
 <br>
-In this repository,
+Clone this repository with git. Then update all submodules in the root of the repository with `git submodule update --init --recursive`.
+<br>
+Install CMake and confirm that it's installed by running <code>cmake --version</code> in a command prompt.
+<br>
+Then in this repository,
+<br>
 <code>
 cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
 </code>
-Then open `build/ChucKDesignerCHOP.sln`
+<br>
+Then open <code>build/ChucKDesignerCHOP.sln</code> and compile.
 </details>
 
 ### MacOS
