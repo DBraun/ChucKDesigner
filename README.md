@@ -20,10 +20,6 @@ Demo:
 
 [Downloading ChucK](https://chuck.stanford.edu/release/) is optional but highly encouraged! Use miniAudicle and the examples that come with the installation to learn ChucK. More educational resources are available from the [ChucK homepage](https://chuck.stanford.edu/). ChucKDesigner is very similar to [Chunity](https://chuck.stanford.edu/chunity/) (the integration of ChucK with Unity), so you are also encouraged to learn about Chunity!
 
-### Python
-
-Install Python 3.9. It is necessary because ChucKDesigner uses the new Custom Operator API for communicating between C++ and Python.
-
 ### Windows
 
 Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.dll` files to this project's `Plugins` folder or `%USERPROFILE%/Documents/Derivative/Plugins`.
@@ -32,6 +28,8 @@ Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKD
 <summary>Building on Windows</summary>
 <br>
 Clone this repository with git. Then update all submodules in the root of the repository with `git submodule update --init --recursive`.
+<br>
+Install Python 3.9 and confirm it's in your system PATH.
 <br>
 Install CMake and confirm that it's installed by running <code>cmake --version</code> in a command prompt.
 <br>
@@ -49,11 +47,12 @@ Then open <code>build/ChucKDesignerCHOP.sln</code> and compile.
 Due to some difficulties with codesigning, for the moment you must compile ChucKDesigner on your own computer.
 
 1. Clone this repository with git. Then update all submodules in the root of the repository with `git submodule update --init --recursive`
-2. Install Xcode.
-3. [Install CMake](https://cmake.org/download/) and confirm that it's installed by running `cmake --version` in Terminal.
-4. Find your Development Profile. Open Keychain Access, go to 'login' on the left, and look for something like `Apple Development: example@example.com (ABCDE12345)`. Then in Terminal, run `export CODESIGN_IDENTITY="Apple Development: example@example.com (ABCDE12345)"` with your own info substituted. If you weren't able to find your profile, you need to create one. Open Xcode, go to "Accounts", add your Apple ID, click "Manage Certificates", and use the plus icon to add a profile. Then check Keychain Access again.
-5. In the same Terminal window, navigate to the root of this repository and run `sh build_macos.sh`
-6. Open `ChucKDesigner.toe`
+2. Install Python 3.9 and confirm it's in your system PATH.
+3. Install Xcode.
+4. [Install CMake](https://cmake.org/download/) and confirm that it's installed by running `cmake --version` in Terminal.
+5. Find your Development Profile. Open Keychain Access, go to 'login' on the left, and look for something like `Apple Development: example@example.com (ABCDE12345)`. Then in Terminal, run `export CODESIGN_IDENTITY="Apple Development: example@example.com (ABCDE12345)"` with your own info substituted. If you weren't able to find your profile, you need to create one. Open Xcode, go to "Accounts", add your Apple ID, click "Manage Certificates", and use the plus icon to add a profile. Then check Keychain Access again.
+6. In the same Terminal window, navigate to the root of this repository and run `sh build_macos.sh`
+7. Open `ChucKDesigner.toe`
 
 <!-- Download and unzip the latest macOS [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.plugin` and `.dylib` files to this project's `Plugins` folder or `~/Library/Application Support/Derivative/TouchDesigner099/Plugins`. -->
 
