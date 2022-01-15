@@ -50,7 +50,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-11]
+        os: [macos-latest]
     steps:
     - uses: actions/checkout@v2
       with:
@@ -72,10 +72,11 @@ jobs:
 
     - name: Build MacOS (Release)
       run: |
+        lipo -info /usr/local/opt/python@3.9/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib
         export PATH=$pythonLocation:$PATH
         mkdir build
         cd build
-        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15
+        cmake .. -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
         xcodebuild -configuration Release -project ChucKDesignerCHOP.xcodeproj
         ls -r *
         install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib  Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
