@@ -34,29 +34,32 @@ const char* PythonCallbacksDATStubs =
 "# This is an example callbacks DAT for a ChucK Audio Operator.\n"
 "# In all callback methods, \"listener\" is the ChucK Listener operator doing the callback.\n"
 "\n\n"
-"# Do something with a ChucK global float.\n"
 "def getGlobalFloat(listener, name, val):\n"
-"    # print(f'getGlobalFloat(name={name}, val={val})')\n"
+"    # print(f'getGlobalFloat(name=\"{name}\", val={val})')\n"
 "    pass\n"
 "\n\n"
 "def getGlobalInt(listener, name, val):\n"
-"    # print(f'getGlobalInt(name={name}, val={val})')\n"
+"    # print(f'getGlobalInt(name=\"{name}\", val={val})')\n"
 "    pass\n"
 "\n\n"
 "def getGlobalString(listener, name, val):\n"
-"    # print(f'getGlobalString(name={name}, val={val})')\n"
+"    # print(f'getGlobalString(name=\"{name}\", val={val})')\n"
 "    pass\n"
 "\n\n"
 "def getGlobalEvent(listener, name):\n"
-"    # print(f'getGlobalEvent(name={name})')\n"
+"    # print(f'getGlobalEvent(name=\"{name}\")')\n"
 "    pass\n"
 "\n\n"
 "def getGlobalFloatArray(listener, name, vals):\n"
-"    # print(f'getGlobalFloatArray(name={name}, vals={vals})')\n"
+"    # print(f'getGlobalFloatArray(name=\"{name}\", vals={vals})')\n"
 "    pass\n"
 "\n\n"
 "def getGlobalIntArray(listener, name, vals):\n"
-"    # print(f'getGlobalIntArray(name={name}, vals={vals})')\n"
+"    # print(f'getGlobalIntArray(name=\"{name}\", vals={vals})')\n"
+"    pass\n"
+"\n\n"
+"def getGlobalEvent(listener, name):\n"
+"    # print(f'getGlobalIntArray(name=\"{name}\")')\n"
 "    pass\n"
 ;
 
@@ -222,31 +225,14 @@ ChucKListenerCHOP::getChannelName(int32_t index, OP_String *name, const OP_Input
 		return;
 	}
 
-	name->setString("chan1");
-}
-
-class MyCallback {
-public:
-	MyCallback(const char* newName, void (*callback)(const char*)) : m_name{ newName }, m_callback{ callback } {
-
-	};
-	~MyCallback() {
-
-	};
-
-	void update() {
-		while (m_numTimesCalled > 0)
-		{
-			m_callback(m_name);
-			m_numTimesCalled--;
-		}
+	index -= myFloatVarNames.size();
+	if (index < myIntVarNames.size()) {
+		name->setString(myIntVarNames.at(index).c_str());
+		return;
 	}
 
-private:
-	const char* m_name;
-	int m_numTimesCalled = 0;
-	void (*m_callback)(const char*);
-};
+	name->setString("chan1");
+}
 
 
 void
