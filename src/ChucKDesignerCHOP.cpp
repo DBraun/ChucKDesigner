@@ -243,8 +243,8 @@ pySetGlobalFloatArrayValue(PyObject* self, PyObject* args, void*)
 
         const char* castName = PyBytes_AsString(PyUnicode_AsASCIIString(name));
 
-        unsigned int castIndex = _PyLong_AsInt(index);
-        t_CKFLOAT castValue = PyLong_AsDouble(value);
+        int castIndex = _PyLong_AsInt(index);
+        t_CKFLOAT castValue = PyFloat_AsDouble(value);
 
         inst->setGlobalFloatArrayValue(castName, castIndex, castValue);
         // Make the node dirty so it will cook an output a newly reset filter when asked next
@@ -279,7 +279,7 @@ pySetGlobalIntArrayValue(PyObject* self, PyObject* args, void*)
 
         const char* castName = PyBytes_AsString(PyUnicode_AsASCIIString(name));
 
-        unsigned int castIndex = _PyLong_AsInt(index);
+        int castIndex = _PyLong_AsInt(index);
         t_CKINT castValue = PyLong_AsLongLong(value);
 
         inst->setGlobalIntArrayValue(castName, castIndex, castValue);
@@ -317,7 +317,7 @@ pySetGlobalAssociativeFloatArrayValue(PyObject* self, PyObject* args, void*)
 
         char* castKey = PyBytes_AsString(PyUnicode_AsASCIIString(key));
 
-        t_CKFLOAT castValue = PyLong_AsDouble(value);
+        t_CKFLOAT castValue = PyFloat_AsDouble(value);
 
         inst->setGlobalAssociativeFloatArrayValue(castName, castKey, castValue);
         // Make the node dirty so it will cook an output a newly reset filter when asked next
