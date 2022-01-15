@@ -57,9 +57,11 @@ jobs:
         submodules: true
 
     - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
+      run: |
+        cd ./github
+        python macos_install_python.py
+        which python
+        python --version
 
     - name: Get CMake
       uses: lukka/get-cmake@latest
@@ -72,11 +74,10 @@ jobs:
 
     - name: Build MacOS (Release)
       run: |
-        lipo -info /usr/local/opt/python@3.9/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib
-        export PATH=$pythonLocation:$PATH
+        export PATH="/Library/Frameworks/Python.framework/Versions/3.9/bin":$PATH
         mkdir build
         cd build
-        cmake .. -G "Xcode" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
         xcodebuild -configuration Release -project ChucKDesignerCHOP.xcodeproj
         ls -r *
         install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib  Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
