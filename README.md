@@ -147,20 +147,18 @@ The `Event` type syntax is worth discussing. Let this be the compiled code:
 global Event pulse;
 global Event notifier;
 
-fun void playImpact()
-{
+fun void playImpact() {
 	SndBuf buf => dac;
 	"special:dope" => buf.read;
 
-    // chuck enough time so that the buf plays
+	// chuck enough time so that the buf plays
 	1::second => now; 
 	
 	// invoke getGlobalEvent("notifier") in TouchDesigner
 	notifier.broadcast();
 }
 
-while( true )
-{
+while( true ) {
 	pulse => now;
 	spork ~ playImpact();
 }
