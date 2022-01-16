@@ -118,36 +118,27 @@ def make_symlinks(installation_bin_path: Path, python_executable: str, pip_execu
     (SYMLINKS_DIR / "pip").symlink_to(installation_bin_path / pip_executable)
 
 
-def install_cpython(version: str, url: str) -> Path:
-    installed_system_packages = subprocess.run(
-        ["pkgutil", "--pkgs"], universal_newlines=True, check=True, stdout=subprocess.PIPE
-    ).stdout.splitlines()
+def install_cpython(tmp: Path, version: str, url: str) -> Path:
+    installation_path = Path(f"/Library/Frameworks/Python.framework/Versions/{version}")
+    pkg_path = tmp / "Python.pkg"
+    # download the pkg
+    download(url, pkg_path)
+    # install
+    call("sudo", "installer", "-pkg", pkg_path, "-target", "/")
+    pkg_path.unlink()
+    call(installation_path / "bin" / "python3", install_certifi_script)
 
-    # if this version of python isn't installed, get it from python.org and install
-    python_package_identifier = f"org.python.Python.PythonFramework-{version}"
-    python_executable = "python3"
-    installation_bin_path = Path(f"/Library/Frameworks/Python.framework/Versions/{version}/bin")
-
-    if python_package_identifier not in installed_system_packages:
-        # download the pkg
-        download(url, Path("/tmp/Python.pkg"))
-        # install
-        call("sudo", "installer", "-pkg", "/tmp/Python.pkg", "-target", "/")
-        call("sudo", str(installation_bin_path / python_executable), str(install_certifi_script))
-
-    pip_executable = "pip3"
-    make_symlinks(installation_bin_path, python_executable, pip_executable)
-
-    return installation_bin_path
-
+    return installation_path / "bin" / "python3"
+    
 
 def main():
 
+    tmp = Path("/tmp/cibw_tmp")
     version = "3.9"
     url = "https://www.python.org/ftp/python/3.9.7/python-3.9.7-macos11.pkg"
 
-    install_cpython(version, url)
-
+    base_python = install_cpython(version, url)
+    assert base_python.exists()
 
 if __name__ == '__main__':
     main()
