@@ -34,32 +34,28 @@ const char* PythonCallbacksDATStubs =
 "# This is an example callbacks DAT for a ChucK Audio Operator.\n"
 "# In all callback methods, \"listener\" is the ChucK Listener operator doing the callback.\n"
 "\n\n"
-"def getGlobalFloat(listener, name, val):\n"
-"    # print(f'getGlobalFloat(name=\"{name}\", val={val})')\n"
+"def getFloat(listener, name, val):\n"
+"    # print(f'getFloat(name=\"{name}\", val={val})')\n"
 "    pass\n"
 "\n\n"
-"def getGlobalInt(listener, name, val):\n"
-"    # print(f'getGlobalInt(name=\"{name}\", val={val})')\n"
+"def getInt(listener, name, val):\n"
+"    # print(f'getInt(name=\"{name}\", val={val})')\n"
 "    pass\n"
 "\n\n"
-"def getGlobalString(listener, name, val):\n"
-"    # print(f'getGlobalString(name=\"{name}\", val={val})')\n"
+"def getString(listener, name, val):\n"
+"    # print(f'getString(name=\"{name}\", val={val})')\n"
 "    pass\n"
 "\n\n"
-"def getGlobalEvent(listener, name):\n"
-"    # print(f'getGlobalEvent(name=\"{name}\")')\n"
+"def getEvent(listener, name):\n"
+"    # print(f'getEvent(name=\"{name}\")')\n"
 "    pass\n"
 "\n\n"
-"def getGlobalFloatArray(listener, name, vals):\n"
-"    # print(f'getGlobalFloatArray(name=\"{name}\", vals={vals})')\n"
+"def getFloatArray(listener, name, vals):\n"
+"    # print(f'getFloatArray(name=\"{name}\", vals={vals})')\n"
 "    pass\n"
 "\n\n"
-"def getGlobalIntArray(listener, name, vals):\n"
-"    # print(f'getGlobalIntArray(name=\"{name}\", vals={vals})')\n"
-"    pass\n"
-"\n\n"
-"def getGlobalEvent(listener, name):\n"
-"    # print(f'getGlobalEvent(name=\"{name}\")')\n"
+"def getIntArray(listener, name, vals):\n"
+"    # print(f'getIntArray(name=\"{name}\", vals={vals})')\n"
 "    pass\n"
 ;
 
@@ -329,7 +325,7 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
         PyTuple_SET_ITEM(args, 2, PyLong_FromDouble(val));
 		
 
-        PyObject *result = myNodeInfo->context->callPythonCallback("getGlobalFloat", args, nullptr, nullptr);
+        PyObject *result = myNodeInfo->context->callPythonCallback("getFloat", args, nullptr, nullptr);
         // callPythonCallback doesn't take ownership of the argts
         Py_DECREF(args);
 
@@ -353,7 +349,7 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 		PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
 		PyTuple_SET_ITEM(args, 2, PyLong_FromLongLong(val));
 
-		PyObject* result = myNodeInfo->context->callPythonCallback("getGlobalInt", args, nullptr, nullptr);
+		PyObject* result = myNodeInfo->context->callPythonCallback("getInt", args, nullptr, nullptr);
 		// callPythonCallback doesn't take ownership of the argts
 		Py_DECREF(args);
 
@@ -372,7 +368,7 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 		PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
 		PyTuple_SET_ITEM(args, 2, PyUnicode_FromString(str));
 
-		PyObject* result = myNodeInfo->context->callPythonCallback("getGlobalString", args, nullptr, nullptr);
+		PyObject* result = myNodeInfo->context->callPythonCallback("getString", args, nullptr, nullptr);
 		// callPythonCallback doesn't take ownership of the argts
 		Py_DECREF(args);
 
@@ -403,7 +399,7 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 
         PyTuple_SET_ITEM(args, 2, lst);
 
-        PyObject *result = myNodeInfo->context->callPythonCallback("getGlobalFloatArray", args, nullptr, nullptr);
+        PyObject *result = myNodeInfo->context->callPythonCallback("getFloatArray", args, nullptr, nullptr);
         // callPythonCallback doesn't take ownership of the argts
         Py_DECREF(args);
         //Py_DECREF(lst);  // todo?
@@ -435,7 +431,7 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 
 		PyTuple_SET_ITEM(args, 2, lst);
 
-		PyObject* result = myNodeInfo->context->callPythonCallback("getGlobalIntArray", args, nullptr, nullptr);
+		PyObject* result = myNodeInfo->context->callPythonCallback("getIntArray", args, nullptr, nullptr);
 		// callPythonCallback doesn't take ownership of the argts
 		Py_DECREF(args);
         //Py_DECREF(lst);  // todo?
@@ -454,7 +450,7 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 			// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
 			PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
 
-			PyObject* result = myNodeInfo->context->callPythonCallback("getGlobalEvent", args, nullptr, nullptr);
+			PyObject* result = myNodeInfo->context->callPythonCallback("getEvent", args, nullptr, nullptr);
 			// callPythonCallback doesn't take ownership of the argts
 			Py_DECREF(args);
 

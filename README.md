@@ -63,15 +63,15 @@ Due to some difficulties with codesigning, for the moment you must compile ChucK
 
 The ChucK Audio CHOP's functions:
 
-* `.set_global_float(name: str, val: float)`
-* `.set_global_int(name: str, val: int)`
-* `.set_global_string(name: str, val: int)`
-* `.set_global_float_array(name: str, vals: List[float])` **not numpy arrays!**
-* `.set_global_int_array(name: str, vals: List[int])` **not numpy arrays!**
-* `.set_global_float_array_value(name: str, index: int, val: float)`
-* `.set_global_int_array_value(name: str, index: int, val: int)`
-* `.set_global_associative_float_array_value(name: str, key: str, val: float)`
-* `.set_global_associative_int_array_value(name: str, key: str, val: int)`
+* `.set_float(name: str, val: float)`
+* `.set_int(name: str, val: int)`
+* `.set_string(name: str, val: int)`
+* `.set_float_array(name: str, vals: List[float])` **not numpy arrays!**
+* `.set_int_array(name: str, vals: List[int])` **not numpy arrays!**
+* `.set_float_array_value(name: str, index: int, val: float)`
+* `.set_int_array_value(name: str, index: int, val: int)`
+* `.set_associative_float_array_value(name: str, key: str, val: float)`
+* `.set_associative_int_array_value(name: str, key: str, val: int)`
 * `.broadcast_event(name: str)`
 * `.set_log_level(level: int)`
 
@@ -93,7 +93,7 @@ This can be seen in the following image:
 ![Float Example TouchDesigner Screenshot](docs/float_example.png?raw=true "Float Example TouchDesigner Screenshot")
 
 In TouchDesigner, we can execute the Python code
-`op('chuckaudio1').set_global_float("freq", 880.)`
+`op('chuckaudio1').set_float("freq", 880.)`
 This will set the global float variable named "freq" to 880. The code has been written to update the sine oscillator's frequency every 10 milliseconds, so you will immediately hear a change in the frequency. Note that the code below would **not** have led to a change in sound.
 
 ```chuck
@@ -129,32 +129,29 @@ On the ChucK Audio Listener, there is a custom parameter for "Float Variables". 
 
 ### Python Callbacks in ChucK Listener CHOP
 
-In the example above, we used a `global float freq` and a `global int randInt`. Find the `Float Variables` and `Int Variables` custom parameters on the ChucK Listener CHOP and set them to `freq` and `randInt` respectively. Now `freq` will appear in the `getGlobalFloat` callback, and `randInt` will appear in the `getGlobalInt` callback. 
+In the example above, we used a `global float freq` and a `global int randInt`. Find the `Float Variables` and `Int Variables` custom parameters on the ChucK Listener CHOP and set them to `freq` and `randInt` respectively. Now `freq` will appear in the `getFloat` callback, and `randInt` will appear in the `getInt` callback. 
 
 ```python
 # This is an example callbacks DAT for a ChucK Audio Operator.
 # In all callback methods, "listener" is the ChucK Listener operator doing the callback.
 
-def getGlobalFloat(listener, name, val):
-    print(f'getGlobalFloat(name="{name}", val={val})')
+def getFloat(listener, name, val):
+    print(f'getFloat(name="{name}", val={val})')
 
-def getGlobalInt(listener, name, val):
-    print(f'getGlobalInt(name="{name}", val={val})')
+def getInt(listener, name, val):
+    print(f'getInt(name="{name}", val={val})')
 
-def getGlobalString(listener, name, val):
-    print(f'getGlobalString(name="{name}", val={val})')
+def getString(listener, name, val):
+    print(f'getString(name="{name}", val={val})')
 
-def getGlobalEvent(listener, name):
-    print(f'getGlobalEvent(name="{name}")')
+def getEvent(listener, name):
+    print(f'getEvent(name="{name}")')
 
-def getGlobalFloatArray(listener, name, vals):
-    print(f'getGlobalFloatArray(name="{name}", vals={vals})')
+def getFloatArray(listener, name, vals):
+    print(f'getFloatArray(name="{name}", vals={vals})')
 
-def getGlobalIntArray(listener, name, vals):
-    print(f'getGlobalIntArray(name="{name}", vals={vals})')
-
-def getGlobalEvent(listener, name):
-    print(f'getGlobalEvent(name="{name}")')
+def getIntArray(listener, name, vals):
+    print(f'getIntArray(name="{name}", vals={vals})')
 ```
 
 Most of these callbacks are straightforward to understand, but the `Event` type syntax is worth discussing. Let this be the compiled ChucK code:
@@ -170,7 +167,7 @@ fun void playImpact() {
     // chuck enough time so that the buf plays
     1::second => now; 
     
-    // invoke getGlobalEvent("notifier") in TouchDesigner
+    // invoke getEvent("notifier") in TouchDesigner
     notifier.broadcast();
 }
 
@@ -185,4 +182,4 @@ At the beginning, there will be 2 channels of output by default. In TouchDesigne
 op('chuckaudio1').broadcast_event('pulse')
 ```
 
-This will spork a shred of `playImpact()`, which will play a short sound. After 1 second of playing the sound, ChucK will broadcast an event named "notifier" back to TouchDesigner. This event will show up in the `getGlobalEvent()` method, if "notifier" is in custom parameter `Event Variables`.
+This will spork a shred of `playImpact()`, which will play a short sound. After 1 second of playing the sound, ChucK will broadcast an event named "notifier" back to TouchDesigner. This event will show up in the `getEvent()` method, if "notifier" is in custom parameter `Event Variables`.

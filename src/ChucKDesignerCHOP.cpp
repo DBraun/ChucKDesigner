@@ -427,18 +427,18 @@ pySetLogLevel(PyObject* self, PyObject* args, void*)
 
 static PyMethodDef methods[] =
 {
-    {"set_global_float", (PyCFunction)pySetGlobalFloat, METH_VARARGS, "Set a ChucK global float variable."},
-    {"set_global_int", (PyCFunction)pySetGlobalInt, METH_VARARGS, "Set a ChucK global float variable."},
-    {"set_global_string", (PyCFunction)pySetGlobalString, METH_VARARGS, "Set a ChucK global string variable."},
+    {"set_float", (PyCFunction)pySetGlobalFloat, METH_VARARGS, "Set a ChucK global float variable."},
+    {"set_int", (PyCFunction)pySetGlobalInt, METH_VARARGS, "Set a ChucK global float variable."},
+    {"set_string", (PyCFunction)pySetGlobalString, METH_VARARGS, "Set a ChucK global string variable."},
     
-    {"set_global_float_array", (PyCFunction)pySetGlobalFloatArray, METH_VARARGS, "Set a ChucK global float array variable."},
-    {"set_global_int_array", (PyCFunction)pySetGlobalIntArray, METH_VARARGS, "Set a ChucK global int array variable."},
+    {"set_float_array", (PyCFunction)pySetGlobalFloatArray, METH_VARARGS, "Set a ChucK global float array variable."},
+    {"set_int_array", (PyCFunction)pySetGlobalIntArray, METH_VARARGS, "Set a ChucK global int array variable."},
     
-    {"set_global_float_array_value", (PyCFunction)pySetGlobalFloatArrayValue, METH_VARARGS, "Set a single value in a ChucK global float array variable."},
-    {"set_global_int_array_value", (PyCFunction)pySetGlobalIntArrayValue, METH_VARARGS, "Set a single value in a ChucK global int array variable."},
+    {"set_float_array_value", (PyCFunction)pySetGlobalFloatArrayValue, METH_VARARGS, "Set a single value in a ChucK global float array variable."},
+    {"set_int_array_value", (PyCFunction)pySetGlobalIntArrayValue, METH_VARARGS, "Set a single value in a ChucK global int array variable."},
 
-    {"set_global_associative_float_array_value", (PyCFunction)pySetGlobalAssociativeFloatArrayValue, METH_VARARGS, "Set a single value in an associative ChucK global float array variable."},
-    {"set_global_associative_float_int_value", (PyCFunction)pySetGlobalAssociativeIntArrayValue, METH_VARARGS, "Set a single value in an associative ChucK global int array variable."},
+    {"set_associative_float_array_value", (PyCFunction)pySetGlobalAssociativeFloatArrayValue, METH_VARARGS, "Set a single value in an associative ChucK global float array variable."},
+    {"set_associative_float_int_value", (PyCFunction)pySetGlobalAssociativeIntArrayValue, METH_VARARGS, "Set a single value in an associative ChucK global int array variable."},
 
     {"broadcast_event", (PyCFunction)pyBroadcastChuckEvent, METH_VARARGS, "Broadcast an event to ChucK."},
 
