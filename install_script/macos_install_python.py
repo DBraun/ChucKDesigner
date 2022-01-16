@@ -35,20 +35,6 @@ import shutil
 
 from typing import Union, Optional
 
-# python_configurations = [
-#   { identifier: "cp36-macosx_x86_64", version: "3.6", url: "https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg" },
-#   { identifier: "cp37-macosx_x86_64", version: "3.7", url: "https://www.python.org/ftp/python/3.7.9/python-3.7.9-macosx10.9.pkg" },
-#   { identifier: "cp38-macosx_x86_64", version: "3.8", url: "https://www.python.org/ftp/python/3.8.10/python-3.8.10-macosx10.9.pkg" },
-#   { identifier: "cp38-macosx_arm64", version: "3.8", url: "https://www.python.org/ftp/python/3.8.10/python-3.8.10-macosx10.9.pkg" },
-#   { identifier: "cp38-macosx_universal2", version: "3.8", url: "https://www.python.org/ftp/python/3.8.10/python-3.8.10-macosx10.9.pkg" },
-#   { identifier: "cp39-macosx_x86_64", version: "3.9", url: "https://www.python.org/ftp/python/3.9.7/python-3.9.7-macos11.pkg" },
-#   { identifier: "cp39-macosx_arm64", version: "3.9", url: "https://www.python.org/ftp/python/3.9.7/python-3.9.7-macos11.pkg" },
-#   { identifier: "cp39-macosx_universal2", version: "3.9", url: "https://www.python.org/ftp/python/3.9.7/python-3.9.7-macos11.pkg" },
-#   { identifier: "cp310-macosx_x86_64", version: "3.10", url: "https://www.python.org/ftp/python/3.10.0/python-3.10.0-macos11.pkg" },
-#   { identifier: "cp310-macosx_arm64", version: "3.10", url: "https://www.python.org/ftp/python/3.10.0/python-3.10.0-macos11.pkg" },
-#   { identifier: "cp310-macosx_universal2", version: "3.10", url: "https://www.python.org/ftp/python/3.10.0/python-3.10.0-macos11.pkg" },
-#   { identifier: "pp37-macosx_x86_64", version: "3.7", url: "https://downloads.python.org/pypy/pypy3.7-v7.3.5-osx64.tar.bz2" },
-# ]
 
 install_certifi_script = Path(__file__).parent / "install_certifi.py"
 
@@ -135,7 +121,7 @@ def main():
 
     tmp = Path("/tmp/cibw_tmp")
     version = "3.9"
-    url = "https://www.python.org/ftp/python/3.9.7/python-3.9.7-macos11.pkg"
+    url = "https://www.python.org/ftp/python/3.9.9/python-3.9.9-macos11.pkg"
 
     base_python = install_cpython(tmp, version, url)
     assert base_python.exists()
