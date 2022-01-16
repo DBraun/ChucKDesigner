@@ -85,8 +85,8 @@ Suppose the ChucK Audio CHOP has compiled this code:
 SinOsc s => dac;
 
 while(true) {
-	freq => s.freq;
-	10::ms => now;
+    freq => s.freq;
+    10::ms => now;
 }
 ```
 
@@ -104,7 +104,7 @@ SinOsc s => dac;
 440. => global float freq => s.freq;
 
 while(true) {
-	10::ms => now;
+    10::ms => now;
 }
 ```
 
@@ -121,9 +121,9 @@ The ChucK Listener has a custom parameter for the ChucK Audio CHOP to which it s
 SinOsc s => dac;
 
 while(true) {
-	freq => s.freq;
-	Std.rand2(0, 10) => randInt;
-	10::ms => now;
+    freq => s.freq;
+    Std.rand2(0, 10) => randInt;
+    10::ms => now;
 }
 ```
 
@@ -166,19 +166,19 @@ global Event pulse;
 global Event notifier;
 
 fun void playImpact() {
-	SndBuf buf => dac;
-	"special:dope" => buf.read;
+    SndBuf buf => dac;
+    "special:dope" => buf.read;
 
-	// chuck enough time so that the buf plays
-	1::second => now; 
-	
-	// invoke getGlobalEvent("notifier") in TouchDesigner
-	notifier.broadcast();
+    // chuck enough time so that the buf plays
+    1::second => now; 
+    
+    // invoke getGlobalEvent("notifier") in TouchDesigner
+    notifier.broadcast();
 }
 
 while( true ) {
-	pulse => now;
-	spork ~ playImpact();
+    pulse => now;
+    spork ~ playImpact();
 }
 ```
 
