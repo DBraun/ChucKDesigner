@@ -59,7 +59,7 @@ const char* PythonCallbacksDATStubs =
 "    pass\n"
 "\n\n"
 "def getGlobalEvent(listener, name):\n"
-"    # print(f'getGlobalIntArray(name=\"{name}\")')\n"
+"    # print(f'getGlobalEvent(name=\"{name}\")')\n"
 "    pass\n"
 ;
 
