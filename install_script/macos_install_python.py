@@ -96,9 +96,14 @@ def install_cpython(version: str, url: str) -> Path:
 
     return installation_bin_path
 
-if __name__ == '__main__':
+
+def main():
 
     version = "3.9"
     url = "https://www.python.org/ftp/python/3.9.7/python-3.9.7-macos11.pkg"
 
     install_cpython(version, url)
+
+
+if __name__ == '__main__':
+    main()
