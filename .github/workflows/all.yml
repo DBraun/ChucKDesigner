@@ -50,7 +50,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [macos-11]
     steps:
     - uses: actions/checkout@v2
       with:
@@ -86,7 +86,7 @@ jobs:
         which python3
         python3 --version
         mkdir build && cd build
-        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
         xcodebuild -configuration Release -project ChucKDesignerCHOP.xcodeproj
         ls -r *
         install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
