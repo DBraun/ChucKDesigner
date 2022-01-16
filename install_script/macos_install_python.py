@@ -30,6 +30,9 @@ import ssl
 import urllib.request
 import subprocess
 import certifi
+import shlex
+
+from typing import Union, Optional
 
 # python_configurations = [
 #   { identifier: "cp36-macosx_x86_64", version: "3.6", url: "https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg" },
@@ -73,6 +76,25 @@ def download(url: str, dest: Path) -> None:
         dest.write_bytes(response.read())
     finally:
         response.close()
+
+
+PathOrStr = Union[str, "os.PathLike[str]"]
+
+
+def call(
+    *args: PathOrStr,
+) -> Optional[str]:
+    """
+    Run subprocess.run, but print the commands first. Takes the commands as
+    *args. Uses shell=True on Windows due to a bug. Also converts to
+    Paths to strings, due to Windows behavior at least on older Pythons.
+    https://bugs.python.org/issue8557
+    """
+    args_ = [str(arg) for arg in args]
+    # print the command executing for the logs
+    print("+ " + " ".join(shlex.quote(a) for a in args_))
+    result = subprocess.run(args_, check=True, shell=False, env=None, cwd=None)
+    return None
 
 
 def install_cpython(version: str, url: str) -> Path:
