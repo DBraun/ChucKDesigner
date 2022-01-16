@@ -129,7 +129,7 @@ def install_cpython(tmp: Path, version: str, url: str) -> Path:
     call(installation_path / "bin" / "python3", install_certifi_script)
 
     return installation_path / "bin" / "python3"
-    
+
 
 def main():
 
@@ -137,7 +137,7 @@ def main():
     version = "3.9"
     url = "https://www.python.org/ftp/python/3.9.7/python-3.9.7-macos11.pkg"
 
-    base_python = install_cpython(version, url)
+    base_python = install_cpython(tmp, version, url)
     assert base_python.exists()
 
 if __name__ == '__main__':
