@@ -385,6 +385,10 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
         auto name = varName.c_str();
 		int numItems = 0;
         auto vec = ChucK_For_TouchDesigner::getFloatArray(name, numItems);
+        
+        if (!numItems || !vec) {
+            continue;
+        }
 
         // We'll only be adding one extra argument
         PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
@@ -402,6 +406,7 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
         PyObject *result = myNodeInfo->context->callPythonCallback("getGlobalFloatArray", args, nullptr, nullptr);
         // callPythonCallback doesn't take ownership of the argts
         Py_DECREF(args);
+        //Py_DECREF(lst);  // todo?
 
         // We own result now, so we need to Py_DECREF it unless we want to hold onto it
         if (result) { Py_DECREF(result); }
@@ -413,13 +418,17 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 		int numItems = 0;
 		auto vec = ChucK_For_TouchDesigner::getIntArray(name, numItems);
 
+        if (!numItems || !vec) {
+            continue;
+        }
+        
 		// We'll only be adding one extra argument
 		PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
 		// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
 		PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
 
 		// todo: return a numpy array
-		PyObject* lst = PyList_New(numItems);
+		PyObject *lst = PyList_New(numItems);
 		for (i = 0; i < numItems; i++) {
 			PyList_SET_ITEM(lst, i, PyLong_FromLongLong(*(vec++)));
 		}
@@ -429,6 +438,7 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 		PyObject* result = myNodeInfo->context->callPythonCallback("getGlobalIntArray", args, nullptr, nullptr);
 		// callPythonCallback doesn't take ownership of the argts
 		Py_DECREF(args);
+        //Py_DECREF(lst);  // todo?
 
 		// We own result now, so we need to Py_DECREF it unless we want to hold onto it
 		if (result) { Py_DECREF(result); }

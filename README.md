@@ -6,7 +6,7 @@ ChucKDesigner is an integration of the ChucK music/audio programming language wi
 * TouchDesigner can run ChucK code at any sample rate, with any number of input and output channels.
 * TouchDesigner can receive and post-process ChucK's output such as audio or melodic information.
 * TouchDesigner can set ChucK global variables with TouchDesigner UI, CHOP streams, and Python scripting.
-* TouchDesigner can use callbacks in a DAT to respond to changes in ChucK global variables.
+* TouchDesigner can use Python callbacks to respond to changes in ChucK global variables.
 
 Please use the [issues](https://github.com/DBraun/ChucKDesigner/issues) and [discussions](https://github.com/DBraun/ChucKDesigner/discussions) pages on GitHub.
 
@@ -51,14 +51,15 @@ Due to some difficulties with codesigning, for the moment you must compile ChucK
 3. Install Xcode.
 4. [Install CMake](https://cmake.org/download/) and confirm that it's installed by running `cmake --version` in Terminal.
 5. Find your Development Profile. Open Keychain Access, go to 'login' on the left, and look for something like `Apple Development: example@example.com (ABCDE12345)`. Then in Terminal, run `export CODESIGN_IDENTITY="Apple Development: example@example.com (ABCDE12345)"` with your own info substituted. If you weren't able to find your profile, you need to create one. Open Xcode, go to "Accounts", add your Apple ID, click "Manage Certificates", and use the plus icon to add a profile. Then check Keychain Access again.
-6. In the same Terminal window, navigate to the root of this repository and run `sh build_macos.sh`
-7. Open `ChucKDesigner.toe`
+6. Similarly export a variable to the TouchDesigner.app to which you'd like to support. For example: `export TOUCHDESIGNER_APP=/Applications/TouchDesigner-2021.app`, assuming this version is a 2021.30000 build or higher.
+7. In the same Terminal window, navigate to the root of this repository and run `sh build_macos.sh`
+8. Open `ChucKDesigner.toe`
 
 <!-- Download and unzip the latest macOS [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.plugin` and `.dylib` files to this project's `Plugins` folder or `~/Library/Application Support/Derivative/TouchDesigner099/Plugins`. -->
 
 ## API
 
-The 2021 **experimental** build of TouchDesigner supports a more [powerful interface for Custom Operators](https://docs.derivative.ca/Release_Notes/2021.30000#Custom_Operators). This interface allows Python code in TouchDesigner to invoke methods inside a custom operator. In the other direction, the interface also allows the custom operator to invoke a Python callback inside TouchDesigner. The ChucK Audio CHOP is where ChucK code is run, and therefore it's the operator which can be told what to do via Python methods. In the other direction, the ChucK Listener CHOP can listen to a ChucK Audio CHOP and use a callback DAT to respond to changes in global variables. Let's discuss some examples for each.
+The 2021.30000+ builds of TouchDesigner support a more [powerful interface for Custom Operators](https://docs.derivative.ca/Release_Notes/2021.30000#Custom_Operators). This interface allows Python code in TouchDesigner to invoke methods inside a custom operator. The ChucK Audio CHOP is where ChucK code is run, and therefore it's the operator which can be told what to do via Python methods. In the other direction, the ChucK Listener CHOP can use a callback DAT to respond to changes in a ChucK Audio CHOP's global variables. Let's discuss some examples for each.
 
 ### Python interface to ChucK Audio CHOP
 

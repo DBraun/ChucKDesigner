@@ -1,3 +1,10 @@
+if [ "$TOUCHDESIGNER_APP" == "" ]; then
+	# a reasonable default in case you forget to set the path to TouchDesigner.
+	export TOUCHDESIGNER_APP=/Applications/TouchDesigner-2021.app
+fi
+
+echo Assuming TouchDesigner is located at $TOUCHDESIGNER_APP
+
 # Remove any old plugins and dylib
 rm Plugins/libChucKDesignerShared.dylib
 rm -r Plugins/ChucKDesignerCHOP.plugin
@@ -18,6 +25,10 @@ xcodebuild -configuration Release -project ChucKDesignerCHOP.xcodeproj
 # Steps so that libChucKDesignerShared.dylib is found as a dependency
 install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib  Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
 install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib  Release/ChucKListenerCHOP.plugin/Contents/MacOS/ChucKListenerCHOP
+
+# This is pretty hacky because we didn't originally link to the TouchDesigner python library when compiling.
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
+install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib Release/ChucKListenerCHOP.plugin/Contents/MacOS/ChucKListenerCHOP
 
 # codesigning
 # Open Keychain Access. Go to "login". Look for "Apple Development".
