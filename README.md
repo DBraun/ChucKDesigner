@@ -8,6 +8,8 @@ ChucKDesigner is an integration of the ChucK music/audio programming language wi
 * TouchDesigner can set ChucK global variables with TouchDesigner UI, CHOP streams, and Python scripting.
 * TouchDesigner can use Python callbacks to respond to changes in ChucK global variables.
 
+ChucKDesigner consists of two custom operators, the ChucK Audio CHOP and the ChucK Listener CHOP. The Audio CHOP "runs" the ChucK code. TouchDesigner can also tell it how to update global variables. The Listener CHOP "listens" to an Audio CHOP. It can continuously stream out global floats and integers as ordinary CHOP data. Using a Python-based callback DAT, it can also access many more global variable types such as float arrays, strings, and events.
+
 Please use the [issues](https://github.com/DBraun/ChucKDesigner/issues) and [discussions](https://github.com/DBraun/ChucKDesigner/discussions) pages on GitHub.
 
 Demo:
@@ -27,7 +29,7 @@ Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKD
 <details>
 <summary>Building on Windows</summary>
 <br>
-Clone this repository with git. Then update all submodules in the root of the repository with `git submodule update --init --recursive`.
+Clone this repository with git. Then update all submodules in the root of the repository with <code>git submodule update --init --recursive</code>.
 <br>
 Install Python 3.9 and confirm it's in your system PATH.
 <br>
@@ -39,7 +41,7 @@ Then in this repository,
 cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
 </code>
 <br>
-Then open <code>build/ChucKDesignerCHOP.sln</code> and compile.
+Finally, open <code>build/ChucKDesignerCHOP.sln</code> and compile.
 </details>
 
 ### MacOS
@@ -59,11 +61,9 @@ Due to some difficulties with codesigning, for the moment you must compile ChucK
 
 ## API
 
-The 2021.30000+ builds of TouchDesigner support a more [powerful interface for Custom Operators](https://docs.derivative.ca/Release_Notes/2021.30000#Custom_Operators). This interface allows Python code in TouchDesigner to invoke methods inside a custom operator. The ChucK Audio CHOP is where ChucK code is run, and therefore it's the operator which can be told what to do via Python methods. In the other direction, the ChucK Listener CHOP can use a callback DAT to respond to changes in a ChucK Audio CHOP's global variables. Let's discuss some examples for each.
-
 ### Python interface to ChucK Audio CHOP
 
-Methods:
+The ChucK Audio CHOP's functions:
 
 * `.set_global_float(name: str, val: float)`
 * `.set_global_int(name: str, val: int)`
@@ -94,7 +94,7 @@ This can be seen in the following image:
 
 ![Float Example TouchDesigner Screenshot](docs/float_example.png?raw=true "Float Example TouchDesigner Screenshot")
 
-In TouchDesigner, we can execute the python code
+In TouchDesigner, we can execute the Python code
 `op('chuckaudio1').set_global_float("freq", 880.)`
 This will set the global float variable named "freq" to 880. The code has been written to update the sine oscillator's frequency every 10 milliseconds, so you will immediately hear a change in the frequency. Note that the code below would **not** have led to a change in sound.
 
