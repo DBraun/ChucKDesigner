@@ -31,6 +31,7 @@ import urllib.request
 import subprocess
 import certifi
 import shlex
+import shutil
 
 from typing import Union, Optional
 
@@ -95,6 +96,26 @@ def call(
     print("+ " + " ".join(shlex.quote(a) for a in args_))
     result = subprocess.run(args_, check=True, shell=False, env=None, cwd=None)
     return None
+
+
+SYMLINKS_DIR = Path("/tmp/cibw_bin")
+
+
+def make_symlinks(installation_bin_path: Path, python_executable: str, pip_executable: str) -> None:
+    assert (installation_bin_path / python_executable).exists()
+
+    # Python bin folders on Mac don't symlink `python3` to `python`, and neither
+    # does PyPy for `pypy` or `pypy3`, so we do that so `python` and `pip` always
+    # point to the active configuration.
+    if SYMLINKS_DIR.exists():
+        shutil.rmtree(SYMLINKS_DIR)
+    SYMLINKS_DIR.mkdir(parents=True)
+
+    (SYMLINKS_DIR / "python").symlink_to(installation_bin_path / python_executable)
+    (SYMLINKS_DIR / "python-config").symlink_to(
+        installation_bin_path / (python_executable + "-config")
+    )
+    (SYMLINKS_DIR / "pip").symlink_to(installation_bin_path / pip_executable)
 
 
 def install_cpython(version: str, url: str) -> Path:
