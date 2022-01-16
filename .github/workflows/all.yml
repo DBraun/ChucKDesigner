@@ -65,6 +65,7 @@ jobs:
       run: |
         which python
         python --version
+        pip install --upgrade certifi
         cd install_script
         python macos_install_python.py
         which python
