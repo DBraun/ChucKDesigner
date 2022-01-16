@@ -24,14 +24,12 @@ Demo:
 
 ### Windows
 
-Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.dll` files to this project's `Plugins` folder or `%USERPROFILE%/Documents/Derivative/Plugins`.
+Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.dll` files to this project's `Plugins` folder or `%USERPROFILE%/Documents/Derivative/Plugins`. Install Python 3.9 to `C:/Python39/` and confirm it's in your system PATH.
 
 <details>
 <summary>Building on Windows</summary>
 <br>
 Clone this repository with git. Then update all submodules in the root of the repository with <code>git submodule update --init --recursive</code>.
-<br>
-Install Python 3.9 and confirm it's in your system PATH.
 <br>
 Install CMake and confirm that it's installed by running <code>cmake --version</code> in a command prompt.
 <br>
