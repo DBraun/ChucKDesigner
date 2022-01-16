@@ -29,6 +29,7 @@ import os
 import ssl
 import urllib.request
 import subprocess
+import certifi
 
 # python_configurations = [
 #   { identifier: "cp36-macosx_x86_64", version: "3.6", url: "https://www.python.org/ftp/python/3.6.8/python-3.6.8-macosx10.9.pkg" },
