@@ -108,7 +108,7 @@ while(true) {
 }
 ```
 
-The reason is that global variables are not `UGen`. Although `freq` has been chucked to `s.freq`, we still need code in the `while(true)` loop to update the oscillator's frequency.
+The reason is that global variables are not [Unit Generators](https://chuck.stanford.edu/doc/program/ugen.html). Although `freq` has been chucked to `s.freq`, we still need code in the `while(true)` loop to update the oscillator's frequency.
 
 ### Streaming global floats and integers in ChucK Listener CHOP
 
