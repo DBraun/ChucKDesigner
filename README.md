@@ -1,14 +1,14 @@
 # ChucKDesigner
 
-[TouchDesigner](https://derivative.ca/) => [ChucK](https://chuck.stanford.edu/) => [TouchDesigner](https://derivative.ca/);
+`TouchDesigner => ChucK => TouchDesigner;`
 
-ChucKDesigner is an integration of the ChucK music/audio programming language with the TouchDesigner visual programming language. With ChucKDesigner,
+ChucKDesigner is an integration of the [ChucK](https://chuck.stanford.edu/) music/audio programming language with the [TouchDesigner](https://derivative.ca) visual programming language. With ChucKDesigner,
 * TouchDesigner can run ChucK code at any sample rate, with any number of input and output channels.
 * TouchDesigner can receive and post-process ChucK's output such as audio or melodic information.
 * TouchDesigner can set ChucK global variables with TouchDesigner UI, CHOP streams, and Python scripting.
 * TouchDesigner can use Python callbacks to respond to changes in ChucK global variables.
 
-ChucKDesigner consists of two custom operators, the ChucK Audio CHOP and the ChucK Listener CHOP. The Audio CHOP "runs" the ChucK code. TouchDesigner can also tell it how to update global variables. The Listener CHOP "listens" to an Audio CHOP. It can continuously stream out global floats and integers as ordinary CHOP data. Using a Python-based callback DAT, it can also access many more global variable types such as float arrays, strings, and events.
+ChucKDesigner consists of two custom operators, the ChucK Audio CHOP and the ChucK Listener CHOP. The ChucK Audio CHOP "runs" the ChucK code. TouchDesigner can also tell it how to update global variables. The Listener CHOP "listens" to a ChucK Audio CHOP. It can continuously stream out global floats and integers as ordinary CHOP data. Using a Python-based callback DAT, it can also access many more global variable types such as arrays, strings, and events.
 
 Please use the [issues](https://github.com/DBraun/ChucKDesigner/issues) and [discussions](https://github.com/DBraun/ChucKDesigner/discussions) pages on GitHub.
 
