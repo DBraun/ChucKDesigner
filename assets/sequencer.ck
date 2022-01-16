@@ -1,7 +1,7 @@
 // number of tracks
 7 => int NUM_TRACKS;
 
-// TouchDesigner will set these global Event and int variables
+// TouchDesigner sets these global Event and int variables
 global Event notifier0;
 global Event notifier1;
 global Event notifier2;
@@ -32,10 +32,11 @@ global float playheadPos;
 // so we pick something less than (1000./60.)=16.6 ms
 10::ms => dur POS_RATE;
 
-// MEASURE_SEC is the amount of seconds in 4 quarter notes
-(240. / BPM)::second => dur MEASURE_SEC;
+// MEASURE_SEC is the amount of seconds in 4 beats
+(60. * 4./ BPM)::second => dur MEASURE_SEC;
 
-// posInc is how much playheadPos needs to increment when now advances by POS_RATE
+// posInc is how much playheadPos needs to increment
+// when now advances by POS_RATE
 POS_RATE/MEASURE_SEC => float posInc;
 
 class Track {
@@ -65,7 +66,8 @@ class Track {
 
     time offTime;
 
-    fun void setup(int id, string name, string file_path, int seq[], Event notifier) {
+    fun void setup(int id, string name, string file_path,
+                   int seq[], Event notifier) {
         id => trackID;
         name => myName;
         seq @=> mySeq;
