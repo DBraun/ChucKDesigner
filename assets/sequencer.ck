@@ -1,15 +1,7 @@
 // number of tracks
 7 => int NUM_TRACKS;
 
-// TouchDesigner sets these global Event and int variables
-global Event notifier0;
-global Event notifier1;
-global Event notifier2;
-global Event notifier3;
-global Event notifier4;
-global Event notifier5;
-global Event notifier6;
-
+// TouchDesigner sets these int arrays, one per track
 global int sequence0[4];
 global int sequence1[4];
 global int sequence2[4];
@@ -20,6 +12,14 @@ global int sequence6[16];
 
 // ChucK will own the following global variables,
 // and TouchDesigner will receive them in callbacks
+global Event notifier0;
+global Event notifier1;
+global Event notifier2;
+global Event notifier3;
+global Event notifier4;
+global Event notifier5;
+global Event notifier6;
+
 global float adsr_curves[NUM_TRACKS];
 
 // playheadPos loops between 0 and 1 every measure
