@@ -12,9 +12,15 @@ ChucKDesigner consists of two custom operators, the ChucK Audio CHOP and the Chu
 
 Please use the [issues](https://github.com/DBraun/ChucKDesigner/issues) and [discussions](https://github.com/DBraun/ChucKDesigner/discussions) pages on GitHub.
 
-Demo:
+## Tutorials
+
+Part 1 (Introduction):
 
 [![Demo Video Screenshot](https://img.youtube.com/vi/TmJQh1lWXso/0.jpg)](https://www.youtube.com/watch?v=TmJQh1lWXso "ChucKDesigner - Music Programming in TouchDesigner")
+
+Part 2 (Python API):
+
+[![Make a Drum Sequencer with ChucK in TouchDesigner](https://img.youtube.com/vi/U34PyL_zMJ0/0.jpg)](https://www.youtube.com/watch?v=U34PyL_zMJ0 "Make a Drum Sequencer with ChucK in TouchDesigner")
 
 ## Installation
 
