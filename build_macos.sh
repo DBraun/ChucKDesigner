@@ -1,6 +1,6 @@
 if [ "$TOUCHDESIGNER_APP" == "" ]; then
 	# a reasonable default in case you forget to set the path to TouchDesigner.
-	export TOUCHDESIGNER_APP=/Applications/TouchDesigner-2021.app
+	export TOUCHDESIGNER_APP=/Applications/TouchDesigner.app
 fi
 
 echo Assuming TouchDesigner is located at $TOUCHDESIGNER_APP
