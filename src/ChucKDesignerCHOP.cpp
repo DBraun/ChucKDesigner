@@ -572,7 +572,7 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
 
     if (needCompile) {
 
-        string globalDir = inputs->getParString("Workingdirectory");
+        string globalDir = inputs->getParFilePath("Workingdirectory");
 
         double sample_rate = inputs->getParDouble("Samplerate");
 

@@ -79,7 +79,7 @@ The ChucK Audio CHOP's functions:
 * `.set_associative_float_array_value(name: str, key: str, val: float)`
 * `.set_associative_int_array_value(name: str, key: str, val: int)`
 * `.broadcast_event(name: str)`
-* `.set_log_level(level: int)`
+* `.set_log_level(level: int)` **0 is None and 10 is "Crazy"**
 
 Suppose the ChucK Audio CHOP has compiled this code:
 
@@ -189,3 +189,8 @@ op('chuckaudio1').broadcast_event('pulse')
 ```
 
 This will spork a shred of `playImpact()`, which will play a short sound. After 1 second of playing the sound, ChucK will broadcast an event named "notifier" back to TouchDesigner. This event will show up in the `getEvent()` method, if "notifier" is in custom parameter `Event Variables`.
+
+
+### Chugins
+
+ChucKDesigner supports [Chugins](https://github.com/ccrma/chugins/), which are custom pre-compiled ChucK "plugins". The chugin should be located in a subfolder named "Chugins" of the "working directory" custom parameter on the ChucK Audio CHOP. For example, if the working directory parameter is "assets", then the chugins should be in "assets/Chugins".

@@ -952,6 +952,7 @@ namespace ChucK_For_TouchDesigner
             chugin_search.push_back(globalDir + "/Chugins" );
             chugin_search.push_back(globalDir + "/ChuGins" );
             chugin_search.push_back(globalDir + "/chugins" );
+
             chuck->setParam( CHUCK_PARAM_USER_CHUGIN_DIRECTORIES, chugin_search );
             
             // initialize and start
