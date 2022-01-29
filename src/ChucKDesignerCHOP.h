@@ -134,7 +134,6 @@ private:
 
 	void reset();
 
-    bool myStatus = false;
     bool needCompile = false;
 
     float* inChucKBuffer = new float[1];

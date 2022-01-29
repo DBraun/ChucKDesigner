@@ -639,10 +639,7 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
 
 void
 ChucKDesignerCHOP::getErrorString(OP_String* error, void* reserved1) {
-
-    if (!myStatus) {
-        error->setString(myError.str().c_str());
-    }
+    error->setString(myError.str().c_str());
 }
 
 int32_t
