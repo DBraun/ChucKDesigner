@@ -30,10 +30,10 @@ Part 2 (Python API):
 
 ### Windows
 
-Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.dll` files to this project's `Plugins` folder or `%USERPROFILE%/Documents/Derivative/Plugins`. Install Python 3.9 to `C:/Python39/` and confirm it's in your system PATH.
+Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.dll` files to this project's `Plugins` folder or `%USERPROFILE%/Documents/Derivative/Plugins`. Install [Python 3.9](https://www.python.org/downloads/release/python-3910/) to `C:/Python39/` and confirm it's in your system PATH. That's all!
 
 <details>
-<summary>Building on Windows</summary>
+<summary>Building on Windows (Optional)</summary>
 <br>
 Clone this repository with git. Then update all submodules in the root of the repository with <code>git submodule update --init --recursive</code>.
 <br>
@@ -53,11 +53,11 @@ Finally, open <code>build/ChucKDesignerCHOP.sln</code> and compile.
 Due to some difficulties with codesigning, for the moment you must compile ChucKDesigner on your own computer.
 
 1. Clone this repository with git. Then update all submodules in the root of the repository with `git submodule update --init --recursive`
-2. Install Python 3.9 and confirm it's in your system PATH.
+2. Install [Python 3.9 universal2](https://www.python.org/downloads/release/python-3910/) and confirm it's in your system PATH.
 3. Install Xcode.
 4. [Install CMake](https://cmake.org/download/) and confirm that it's installed by running `cmake --version` in Terminal.
 5. Find your Development Profile. Open Keychain Access, go to 'login' on the left, and look for something like `Apple Development: example@example.com (ABCDE12345)`. Then in Terminal, run `export CODESIGN_IDENTITY="Apple Development: example@example.com (ABCDE12345)"` with your own info substituted. If you weren't able to find your profile, you need to create one. Open Xcode, go to "Accounts", add your Apple ID, click "Manage Certificates", and use the plus icon to add a profile. Then check Keychain Access again.
-6. Similarly export a variable to the TouchDesigner.app to which you'd like to support. For example: `export TOUCHDESIGNER_APP=/Applications/TouchDesigner-2021.app`, assuming this version is a 2021.30000 build or higher.
+6. Similarly export a variable to the TouchDesigner.app to which you'd like to support. For example: `export TOUCHDESIGNER_APP=/Applications/TouchDesigner.app`, assuming this version is a 2021.30000 build or higher.
 7. In the same Terminal window, navigate to the root of this repository and run `sh build_macos.sh`
 8. Open `ChucKDesigner.toe`
 
@@ -188,7 +188,7 @@ At the beginning, there will be 2 channels of output by default. In TouchDesigne
 op('chuckaudio1').broadcast_event('pulse')
 ```
 
-This will spork a shred of `playImpact()`, which will play a short sound. After 1 second of playing the sound, ChucK will broadcast an event named "notifier" back to TouchDesigner. This event will show up in the `getEvent()` method, if "notifier" is in custom parameter `Event Variables`.
+This will spork a shred of `playImpact()`, which will play a short sound. After 1 second of playing the sound, ChucK will broadcast an event named "notifier" back to TouchDesigner. This event will show up in the `getEvent()` method, if "notifier" is in the custom parameter `Event Variables`.
 
 
 ### Chugins
