@@ -30,7 +30,7 @@ jobs:
     - name: Build Windows (Release)
       run: |
         mkdir build
-        cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
+        cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPython_ROOT_DIR=$pythonLocation
         cd build
         msbuild ChucKDesignerCHOP.sln /property:Configuration=Release
 
@@ -50,7 +50,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-11]
+        os: [macos-latest]
     steps:
     - uses: actions/checkout@v2
       with:
