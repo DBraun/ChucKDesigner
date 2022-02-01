@@ -572,7 +572,11 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
 
     if (needCompile) {
 
-        string globalDir = inputs->getParFilePath("Workingdirectory");
+        // Until ChucK on windows parses the working directory better,
+        // we have to pass it as a relative path rather than an absolute path.
+        // https://github.com/ccrma/chuck/blob/de0530b4d0d85c9fe4abca17019730fe8e8e0454/src/core/chuck.cpp#L524
+        string globalDir = inputs->getParString("Workingdirectory");
+        //string globalDir = inputs->getParFilePath("Workingdirectory");
 
         double sample_rate = inputs->getParDouble("Samplerate");
 
