@@ -30,8 +30,9 @@ jobs:
     - name: Build Windows (Release)
       run: |
         mkdir build
-        set PATH="$pythonLocation;$PATH"
+        echo "$pythonLocation" >> $GITHUB_PATH
         echo "PATH: " $PATH
+        echo "GITHUB_PATH: " $GITHUB_PATH
         cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPython3_ROOT_DIR=$pythonLocation
         cd build
         msbuild ChucKDesignerCHOP.sln /property:Configuration=Release
