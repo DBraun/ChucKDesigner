@@ -30,6 +30,7 @@ jobs:
     - name: Build Windows (Release)
       run: |
         mkdir build
+        set PATH="$pythonLocation;$PATH"
         cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPython_ROOT_DIR=$pythonLocation
         cd build
         msbuild ChucKDesignerCHOP.sln /property:Configuration=Release
