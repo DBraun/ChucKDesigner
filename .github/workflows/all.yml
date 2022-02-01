@@ -19,7 +19,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
+        python-version: "3.9"
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.3
@@ -31,7 +31,8 @@ jobs:
       run: |
         mkdir build
         set PATH="$pythonLocation;$PATH"
-        cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPython_ROOT_DIR=$pythonLocation
+        echo "PATH: " $PATH
+        cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPython3_ROOT_DIR=$pythonLocation
         cd build
         msbuild ChucKDesignerCHOP.sln /property:Configuration=Release
 
