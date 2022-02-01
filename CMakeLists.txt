@@ -236,8 +236,9 @@ target_include_directories(ChucKDesignerCHOP PUBLIC
     $<INSTALL_INTERFACE:ChucKDesignerCHOP>
     )
 
-set(Python_FIND_REGISTRY "LAST")
-find_package(Python REQUIRED COMPONENTS Interpreter Development)
+set(Python3_FIND_REGISTRY "LAST")
+set(Python3_FIND_STRATEGY "LOCATION")
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(${PROJECT_NAME} PUBLIC Python::Python)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ChucKDesignerShared)
