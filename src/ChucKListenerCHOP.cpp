@@ -31,7 +31,7 @@
 #endif
 
 const char* PythonCallbacksDATStubs =
-"# This is an example callbacks DAT for a ChucK Audio Operator.\n"
+"# This is an example callbacks DAT for a ChucK Listener Operator.\n"
 "# In all callback methods, \"listener\" is the ChucK Listener operator doing the callback.\n"
 "\n\n"
 "def getFloat(listener, name, val):\n"
@@ -322,7 +322,7 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
         PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
         // The first argument is already set to the 'op' variable, so we set the second argument to our speed value
         PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
-        PyTuple_SET_ITEM(args, 2, PyLong_FromDouble(val));
+        PyTuple_SET_ITEM(args, 2, PyFloat_FromDouble(val));
 		
 
         PyObject *result = myNodeInfo->context->callPythonCallback("getFloat", args, nullptr, nullptr);
