@@ -17,7 +17,6 @@
 #include "CHOP_CPlusPlusBase.h"
 using namespace TD;
 
-#include "chuck.h"
 #include "Plugin_ChucK.h"
 
 #include <functional>
@@ -53,7 +52,7 @@ public:
 	virtual void		setupParameters(OP_ParameterManager* manager, void *reserved1) override;
 	virtual void		pulsePressed(const char* name, void* reserved1) override;
 
-    virtual void getErrorString(OP_String* error, void* reserved1);
+    virtual void getErrorString(OP_String* error, void* reserved1) override;
     
     void
     setGlobalFloat(const char* name, t_CKFLOAT val)
