@@ -569,8 +569,14 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
 							  void* reserved)
 {
 	myExecuteCount++;
+        
+    if (needReset) {
+        needReset = false;
+        ChucKDesignerCHOP::reset();
+    }
 
     if (needCompile) {
+        needCompile = false;
 
         // Until ChucK on windows parses the working directory better,
         // we have to pass it as a relative path rather than an absolute path.
@@ -607,10 +613,8 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
         else {
             myError.str("ChucK code did not compile correctly.");
         }
-
-        needCompile = false;
     }
-
+    
     const OP_CHOPInput* Globalfloat_CHOPInput = inputs->getParCHOP("Globalfloat");
     if (Globalfloat_CHOPInput) {
         for (size_t chanIndex = 0; chanIndex < Globalfloat_CHOPInput->numChannels; chanIndex++)
@@ -638,7 +642,6 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
             memset(output->channels[chan], 0.f, sizeof(float) * output->numSamples);
         }
     }
-
 }
 
 void
@@ -885,12 +888,12 @@ ChucKDesignerCHOP::pulsePressed(const char* name, void* reserved1)
 
     if (!strcmp(name, "Replacechuckcode"))
     {
-        ChucKDesignerCHOP::reset();
+        needReset = true;
         needCompile = true;
     }
 
     if (!strcmp(name, "Reset"))
     {
-        ChucKDesignerCHOP::reset();
+        needReset = true;
     }
 }
