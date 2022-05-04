@@ -168,7 +168,6 @@ ChucKListenerCHOP::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs,
     std::string Floatarrayvars = inputs->getParString("Floatarrayvars");
 	std::string Intarrayvars = inputs->getParString("Intarrayvars");
 
-
 	auto Floatvarstrings = split(Floatvars, ' ');
 	auto Intvarstrings = split(Intvars, ' ');
 	auto Stringvarstrings = split(Stringvars, ' ');
@@ -251,6 +250,9 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 
 	if (chuck_id != m_chuckID) {
 		// stop all listeners
+        for (auto varName : myEventVarNames) {
+            ChucK_For_TouchDesigner::removeListenerCHOP(varName.c_str(), this->myNodeInfo->opId);
+        }
 		myEventVarNames.clear();
 
 		m_chuckID = chuck_id;

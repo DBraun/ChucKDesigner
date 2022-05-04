@@ -826,7 +826,7 @@ namespace ChucK_For_TouchDesigner
 
     CHUCKDESIGNERSHARED_API void sharedFloatArrayCallback(const char* varName, t_CKFLOAT vals[], t_CKUINT numItems) {
         auto vec = new t_CKFLOAT[numItems];
-        for (int i=0; i< numItems; i++) {
+        for (t_CKUINT i=0; i< numItems; i++) {
             vec[i] = vals[i];
         }
 
@@ -840,7 +840,7 @@ namespace ChucK_For_TouchDesigner
 
     CHUCKDESIGNERSHARED_API void sharedIntArrayCallback(const char* varName, t_CKINT vals[], t_CKUINT numItems) {
         auto vec = new t_CKINT[numItems];
-        for (int i = 0; i < numItems; i++) {
+        for (t_CKUINT i = 0; i < numItems; i++) {
             vec[i] = vals[i];
         }
 
@@ -867,7 +867,7 @@ namespace ChucK_For_TouchDesigner
         }
     }
 
-    CHUCKDESIGNERSHARED_API void sharedEventNonCallback(const char* varName) {
+    CHUCKDESIGNERSHARED_API void sharedEventNonCallback(const char*) {
 
     }
 
@@ -1044,9 +1044,6 @@ namespace ChucK_For_TouchDesigner
             //myIntArrayVars.clear();
             //myIntArrayVarSizes.clear();
 
-            // wait a bit
-            usleep( 30000 );
-
             // cleanup this chuck early
             delete chuck;
 
@@ -1086,10 +1083,7 @@ namespace ChucK_For_TouchDesigner
             EffectData::Data * data = it->second;
             data->myId = -1;
         }
-        
-        // wait for callbacks to finish their current run
-        usleep( 30000 );
-        
+
         // next, delete chucks
         for( std::map< unsigned int, ChucK * >::iterator it =
              chuck_instances.begin(); it != chuck_instances.end(); it++ )
