@@ -30,6 +30,8 @@ file(GLOB CK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/lo/*.c
 )
 
+list(FILTER CK_SOURCES EXCLUDE REGEX ".*lex.yy.c")
+
 if(WIN32)
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*server_thread.c")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/config.h")
@@ -37,7 +39,6 @@ else()
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.h")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.c")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*core/regex/*")
-    list(FILTER CK_SOURCES EXCLUDE REGEX ".*lex.yy.c")
     list(APPEND CK_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/chuck.yy.c")
 endif()
 
