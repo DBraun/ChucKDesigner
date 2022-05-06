@@ -38,7 +38,7 @@ jobs:
       run: |
         mkdir chuckdesigner_dist
         move ${{ github.workspace }}/Plugins/ChucK*.dll chuckdesigner_dist
-        tar.exe -c -f ChucKDesigner-${{ matrix.os }}.zip chuckdesigner_dist
+        7z a ChucKDesigner-${{ matrix.os }}.zip ./TD-chuckdesigner_dist/* -r
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
