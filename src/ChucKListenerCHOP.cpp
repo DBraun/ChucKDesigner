@@ -32,7 +32,7 @@
 
 const char* PythonCallbacksDATStubs =
 "# This is an example callbacks DAT for a ChucK Listener Operator.\n"
-"# In all callback methods, \"listener\" is the ChucK Listener operator doing the callback.\n"
+"# In all callback methods, \"listener\" is the ChucK Listener operator.\n"
 "\n\n"
 "def getFloat(listener, name, val):\n"
 "    # print(f'getFloat(name=\"{name}\", val={val})')\n"
@@ -81,7 +81,6 @@ FillCHOPPluginInfo(CHOP_PluginInfo *info)
 	// The opLabel is the text that will show up in the OP Create Dialog
 	info->customOPInfo.opLabel->setString("ChucK Listener");
 	info->customOPInfo.opIcon->setString("CKL");
-
 
 	// Information about the author of this OP
 	info->customOPInfo.authorName->setString("David Braun");
@@ -464,7 +463,8 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
     
 }
 
-void ChucKListenerCHOP::getErrorString(OP_String* error, void* reserved1) {
+void
+ChucKListenerCHOP::getErrorString(OP_String* error, void* reserved1) {
 
     if (!myStatus) {
         error->setString(myError.str().c_str());

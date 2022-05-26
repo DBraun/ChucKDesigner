@@ -881,6 +881,8 @@ ChucKDesignerCHOP::setupParameters(OP_ParameterManager* manager, void *reserved1
 void 
 ChucKDesignerCHOP::pulsePressed(const char* name, void* reserved1)
 {
+    // Note that we avoid bugs by just changing bool values here.
+
 	if (!strcmp(name, "Addchuckcode"))
 	{
         needCompile = true;

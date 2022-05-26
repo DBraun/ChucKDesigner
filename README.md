@@ -57,7 +57,7 @@ Due to some difficulties with codesigning, for the moment you must compile ChucK
 3. Install Xcode.
 4. [Install CMake](https://cmake.org/download/) and confirm that it's installed by running `cmake --version` in Terminal.
 5. Find your Development Profile. Open Keychain Access, go to 'login' on the left, and look for something like `Apple Development: example@example.com (ABCDE12345)`. Then in Terminal, run `export CODESIGN_IDENTITY="Apple Development: example@example.com (ABCDE12345)"` with your own info substituted. If you weren't able to find your profile, you need to create one. Open Xcode, go to "Accounts", add your Apple ID, click "Manage Certificates", and use the plus icon to add a profile. Then check Keychain Access again.
-6. Similarly export a variable to the TouchDesigner.app to which you'd like to support. For example: `export TOUCHDESIGNER_APP=/Applications/TouchDesigner.app`, assuming this version is a 2021.30000 build or higher.
+6. Similarly export a variable to the TouchDesigner.app to which you'd like to support. For example: `export TOUCHDESIGNER_APP=/Applications/TouchDesigner.app`, assuming this version is a 2022.22650 build or higher.
 7. In the same Terminal window, navigate to the root of this repository and run `sh build_macos.sh`
 8. Open `ChucKDesigner.toe`
 
@@ -138,8 +138,8 @@ On the ChucK Audio Listener, there is a custom parameter for "Float Variables". 
 In the example above, we used a `global float freq` and a `global int randInt`. Find the `Float Variables` and `Int Variables` custom parameters on the ChucK Listener CHOP and set them to `freq` and `randInt` respectively. Now `freq` will appear in the `getFloat` callback, and `randInt` will appear in the `getInt` callback. 
 
 ```python
-# This is an example callbacks DAT for a ChucK Audio Operator.
-# In all callback methods, "listener" is the ChucK Listener operator doing the callback.
+# This is an example callbacks DAT for a ChucK Listener Operator.
+# In all callback methods, "listener" is the ChucK Listener operator.
 
 def getFloat(listener, name, val):
     print(f'getFloat(name="{name}", val={val})')
@@ -183,12 +183,12 @@ while( true ) {
 }
 ```
 
-At the beginning, there will be 2 channels of output by default. In TouchDesigner, we can run the Python code:
+At the beginning, there will be 2 channels of silent output by default. In TouchDesigner, we can run the Python code:
 ```python
 op('chuckaudio1').broadcast_event('pulse')
 ```
 
-This will spork a shred of `playImpact()`, which will play a short sound. After 1 second of playing the sound, ChucK will broadcast an event named "notifier" back to TouchDesigner. This event will show up in the `getEvent()` method, if "notifier" is in the custom parameter `Event Variables`.
+This will cause the line `pulse => now;` to no consume time. Then it will spork a shred of `playImpact()`, which will play a short sound. After 1 second of playing the sound, ChucK will broadcast an event named "notifier" back to TouchDesigner. This event will show up in the `getEvent()` callback method, if "notifier" is in the custom parameter `Event Variables`.
 
 
 ### Chugins
