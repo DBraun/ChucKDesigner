@@ -109,8 +109,25 @@ extern "C" {
         CHUCKDESIGNERSHARED_API bool getInstanceInfo(unsigned int chuckID, int& numChannels, int& numSamples, float& sampleRate);
 
         CHUCKDESIGNERSHARED_API bool processBlock(unsigned int chuckID, const float** inBuffer, int inBufferNumChannels, int inBufferNumSamples, float* inChucKBuffer, float* outChucKBuffer, float** outBuffer, int numOutSamples, int numOutChannels);
-        CHUCKDESIGNERSHARED_API float getFloat(const char* varStr);
+        
+        CHUCKDESIGNERSHARED_API t_CKFLOAT getFloat(const char* varStr);
+        CHUCKDESIGNERSHARED_API t_CKINT getInt(const char* varStr);
+        CHUCKDESIGNERSHARED_API const char* getString(const char* varStr);
+        CHUCKDESIGNERSHARED_API t_CKFLOAT* getFloatArray(const char* varName, int& numItems);
+        CHUCKDESIGNERSHARED_API t_CKINT* getIntArray(const char* varName, int& numItems);
 
         CHUCKDESIGNERSHARED_API void sharedFloatCallback(const char* varName, t_CKFLOAT val);
+        CHUCKDESIGNERSHARED_API void sharedIntCallback(const char* varName, t_CKINT val);
+        CHUCKDESIGNERSHARED_API void sharedStringCallback(const char* varName, const char* val);
+
+        CHUCKDESIGNERSHARED_API void sharedFloatArrayCallback(const char* varName, t_CKFLOAT vals[], t_CKUINT numItems);
+        CHUCKDESIGNERSHARED_API void sharedIntArrayCallback(const char* varName, t_CKINT vals[], t_CKUINT numItems);
+
+        CHUCKDESIGNERSHARED_API void sharedEventCallback(const char* varName);
+        CHUCKDESIGNERSHARED_API void sharedEventNonCallback(const char* varName);
+
+        CHUCKDESIGNERSHARED_API void addListenerCHOP(const char* varName, uint32_t opID);
+        CHUCKDESIGNERSHARED_API void removeListenerCHOP(const char* varName, uint32_t opID);
+        CHUCKDESIGNERSHARED_API int queryEvent(const char* varName, uint32_t opID);
     }
 };

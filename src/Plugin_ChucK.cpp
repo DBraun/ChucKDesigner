@@ -19,7 +19,6 @@
 
 #include <cmath>
 
-
 namespace ChucK_For_TouchDesigner
 {
     enum Param
@@ -47,8 +46,21 @@ namespace ChucK_For_TouchDesigner
     std::map< unsigned int, EffectData::Data* > data_instances;
     unsigned int _nextValidID = 0;
     std::map< unsigned int, unsigned int> op_ids_to_chuck_ids;
-    static std::map<std::string, double> myFloatVars;
+    static std::map<std::string, t_CKFLOAT> myFloatVars;
+    static std::map<std::string, t_CKINT> myIntVars;
+    static std::map<std::string, std::string> myStringVars;
 
+    static std::map<std::string, t_CKFLOAT*> myFloatArrayVars;
+    static std::map<std::string, int> myFloatArrayVarSizes;
+
+    static std::map<std::string, t_CKINT*> myIntArrayVars;
+    static std::map<std::string, int> myIntArrayVarSizes;
+
+    static std::map<std::string, int> myVoidEventCallbacks;
+
+    static std::map<std::string, std::map<std::uint32_t, bool>> myEventToListenerIDs;
+
+    static std::map<std::string, std::map<std::uint32_t, unsigned int>> myEventToListenerIDCount;
 
     // C# "string" corresponds to passing char *
     CHUCKDESIGNERSHARED_API bool runChuckCode(unsigned int chuckID, const char* code)
@@ -804,15 +816,121 @@ namespace ChucK_For_TouchDesigner
         myFloatVars[varName] = val;
     }
 
+    CHUCKDESIGNERSHARED_API void sharedIntCallback(const char* varName, t_CKINT val) {
+        myIntVars[varName] = val;
+    }
 
-    CHUCKDESIGNERSHARED_API float getFloat(const char* varName) {
+    CHUCKDESIGNERSHARED_API void sharedStringCallback(const char* varName, const char* val) {
+        myStringVars[varName] = val;
+    }
+
+    CHUCKDESIGNERSHARED_API void sharedFloatArrayCallback(const char* varName, t_CKFLOAT vals[], t_CKUINT numItems) {
+        auto vec = new t_CKFLOAT[numItems];
+        for (t_CKUINT i=0; i< numItems; i++) {
+            vec[i] = vals[i];
+        }
+
+        if (myFloatArrayVars.find(varName) != myFloatArrayVars.end()) {
+            delete[] myFloatArrayVars[varName];
+        }
+
+        myFloatArrayVars[varName] = vec;
+        myFloatArrayVarSizes[varName] = numItems;
+    }
+
+    CHUCKDESIGNERSHARED_API void sharedIntArrayCallback(const char* varName, t_CKINT vals[], t_CKUINT numItems) {
+        auto vec = new t_CKINT[numItems];
+        for (t_CKUINT i = 0; i < numItems; i++) {
+            vec[i] = vals[i];
+        }
+
+        if (myIntArrayVars.find(varName) != myIntArrayVars.end()) {
+            delete[] myIntArrayVars[varName];
+        }
+
+        myIntArrayVars[varName] = vec;
+        myIntArrayVarSizes[varName] = numItems;
+    }
+
+    CHUCKDESIGNERSHARED_API void sharedEventCallback(const char* varName) {
+        auto name = std::string(varName);
+        if ((myEventToListenerIDs.find(name) == myEventToListenerIDs.end()) ||
+            (myEventToListenerIDCount.find(name) == myEventToListenerIDCount.end())) {
+            return;
+        }
+
+        auto id_map = myEventToListenerIDs[name];
+        // For each listener, add to its queue.
+        for (const auto& myPair : id_map) {
+            auto listenerID = myPair.first;
+            myEventToListenerIDCount[name][listenerID] = myEventToListenerIDCount[name][listenerID] + 1;
+        }
+    }
+
+    CHUCKDESIGNERSHARED_API void sharedEventNonCallback(const char*) {
+
+    }
+
+    CHUCKDESIGNERSHARED_API int queryEvent(const char* varName, uint32_t opID) {
+
+        auto name = std::string(varName);
+        if ((myEventToListenerIDs.find(name) == myEventToListenerIDs.end()) ||
+            (myEventToListenerIDCount.find(name) == myEventToListenerIDCount.end())) {
+            return 0;
+        }
+
+        int count = myEventToListenerIDCount[name][opID];
+
+        myEventToListenerIDCount[name][opID] = 0;
+
+        return count;
+    }
+
+    CHUCKDESIGNERSHARED_API t_CKFLOAT getFloat(const char* varName) {
         if (myFloatVars.find(varName) != myFloatVars.end()) {
             return myFloatVars[varName];
         }
         return 0.f;
     }
 
-    
+    CHUCKDESIGNERSHARED_API t_CKINT getInt(const char* varName) {
+        if (myIntVars.find(varName) != myIntVars.end()) {
+            return myIntVars[varName];
+        }
+        return 0;
+    }
+
+    CHUCKDESIGNERSHARED_API const char* getString(const char* varName) {
+        if (myStringVars.find(varName) != myStringVars.end()) {
+            return myStringVars[varName].c_str();
+        }
+        return "";
+    }
+
+    CHUCKDESIGNERSHARED_API t_CKFLOAT* getFloatArray(const char* varName, int& numItems) {
+        if (
+            (myFloatArrayVars.find(varName) != myFloatArrayVars.end()) &&
+            (myFloatArrayVarSizes.find(varName) != myFloatArrayVarSizes.end())
+            ) {
+            numItems = myFloatArrayVarSizes[varName];
+            return myFloatArrayVars[varName];
+        }
+        numItems = 0;
+        return nullptr;
+    }
+
+    CHUCKDESIGNERSHARED_API t_CKINT* getIntArray(const char* varName, int& numItems) {
+        if (
+            (myIntArrayVars.find(varName) != myIntArrayVars.end()) &&
+            (myIntArrayVarSizes.find(varName) != myIntArrayVarSizes.end())
+            ) {
+            numItems = myIntArrayVarSizes[varName];
+            return myIntArrayVars[varName];
+        }
+        numItems = 0;
+        return nullptr;
+    }
+
     CHUCKDESIGNERSHARED_API bool initChuckInstance( unsigned int chuckID, unsigned int sampleRate, unsigned int numInChannels, unsigned int numOutChannels, string globalDir )
     {
         if( chuck_instances.count( chuckID ) == 0 )
@@ -834,6 +952,7 @@ namespace ChucK_For_TouchDesigner
             chugin_search.push_back(globalDir + "/Chugins" );
             chugin_search.push_back(globalDir + "/ChuGins" );
             chugin_search.push_back(globalDir + "/chugins" );
+
             chuck->setParam( CHUCK_PARAM_USER_CHUGIN_DIRECTORIES, chugin_search );
             
             // initialize and start
@@ -911,8 +1030,19 @@ namespace ChucK_For_TouchDesigner
 
             op_ids_to_chuck_ids.erase(opId);
 
-            // wait a bit
-            usleep( 30000 );
+            // todo: is this dangerous?
+            // todo: design consideration, do we even want to clear them?
+            // clear all global vars
+            //myFloatArrayVars.clear();
+            //myFloatVars.clear();
+            //myIntVars.clear();
+            //myStringVars.clear();
+
+            //myFloatArrayVars.clear();
+            //myFloatArrayVarSizes.clear();
+
+            //myIntArrayVars.clear();
+            //myIntArrayVarSizes.clear();
 
             // cleanup this chuck early
             delete chuck;
@@ -953,10 +1083,7 @@ namespace ChucK_For_TouchDesigner
             EffectData::Data * data = it->second;
             data->myId = -1;
         }
-        
-        // wait for callbacks to finish their current run
-        usleep( 30000 );
-        
+
         // next, delete chucks
         for( std::map< unsigned int, ChucK * >::iterator it =
              chuck_instances.begin(); it != chuck_instances.end(); it++ )
@@ -994,5 +1121,23 @@ namespace ChucK_For_TouchDesigner
         data_instances[id] = data;
         
         return true;
+    }
+
+    void addListenerCHOP(const char* varName, uint32_t opID) {
+        auto name = std::string(varName);
+        myEventToListenerIDs[name][opID] = true;
+        myEventToListenerIDCount[name][opID] = 0;
+    }
+    void removeListenerCHOP(const char* varName, uint32_t opID) {
+
+        auto name = std::string(varName);
+
+        if (myEventToListenerIDs.find(name) != myEventToListenerIDs.end()) {
+            myEventToListenerIDs[name].erase(opID);
+        }
+
+        if (myEventToListenerIDCount.find(name) != myEventToListenerIDCount.end()) {
+            myEventToListenerIDCount[name].erase(opID);
+        }
     }
 }

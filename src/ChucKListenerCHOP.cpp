@@ -20,6 +20,45 @@
 #include <cmath>
 #include <assert.h>
 
+//#include <vector>
+
+#ifdef _WIN32
+    #include <Python.h>
+    #include <structmember.h>
+#else
+    #include <Python/Python.h>
+    #include <Python/structmember.h>
+#endif
+
+const char* PythonCallbacksDATStubs =
+"# This is an example callbacks DAT for a ChucK Listener Operator.\n"
+"# In all callback methods, \"listener\" is the ChucK Listener operator.\n"
+"\n\n"
+"def getFloat(listener, name, val):\n"
+"    # print(f'getFloat(name=\"{name}\", val={val})')\n"
+"    pass\n"
+"\n\n"
+"def getInt(listener, name, val):\n"
+"    # print(f'getInt(name=\"{name}\", val={val})')\n"
+"    pass\n"
+"\n\n"
+"def getString(listener, name, val):\n"
+"    # print(f'getString(name=\"{name}\", val={val})')\n"
+"    pass\n"
+"\n\n"
+"def getEvent(listener, name):\n"
+"    # print(f'getEvent(name=\"{name}\")')\n"
+"    pass\n"
+"\n\n"
+"def getFloatArray(listener, name, vals):\n"
+"    # print(f'getFloatArray(name=\"{name}\", vals={vals})')\n"
+"    pass\n"
+"\n\n"
+"def getIntArray(listener, name, vals):\n"
+"    # print(f'getIntArray(name=\"{name}\", vals={vals})')\n"
+"    pass\n"
+;
+
 // These functions are basic C function, which the DLL loader can find
 // much easier than finding a C++ Class.
 // The DLLEXPORT prefix is needed so the compile exports these functions from the .dll
@@ -43,13 +82,17 @@ FillCHOPPluginInfo(CHOP_PluginInfo *info)
 	info->customOPInfo.opLabel->setString("ChucK Listener");
 	info->customOPInfo.opIcon->setString("CKL");
 
-
 	// Information about the author of this OP
 	info->customOPInfo.authorName->setString("David Braun");
 	info->customOPInfo.authorEmail->setString("github.com/DBraun");
 
 	info->customOPInfo.minInputs = 0;
 	info->customOPInfo.maxInputs = 0;
+    
+    info->customOPInfo.pythonVersion->setString(PY_VERSION);
+    //info->customOPInfo.pythonMethods = methods;
+    //info->customOPInfo.pythonGetSets = getSets;
+    info->customOPInfo.pythonCallbacksDAT = PythonCallbacksDATStubs;
 }
 
 DLLEXPORT
@@ -73,24 +116,18 @@ DestroyCHOPInstance(CHOP_CPlusPlusBase* instance)
 
 };
 
-#define __STDC_WANT_LIB_EXT1__ 1
-#include <string.h>
-#include <stdio.h>
+vector<string> split(const string& s, char delim) {
+	vector<string> result;
+	stringstream ss(s);
+	string item;
 
-// for string delimiter
-vector<string> split(string s, string delimiter) {
-	size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-	string token;
-	vector<string> res;
-
-	while ((pos_end = s.find(delimiter, pos_start)) != string::npos) {
-		token = s.substr(pos_start, pos_end - pos_start);
-		pos_start = pos_end + delim_len;
-		res.push_back(token);
+	while (getline(ss, item, delim)) {
+		if (item.compare("") != 0) {
+			result.push_back(item);
+		}
 	}
 
-	res.push_back(s.substr(pos_start));
-	return res;
+	return result;
 }
 
 
@@ -101,6 +138,9 @@ ChucKListenerCHOP::ChucKListenerCHOP(const OP_NodeInfo* info) : myNodeInfo(info)
 
 ChucKListenerCHOP::~ChucKListenerCHOP()
 {
+	for (auto varName : myEventVarNames) {
+		ChucK_For_TouchDesigner::removeListenerCHOP(varName.c_str(), this->myNodeInfo->opId);
+	}
 }
 
 void
@@ -122,26 +162,51 @@ bool
 ChucKListenerCHOP::getOutputInfo(CHOP_OutputInfo* info, const OP_Inputs* inputs, void* reserved1)
 {
 	std::string Floatvars = inputs->getParString("Floatvars");
+	std::string Intvars = inputs->getParString("Intvars");
+	std::string Stringvars = inputs->getParString("Stringvars");
+    std::string Floatarrayvars = inputs->getParString("Floatarrayvars");
+	std::string Intarrayvars = inputs->getParString("Intarrayvars");
 
-	auto Floatvarstrings = split(Floatvars, " ");
+	auto Floatvarstrings = split(Floatvars, ' ');
+	auto Intvarstrings = split(Intvars, ' ');
+	auto Stringvarstrings = split(Stringvars, ' ');
+    auto Floatarrayvarstrings = split(Floatarrayvars, ' ');
+	auto Intarrayvarstrings = split(Intarrayvars, ' ');
 
 	myFloatVarNames.clear();
-	  
-	if (Floatvarstrings.size() == 0 || (Floatvars.compare("") == 0)) {
+	myIntVarNames.clear();
+	myStringVarNames.clear();
+    myFloatArrayVarNames.clear();
+	myIntArrayVarNames.clear();
 
-		info->numChannels = 0;
-		info->numSamples = 0;
-		return true;	
-	}
-
+	//std::vector<std::string> myAssociativeFloatArrayVarNames;
+	//std::vector<std::string> myAssociativeIntArrayVarNames;
+    
 	for (auto& str : Floatvarstrings) {
 		myFloatVarNames.push_back(str);
 	}
 
+	for (auto& str : Intvarstrings) {
+		myIntVarNames.push_back(str);
+	}
+
+	for (auto& str : Stringvarstrings) {
+		myStringVarNames.push_back(str);
+	}
+
+	for (auto& str : Floatarrayvarstrings) {
+		myFloatArrayVarNames.push_back(str);
+	}
+
+	for (auto& str : Intarrayvarstrings) {
+		myIntArrayVarNames.push_back(str);
+	}
+
 	//info->sampleRate = 44100.;
-	//info->numSamples = 1;
-	info->numChannels = Floatvarstrings.size();
+	info->numSamples = 1;
     info->startIndex = 0;
+	info->numChannels = myFloatVarNames.size() + myIntVarNames.size();
+	
 	return true;
 }
 
@@ -154,8 +219,15 @@ ChucKListenerCHOP::getChannelName(int32_t index, OP_String *name, const OP_Input
 		return;
 	}
 
-	name->setString("chan1");	
+	index -= myFloatVarNames.size();
+	if (index < myIntVarNames.size()) {
+		name->setString(myIntVarNames.at(index).c_str());
+		return;
+	}
+
+	name->setString("chan1");
 }
+
 
 void
 ChucKListenerCHOP::execute(CHOP_Output* output,
@@ -164,10 +236,6 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 {
     myStatus = true;
     myError.str("");
-
-	if (myFloatVarNames.size() == 0) {
-		return;
-	}
 
     const OP_CHOPInput* chuckDesignerCHOP = inputs->getParCHOP("Chuck");
 
@@ -179,23 +247,224 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 
 	int chuck_id = ChucK_For_TouchDesigner::getChucKIDForOpID(chuckDesignerCHOP->opId);
 
-	for (const std::string varName : myFloatVarNames) {
+	if (chuck_id != m_chuckID) {
+		// stop all listeners
+        for (auto varName : myEventVarNames) {
+            ChucK_For_TouchDesigner::removeListenerCHOP(varName.c_str(), this->myNodeInfo->opId);
+        }
+		myEventVarNames.clear();
 
+		m_chuckID = chuck_id;
+	}
+
+	if (chuck_id < 0) {
+		return;
+	}
+
+	for (const std::string varName : myFloatVarNames) {
 		ChucK_For_TouchDesigner::getNamedChuckFloat(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedFloatCallback);
 	}
+	for (const std::string varName : myIntVarNames) {
+		ChucK_For_TouchDesigner::getNamedChuckInt(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedIntCallback);
+	}
+	for (const std::string varName : myStringVarNames) {
+		ChucK_For_TouchDesigner::getNamedChuckString(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedStringCallback);
+	}
+    for (const std::string varName : myFloatArrayVarNames) {
+        ChucK_For_TouchDesigner::getNamedGlobalFloatArray(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedFloatArrayCallback);
+    }
+	for (const std::string varName : myIntArrayVarNames) {
+		ChucK_For_TouchDesigner::getNamedGlobalIntArray(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedIntArrayCallback);
+	}
+
+	// << event stuff
+	std::string Eventvars = inputs->getParString("Eventvars");
+
+	auto Eventvarstrings = split(Eventvars, ' ');
+
+	std::set<std::string> newEventStrings, eventsToStartListening, eventsToStopListening;
+
+	for (auto& str : Eventvarstrings) {
+		newEventStrings.insert(str);
+	}
+
+	set_difference(newEventStrings.begin(), newEventStrings.end(), myEventVarNames.begin(), myEventVarNames.end(), inserter(eventsToStartListening, eventsToStartListening.end()));
+	set_difference(myEventVarNames.begin(), myEventVarNames.end(), newEventStrings.begin(), newEventStrings.end(), inserter(eventsToStopListening, eventsToStopListening.end()));
+
+	for (const std::string varName : eventsToStopListening) {
+		bool result = ChucK_For_TouchDesigner::stopListeningForNamedChuckEvent(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedEventNonCallback);
+		if (result) {
+			ChucK_For_TouchDesigner::removeListenerCHOP(varName.c_str(), this->myNodeInfo->opId);
+		}
+	}
+
+	for (const std::string varName : eventsToStartListening) {
+		bool result = ChucK_For_TouchDesigner::startListeningForNamedChuckEvent(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedEventCallback);
+		if (result) {
+			ChucK_For_TouchDesigner::addListenerCHOP(varName.c_str(), this->myNodeInfo->opId);
+
+			myEventVarNames.insert(varName);
+		}
+	}
+	// end event stuff >>
 
 	int i = 0;
 	for (const std::string varName : myFloatVarNames)
 	{
-		if (i >= output->numChannels) {
-			break;
-		}
-		output->channels[i][0] = ChucK_For_TouchDesigner::getFloat(varName.c_str());
+        auto name = varName.c_str();
+        t_CKFLOAT val = ChucK_For_TouchDesigner::getFloat(name);
+        if (i < output->numChannels) {
+            output->channels[i][0] = val;
+        }
+        
 		i += 1;
+        
+        // We'll only be adding one extra argument
+        PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
+        // The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+        PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+        PyTuple_SET_ITEM(args, 2, PyFloat_FromDouble(val));
+		
+
+        PyObject *result = myNodeInfo->context->callPythonCallback("getFloat", args, nullptr, nullptr);
+        // callPythonCallback doesn't take ownership of the argts
+        Py_DECREF(args);
+
+        // We own result now, so we need to Py_DECREF it unless we want to hold onto it
+        if (result) { Py_DECREF(result); }
 	}
+
+	for (const std::string varName : myIntVarNames)
+	{
+		auto name = varName.c_str();
+		t_CKINT val = ChucK_For_TouchDesigner::getInt(name);
+		if (i < output->numChannels) {
+			output->channels[i][0] = val;
+		}
+
+		i += 1;
+
+		// We'll only be adding one extra argument
+		PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
+		// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+		PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+		PyTuple_SET_ITEM(args, 2, PyLong_FromLongLong(val));
+
+		PyObject* result = myNodeInfo->context->callPythonCallback("getInt", args, nullptr, nullptr);
+		// callPythonCallback doesn't take ownership of the argts
+		Py_DECREF(args);
+
+		// We own result now, so we need to Py_DECREF it unless we want to hold onto it
+		if (result) { Py_DECREF(result); }
+	}
+
+	for (const std::string varName : myStringVarNames)
+	{
+		auto name = varName.c_str();
+		auto str = ChucK_For_TouchDesigner::getString(name);
+
+		// We'll only be adding one extra argument
+		PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
+		// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+		PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+		PyTuple_SET_ITEM(args, 2, PyUnicode_FromString(str));
+
+		PyObject* result = myNodeInfo->context->callPythonCallback("getString", args, nullptr, nullptr);
+		// callPythonCallback doesn't take ownership of the argts
+		Py_DECREF(args);
+
+		// We own result now, so we need to Py_DECREF it unless we want to hold onto it
+		if (result) { Py_DECREF(result); }
+	}
+    
+    for (const std::string varName : myFloatArrayVarNames)
+    {
+        auto name = varName.c_str();
+		int numItems = 0;
+        auto vec = ChucK_For_TouchDesigner::getFloatArray(name, numItems);
+        
+        if (!numItems || !vec) {
+            continue;
+        }
+
+        // We'll only be adding one extra argument
+        PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
+        // The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+        PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+
+        // todo: return a numpy array
+        PyObject *lst = PyList_New(numItems);
+        for (i = 0; i < numItems; i++) {
+            PyList_SET_ITEM(lst, i, PyFloat_FromDouble(*(vec++)));
+        }
+
+        PyTuple_SET_ITEM(args, 2, lst);
+
+        PyObject *result = myNodeInfo->context->callPythonCallback("getFloatArray", args, nullptr, nullptr);
+        // callPythonCallback doesn't take ownership of the argts
+        Py_DECREF(args);
+        //Py_DECREF(lst);  // todo?
+
+        // We own result now, so we need to Py_DECREF it unless we want to hold onto it
+        if (result) { Py_DECREF(result); }
+    }
+
+	for (const std::string varName : myIntArrayVarNames)
+	{
+		auto name = varName.c_str();
+		int numItems = 0;
+		auto vec = ChucK_For_TouchDesigner::getIntArray(name, numItems);
+
+        if (!numItems || !vec) {
+            continue;
+        }
+        
+		// We'll only be adding one extra argument
+		PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
+		// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+		PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+
+		// todo: return a numpy array
+		PyObject *lst = PyList_New(numItems);
+		for (i = 0; i < numItems; i++) {
+			PyList_SET_ITEM(lst, i, PyLong_FromLongLong(*(vec++)));
+		}
+
+		PyTuple_SET_ITEM(args, 2, lst);
+
+		PyObject* result = myNodeInfo->context->callPythonCallback("getIntArray", args, nullptr, nullptr);
+		// callPythonCallback doesn't take ownership of the argts
+		Py_DECREF(args);
+        //Py_DECREF(lst);  // todo?
+
+		// We own result now, so we need to Py_DECREF it unless we want to hold onto it
+		if (result) { Py_DECREF(result); }
+	}
+
+	for (const std::string varName : myEventVarNames)
+	{
+		auto name = varName.c_str();
+		int count = ChucK_For_TouchDesigner::queryEvent(name, this->myNodeInfo->opId);
+		for (int i = 0; i < count; i++ ) {
+			// We'll only be adding one extra argument
+			PyObject* args = myNodeInfo->context->createArgumentsTuple(1, nullptr);
+			// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
+			PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
+
+			PyObject* result = myNodeInfo->context->callPythonCallback("getEvent", args, nullptr, nullptr);
+			// callPythonCallback doesn't take ownership of the argts
+			Py_DECREF(args);
+
+			// We own result now, so we need to Py_DECREF it unless we want to hold onto it
+			if (result) { Py_DECREF(result); }
+		}
+
+	}
+    
 }
 
-void ChucKListenerCHOP::getErrorString(OP_String* error, void* reserved1) {
+void
+ChucKListenerCHOP::getErrorString(OP_String* error, void* reserved1) {
 
     if (!myStatus) {
         error->setString(myError.str().c_str());
@@ -223,6 +492,8 @@ ChucKListenerCHOP::getInfoCHOPChan(int32_t index,
 		chan->name->setString("executeCount");
 		chan->value = (float)myExecuteCount;
 	}
+
+	// todo: show number of shreds here
 }
 
 bool		
@@ -286,10 +557,70 @@ ChucKListenerCHOP::setupParameters(OP_ParameterManager* manager, void *reserved1
         OP_ParAppendResult res = manager->appendString(sp);
         assert(res == OP_ParAppendResult::Success);
     }
+
+	{
+		OP_StringParameter	sp;
+
+		sp.name = "Intvars";
+		sp.label = "Int Variables";
+
+		sp.defaultValue = "";
+
+		OP_ParAppendResult res = manager->appendString(sp);
+		assert(res == OP_ParAppendResult::Success);
+	}
+
+	{
+		OP_StringParameter	sp;
+
+		sp.name = "Stringvars";
+		sp.label = "String Variables";
+
+		sp.defaultValue = "";
+
+		OP_ParAppendResult res = manager->appendString(sp);
+		assert(res == OP_ParAppendResult::Success);
+	}
+    
+    {
+        OP_StringParameter    sp;
+
+        sp.name = "Floatarrayvars";
+        sp.label = "Float Array Variables";
+
+        sp.defaultValue = "";
+
+        OP_ParAppendResult res = manager->appendString(sp);
+        assert(res == OP_ParAppendResult::Success);
+    }
+
+	{
+		OP_StringParameter    sp;
+
+		sp.name = "Intarrayvars";
+		sp.label = "Int Array Variables";
+
+		sp.defaultValue = "";
+
+		OP_ParAppendResult res = manager->appendString(sp);
+		assert(res == OP_ParAppendResult::Success);
+	}
+
+	{
+		OP_StringParameter    sp;
+
+		sp.name = "Eventvars";
+		sp.label = "Event Variables";
+
+		sp.defaultValue = "";
+
+		OP_ParAppendResult res = manager->appendString(sp);
+		assert(res == OP_ParAppendResult::Success);
+	}
 }
 
 void 
 ChucKListenerCHOP::pulsePressed(const char* name, void* reserved1)
 {
-}
 
+}

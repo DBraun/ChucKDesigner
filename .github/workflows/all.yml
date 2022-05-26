@@ -16,6 +16,11 @@ jobs:
       with:
         submodules: true
 
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: "3.9"
+
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.3
 
@@ -25,7 +30,7 @@ jobs:
     - name: Build Windows (Release)
       run: |
         mkdir build
-        cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
+        cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPython_ROOT_DIR=$pythonLocation
         cd build
         msbuild ChucKDesignerCHOP.sln /property:Configuration=Release
 
@@ -33,7 +38,7 @@ jobs:
       run: |
         mkdir chuckdesigner_dist
         move ${{ github.workspace }}/Plugins/ChucK*.dll chuckdesigner_dist
-        tar.exe -c -f ChucKDesigner-${{ matrix.os }}.zip chuckdesigner_dist
+        7z a ChucKDesigner-${{ matrix.os }}.zip ./chuckdesigner_dist/* -r
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
@@ -45,11 +50,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-10.15, macos-11]
+        os: [macos-latest]
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: true
+
+    - name: Setup Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Setup Python 3.9
+      run: |
+        which python
+        python --version
+        pip install --upgrade certifi
+        cd install_script
+        python macos_install_python.py
 
     - name: Get CMake
       uses: lukka/get-cmake@latest
@@ -62,11 +80,17 @@ jobs:
 
     - name: Build MacOS (Release)
       run: |
-        mkdir build
-        cd build
-        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=x86_64
+        export PATH=/Library/Frameworks/Python.framework/Versions/3.9:/Library/Frameworks/Python.framework/Versions/3.9/bin:/Library/Frameworks/Python.framework/Versions/3.9/lib:$PATH
+        which python3
+        python3 --version
+        which python3
+        python3 --version
+        mkdir build && cd build
+        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
         xcodebuild -configuration Release -project ChucKDesignerCHOP.xcodeproj
         ls -r *
+        install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
+        install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib Release/ChucKListenerCHOP.plugin/Contents/MacOS/ChucKListenerCHOP
 
     - name: Make distribution
       run: |
@@ -76,11 +100,12 @@ jobs:
         mv ${{ github.workspace }}/build/Release/ChucKListenerCHOP.plugin chuckdesigner_dist
         zip -r ChucKDesigner-${{ matrix.os }}.zip chuckdesigner_dist
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: my-artifact-${{ matrix.os }}
-        path: ChucKDesigner-${{ matrix.os }}.zip
+    # Don't upload until we figure out codesigning.
+    # - name: Upload artifact
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: my-artifact-${{ matrix.os }}
+    #     path: ChucKDesigner-${{ matrix.os }}.zip
 
   create-release:
     if: startsWith(github.ref, 'refs/tags/v')

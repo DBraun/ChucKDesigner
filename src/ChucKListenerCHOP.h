@@ -14,11 +14,14 @@
 
 #pragma once
 #include "CHOP_CPlusPlusBase.h"
+using namespace TD;
+
 #include "chuck.h"
 
 #include <functional>
 #include <map>
 #include <mutex>
+#include <set>
 
 // To get more help about these functions, look at CHOP_CPlusPlusBase.h
 class ChucKListenerCHOP : public CHOP_CPlusPlusBase
@@ -50,7 +53,7 @@ public:
     virtual void		setupParameters(OP_ParameterManager* manager, void* reserved1) override;
     virtual void		pulsePressed(const char* name, void* reserved1) override;
 
-    virtual void getErrorString(OP_String* error, void* reserved1);
+    virtual void getErrorString(OP_String* error, void* reserved1) override;
 
 private:
 
@@ -67,4 +70,14 @@ private:
 
     std::stringstream myError;
     std::vector<std::string> myFloatVarNames;
+    std::vector<std::string> myIntVarNames;
+    std::vector<std::string> myStringVarNames;
+    std::vector<std::string> myFloatArrayVarNames;
+    std::vector<std::string> myIntArrayVarNames;
+    std::set<std::string> myEventVarNames;
+
+    std::vector<std::string> myAssociativeFloatArrayVarNames;
+    std::vector<std::string> myAssociativeIntArrayVarNames;
+
+    unsigned int m_chuckID = -1;
 };

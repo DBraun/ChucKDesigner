@@ -15,7 +15,9 @@
 #pragma once
 
 #include "CHOP_CPlusPlusBase.h"
-#include "chuck.h"
+using namespace TD;
+
+#include "Plugin_ChucK.h"
 
 #include <functional>
 #include <map>
@@ -50,7 +52,73 @@ public:
 	virtual void		setupParameters(OP_ParameterManager* manager, void *reserved1) override;
 	virtual void		pulsePressed(const char* name, void* reserved1) override;
 
-    virtual void getErrorString(OP_String* error, void* reserved1);
+    virtual void getErrorString(OP_String* error, void* reserved1) override;
+    
+    void
+    setGlobalFloat(const char* name, t_CKFLOAT val)
+    {
+        ChucK_For_TouchDesigner::setChuckFloat(m_chuckID, name, val);
+    }
+    
+    void
+    setGlobalInt(const char* name, t_CKINT val)
+    {
+        ChucK_For_TouchDesigner::setChuckInt(m_chuckID, name, val);
+    }
+    
+    void
+    setGlobalString(const char* name, const char* val)
+    {
+        ChucK_For_TouchDesigner::setChuckString(m_chuckID, name, val);
+    }
+    
+    void
+    setGlobalIntArray(const char* name, t_CKINT arrayValues[], unsigned int numValues)
+    {
+        ChucK_For_TouchDesigner::setGlobalIntArray(m_chuckID, name, arrayValues, numValues);
+    }
+    
+    void
+    setGlobalFloatArray(const char* name, t_CKFLOAT arrayValues[], unsigned int numValues)
+    {
+        ChucK_For_TouchDesigner::setGlobalFloatArray(m_chuckID, name, arrayValues, numValues);
+    }
+
+    void
+    setGlobalFloatArrayValue(const char* name, unsigned int index, t_CKFLOAT value)
+    {
+        ChucK_For_TouchDesigner::setGlobalFloatArrayValue(m_chuckID, name, index, value);
+    }
+
+    void
+    setGlobalIntArrayValue(const char* name, unsigned int index, t_CKINT value)
+    {
+        ChucK_For_TouchDesigner::setGlobalIntArrayValue(m_chuckID, name, index, value);
+    }
+
+    void
+    setGlobalAssociativeFloatArrayValue(const char* name, char* key, t_CKFLOAT value)
+    {
+        ChucK_For_TouchDesigner::setGlobalAssociativeFloatArrayValue(m_chuckID, name, key, value);
+    }
+
+    void
+    setGlobalAssociativeIntArrayValue(const char* name, char* key, t_CKINT value)
+    {
+        ChucK_For_TouchDesigner::setGlobalAssociativeIntArrayValue(m_chuckID, name, key, value);
+    }
+
+    void
+    broadcastChuckEvent(const char* name)
+    {
+        ChucK_For_TouchDesigner::broadcastChuckEvent(m_chuckID, name);
+    }
+
+    void
+    setLogLevel(unsigned int level)
+    {
+        ChucK_For_TouchDesigner::setLogLevel(level);
+    }
 
 private:
 
@@ -65,7 +133,7 @@ private:
 
 	void reset();
 
-    bool myStatus = false;
+    bool needReset = false;
     bool needCompile = false;
 
     float* inChucKBuffer = new float[1];
