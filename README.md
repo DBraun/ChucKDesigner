@@ -26,16 +26,18 @@ Part 2 (Python API):
 
 ### ChucK
 
-[Downloading ChucK](https://chuck.stanford.edu/release/) is optional but highly encouraged! Use miniAudicle and the examples that come with the installation to learn ChucK. More educational resources are available from the [ChucK homepage](https://chuck.stanford.edu/). ChucKDesigner is very similar to [Chunity](https://chuck.stanford.edu/chunity/) (the integration of ChucK with Unity), so you are also encouraged to learn about Chunity!
+[Downloading ChucK](https://chuck.stanford.edu/release/) is optional but highly encouraged! Use miniAudicle and the examples that come with the installation to learn ChucK. More educational resources are available from the [ChucK homepage](https://chuck.stanford.edu/). ChucKDesigner is very similar to [Chunity](https://chuck.stanford.edu/chunity/) (the integration of ChucK with Unity), so you are also encouraged to learn about [Chunity](https://github.com/ccrma/chunity/)!
 
 ### Windows
 
-Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.dll` files to this project's `Plugins` folder or `%USERPROFILE%/Documents/Derivative/Plugins`. Install [Python 3.9](https://www.python.org/downloads/release/python-3910/) to `C:/Python39/` and confirm it's in your system PATH. That's all!
+Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.dll` files to this project's `Plugins` folder or `%USERPROFILE%/Documents/Derivative/Plugins`. That's all!
 
 <details>
 <summary>Building on Windows (Optional)</summary>
 <br>
 Clone this repository with git. Then update all submodules in the root of the repository with <code>git submodule update --init --recursive</code>.
+<br>
+Install <a href="https://www.python.org/downloads/release/python-3910/">Python 3.9</a> to <code>C:/Python39/</code> and confirm it's in your system PATH.
 <br>
 Install CMake and confirm that it's installed by running <code>cmake --version</code> in a command prompt.
 <br>
@@ -100,7 +102,7 @@ This can be seen in the following image:
 
 In TouchDesigner, we can execute the Python code
 `op('chuckaudio1').set_float("freq", 880.)`
-This will set the global float variable named "freq" to 880. The code has been written to update the sine oscillator's frequency every 10 milliseconds, so you will immediately hear a change in the frequency. Note that the code below would **not** have led to a change in sound.
+This will set the global float variable named `freq` to 880. The code has been written to update the sine oscillator's frequency every 10 milliseconds, so you will immediately hear a change in the frequency. Note that the code below would **not** have led to a change in sound.
 
 ```chuck
 SinOsc s => dac;
@@ -131,14 +133,14 @@ while(true) {
 }
 ```
 
-On the ChucK Audio Listener, there is a custom parameter for "Float Variables". In this field you can type any number of global variables, each separated by a single space. In this example, there's just one global float, so you can type "freq". Similarly, in the "Int Variables" custom parameter, you can type "randInt". The ChucK Listener will then output as ordinary CHOP information a single-sample with one channel named "freq" and another channel named "randInt". The ordinary CHOP output of the Listener CHOP is only for global floats and global integers. However, all variable types can be received as Python callbacks, as explained in the next section.
+On the ChucK Audio Listener, there is a custom parameter for "Float Variables". In this field you can type any number of global variables, each separated by a single space. In this example, there's just one global float, so you can type `freq`. Similarly, in the "Int Variables" custom parameter, you can type `randInt`. The ChucK Listener will then output as ordinary CHOP information a single-sample with one channel named `freq` and another channel named `randInt`. The ordinary CHOP output of the Listener CHOP is only for global floats and global integers. However, all variable types can be received as Python callbacks, as explained in the next section.
 
 ### Python Callbacks in ChucK Listener CHOP
 
 In the example above, we used a `global float freq` and a `global int randInt`. Find the `Float Variables` and `Int Variables` custom parameters on the ChucK Listener CHOP and set them to `freq` and `randInt` respectively. Now `freq` will appear in the `getFloat` callback, and `randInt` will appear in the `getInt` callback. 
 
 ```python
-# This is an example callbacks DAT for a ChucK Listener Operator.
+# This is an example callbacks DAT for a ChucK Listener operator.
 # In all callback methods, "listener" is the ChucK Listener operator.
 
 def getFloat(listener, name, val):
@@ -183,14 +185,14 @@ while( true ) {
 }
 ```
 
-At the beginning, there will be 2 channels of silent output by default. In TouchDesigner, we can run the Python code:
+At the beginning, there will be 2 channels of silent output by default. The line `pulse => now;` consumes time until we broadcast an event in TouchDesigner with Python:
 ```python
 op('chuckaudio1').broadcast_event('pulse')
 ```
 
-This will cause the line `pulse => now;` to no consume time. Then it will spork a shred of `playImpact()`, which will play a short sound. After 1 second of playing the sound, ChucK will broadcast an event named "notifier" back to TouchDesigner. This event will show up in the `getEvent()` callback method, if "notifier" is in the custom parameter `Event Variables`.
+The ChucK code will then spork a shred of `playImpact()`, which will play a short sound. After 1 second of playing the sound, ChucK will broadcast an event named `notifier` back to TouchDesigner. This event will show up in the `getEvent()` callback method, if `notifier` is in the ChucK Listener's custom parameter "Event Variables".
 
 
 ### Chugins
 
-ChucKDesigner supports [Chugins](https://github.com/ccrma/chugins/), which are custom pre-compiled ChucK "plugins". The chugin should be located in a subfolder named "Chugins" of the "working directory" custom parameter on the ChucK Audio CHOP. For example, if the working directory parameter is "assets", then the chugins should be in "assets/Chugins".
+ChucKDesigner supports [Chugins](https://github.com/ccrma/chugins/), which are custom pre-compiled ChucK "plugins". The chugin should be located in a subfolder named "Chugins" of the "working directory" custom parameter on the ChucK Audio CHOP. For example, if the working directory parameter is `assets`, then the chugins should be in `assets/Chugins`.
