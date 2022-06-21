@@ -291,6 +291,25 @@ add_custom_command(TARGET ${PROJECT_NAME}
                  ${CMAKE_SOURCE_DIR}/Plugins
                  # "%USERPROFILE%/Documents/Derivative/Plugins"
                  )
+else()
+add_custom_command(TARGET ChucKDesignerCHOP
+                 POST_BUILD
+                 COMMAND install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib "$<TARGET_FILE:ChucKDesignerCHOP>"
+                 )
+add_custom_command(TARGET ChucKListenerCHOP
+                 POST_BUILD
+                 COMMAND install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib "$<TARGET_FILE:ChucKListenerCHOP>"
+                 )
+
+# python linking
+add_custom_command(TARGET ChucKDesignerCHOP
+                 POST_BUILD
+                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib "$<TARGET_FILE:ChucKDesignerCHOP>"
+                 )
+add_custom_command(TARGET ChucKListenerCHOP
+                 POST_BUILD
+                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib "$<TARGET_FILE:ChucKListenerCHOP>"
+                 )
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

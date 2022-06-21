@@ -52,16 +52,15 @@ Finally, open <code>build/ChucKDesignerCHOP.sln</code> and compile.
 
 ### MacOS
 
-Due to some difficulties with codesigning, for the moment you must compile ChucKDesigner on your own computer.
+@DBraun doesn't have a macOS App Distribution Developer License, so you must compile ChucKDesigner on your own computer.
 
 1. Clone this repository with git. Then update all submodules in the root of the repository with `git submodule update --init --recursive`
 2. Install [Python 3.9 universal2](https://www.python.org/downloads/release/python-3910/) and confirm it's in your system PATH.
 3. Install Xcode.
 4. [Install CMake](https://cmake.org/download/) and confirm that it's installed by running `cmake --version` in Terminal.
-5. Find your Development Profile. Open Keychain Access, go to 'login' on the left, and look for something like `Apple Development: example@example.com (ABCDE12345)`. Then in Terminal, run `export CODESIGN_IDENTITY="Apple Development: example@example.com (ABCDE12345)"` with your own info substituted. If you weren't able to find your profile, you need to create one. Open Xcode, go to "Accounts", add your Apple ID, click "Manage Certificates", and use the plus icon to add a profile. Then check Keychain Access again.
-6. Similarly export a variable to the TouchDesigner.app to which you'd like to support. For example: `export TOUCHDESIGNER_APP=/Applications/TouchDesigner.app`, assuming this version is a 2022.22650 build or higher.
-7. In the same Terminal window, navigate to the root of this repository and run `sh build_macos.sh`
-8. Open `ChucKDesigner.toe`
+5. In a Terminal Window, export a variable to the TouchDesigner.app to which you'd like to support. For example: `export TOUCHDESIGNER_APP=/Applications/TouchDesigner.app`, assuming this version is a 2022.22650 build or higher.
+6. In the same Terminal window, navigate to the root of this repository and run `sh build_macos.sh`
+7. Open `ChucKDesigner.toe` and play around!
 
 <!-- Download and unzip the latest macOS [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.plugin` and `.dylib` files to this project's `Plugins` folder or `~/Library/Application Support/Derivative/TouchDesigner099/Plugins`. -->
 

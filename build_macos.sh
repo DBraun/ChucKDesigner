@@ -31,29 +31,6 @@ cd ../../../..
 cmake -Bbuild -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=$CMAKE_OSX_ARCHITECTURES
 cmake --build build --config Release
 
-# Steps so that libChucKDesignerShared.dylib is found as a dependency
-install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib  build/Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
-install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib  build/Release/ChucKListenerCHOP.plugin/Contents/MacOS/ChucKListenerCHOP
-
-# This is pretty hacky because we didn't originally link to the TouchDesigner python library when compiling.
-install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib build/Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
-install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib build/Release/ChucKListenerCHOP.plugin/Contents/MacOS/ChucKListenerCHOP
-
-if [ -n "$CODESIGN_IDENTITY" ]; then
-    echo "Doing codesigning."
-    # codesigning
-    # Open Keychain Access. Go to "login". Look for "Apple Development".
-    # run `export CODESIGN_IDENTITY="Apple Development: example@example.com (ABCDE12345)"` with your own info substituted.
-    codesign --force --deep --sign "$CODESIGN_IDENTITY" build/Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
-    codesign --force --deep --sign "$CODESIGN_IDENTITY" build/Release/ChucKListenerCHOP.plugin/Contents/MacOS/ChucKListenerCHOP
-
-    # Confirm the codesigning
-    codesign -vvvv build/Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
-    codesign -vvvv build/Release/ChucKListenerCHOP.plugin/Contents/MacOS/ChucKListenerCHOP
-else
-    echo "Skipping codesigning."
-fi
-
 # Copy to Plugins directory
 cp build/Release/libChucKDesignerShared.dylib Plugins
 cp -R build/Release/ChucKDesignerCHOP.plugin Plugins
