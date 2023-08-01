@@ -10,7 +10,7 @@ ChucKDesigner is an integration of the [ChucK](https://chuck.stanford.edu/) musi
 
 ChucKDesigner consists of two custom operators, the ChucK Audio CHOP and the ChucK Listener CHOP. The ChucK Audio CHOP "runs" the ChucK code. TouchDesigner can also tell it how to update global variables. The Listener CHOP "listens" to a ChucK Audio CHOP. It can continuously stream out global floats and integers as ordinary CHOP data. Using a Python-based callback DAT, it can also access many more global variable types such as arrays, strings, and events.
 
-Please use the [issues](https://github.com/DBraun/ChucKDesigner/issues) and [discussions](https://github.com/DBraun/ChucKDesigner/discussions) pages on GitHub.
+Please use the [issues](https://github.com/DBraun/ChucKDesigner/issues) and [discussions](https://github.com/DBraun/ChucKDesigner/discussions) pages on GitHub. You can also participate in the #ChucKDesigner channel in the [ChucK](https://chuck.stanford.edu/) Discord server.
 
 ## Tutorials
 
