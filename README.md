@@ -39,14 +39,14 @@ Download and unzip the latest Windows [release](https://github.com/DBraun/ChucKD
 <br>
 Clone this repository with git. Then update all submodules in the root of the repository with <code>git submodule update --init --recursive</code>.
 <br>
-Install <a href="https://www.python.org/downloads/release/python-3116/">Python 3.11</a> to <code>C:/Python311/</code> and confirm it's in your system PATH.
+Install <a href="https://www.python.org/downloads/release/python-3910/">Python 3.9</a> to <code>C:/Python39/</code> and confirm it's in your system PATH.
 <br>
 Install CMake and confirm that it's installed by running <code>cmake --version</code> in a command prompt.
 <br>
 Then in this repository,
 <br>
 <code>
-cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPYTHONVER="3.11"
+cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPYTHONVER="3.9"
 </code>
 <br>
 Finally, open <code>build/ChucKDesignerCHOP.sln</code> and compile.
@@ -57,7 +57,7 @@ Finally, open <code>build/ChucKDesignerCHOP.sln</code> and compile.
 [@DBraun](https://github.com/DBraun) doesn't have a macOS App Distribution Developer License, so you must compile ChucKDesigner on your own computer.
 
 1. Clone this repository with git. Then update all submodules in the root of the repository with `git submodule update --init --recursive`
-2. Install [Python 3.11 universal2](https://www.python.org/downloads/release/python-3116/). Confirm it's in your system PATH (`where python3` in Terminal should indicate `/Library/Frameworks/Python.framework/Versions/3.11/bin/python3`).
+2. Install [Python 3.9 universal2](https://www.python.org/downloads/release/python-3910/). Confirm it's in your system PATH (`where python3` in Terminal should indicate `/Library/Frameworks/Python.framework/Versions/3.9/bin/python3`).
 3. Install Xcode.
 4. [Install CMake](https://cmake.org/download/) and confirm that it's installed by running `cmake --version` in Terminal.
 5. In a Terminal Window, export a variable to the TouchDesigner.app to which you'd like to support. For example: `export TOUCHDESIGNER_APP=/Applications/TouchDesigner.app`, assuming this version is a 2022.22650 build or higher.

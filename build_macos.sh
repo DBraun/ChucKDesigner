@@ -17,6 +17,8 @@ if [ "$PYTHONVER" == "" ]; then
     export PYTHONVER=3.9
 fi
 
+echo Building for Python $PYTHONVER
+
 # export CMAKE_OSX_ARCHITECTURES="x86_64"
 
 echo Assuming TouchDesigner is located at $TOUCHDESIGNER_APP
