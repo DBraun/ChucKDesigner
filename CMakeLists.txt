@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.13.0 FATAL_ERROR)
 
-project(ChucKDesigner VERSION 0.0.1)
+SET(VERSION 0.3.1)
+project(ChucKDesigner VERSION ${VERSION})
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ChucKDesignerCHOP)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -8,7 +9,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 ################################################################################
 # Sub-projects
 ################################################################################
-project(ChucKDesignerShared VERSION 0.0.1)
+project(ChucKDesignerShared VERSION ${VERSION})
 
 file(GLOB CK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/*.h
@@ -125,7 +126,7 @@ endif()
 
 ###################### ChucKListenerCHOP
 
-project(ChucKListenerCHOP VERSION 0.0.1)
+project(ChucKListenerCHOP VERSION ${VERSION})
 
 add_library(ChucKListenerCHOP MODULE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKListenerCHOP.h
@@ -140,8 +141,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     # MACOSX_BUNDLE_GUI_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
     MACOSX_BUNDLE_INFO_STRING ${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
-    MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
-    MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
+    MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${VERSION}
     MACOSX_BUNDLE_COPYRIGHT "David Braun"
     MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/src/Info.plist
     XCODE_ATTRIBUTE_FRAMEWORK_SEARCH_PATHS "/System/Library/PrivateFrameworks /Library/Frameworks"
@@ -211,7 +212,7 @@ endif()
 
 ###################### ChucKDesignerCHOP
 
-project(ChucKDesignerCHOP VERSION 0.0.1)
+project(ChucKDesignerCHOP VERSION ${VERSION})
 
 add_library(ChucKDesignerCHOP MODULE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKDesignerCHOP.h
@@ -226,8 +227,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     # MACOSX_BUNDLE_GUI_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
     MACOSX_BUNDLE_INFO_STRING ${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
-    MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
-    MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
+    MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${VERSION}
     MACOSX_BUNDLE_COPYRIGHT "David Braun"
     MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/src/Info.plist
     XCODE_ATTRIBUTE_FRAMEWORK_SEARCH_PATHS "/System/Library/PrivateFrameworks /Library/Frameworks"
