@@ -12,17 +12,17 @@ jobs:
       matrix:
         os: [windows-latest]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true
 
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
-        python-version: "3.9"
+        python-version: "3.11"
 
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.3
+      uses: microsoft/setup-msbuild@v1.1
 
     - name: Get CMake
       uses: lukka/get-cmake@latest
@@ -41,7 +41,7 @@ jobs:
         7z a ChucKDesigner-${{ matrix.os }}.zip ./chuckdesigner_dist/* -r
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: my-artifact-${{ matrix.os }}
         path: ChucKDesigner-${{ matrix.os }}.zip
@@ -52,7 +52,7 @@ jobs:
       matrix:
         os: [macos-latest]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true
 
@@ -61,7 +61,7 @@ jobs:
       with:
         python-version: '3.8'
 
-    - name: Setup Python 3.9
+    - name: Setup Python 3.11
       run: |
         which python
         python --version
@@ -80,7 +80,7 @@ jobs:
 
     - name: Build MacOS (Release)
       run: |
-        export PATH=/Library/Frameworks/Python.framework/Versions/3.9:/Library/Frameworks/Python.framework/Versions/3.9/bin:/Library/Frameworks/Python.framework/Versions/3.9/lib:$PATH
+        export PATH=/Library/Frameworks/Python.framework/Versions/3.11:/Library/Frameworks/Python.framework/Versions/3.11/bin:/Library/Frameworks/Python.framework/Versions/3.11/lib:$PATH
         which python3
         python3 --version
         which python3
@@ -102,7 +102,7 @@ jobs:
 
     # Don't upload until we figure out codesigning.
     # - name: Upload artifact
-    #   uses: actions/upload-artifact@v2
+    #   uses: actions/upload-artifact@v3
     #   with:
     #     name: my-artifact-${{ matrix.os }}
     #     path: ChucKDesigner-${{ matrix.os }}.zip
@@ -113,7 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Create Release on GitHub"
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           path: "dist"
 

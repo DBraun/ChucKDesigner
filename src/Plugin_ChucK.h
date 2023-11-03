@@ -1,3 +1,11 @@
+//-----------------------------------------------------------------------------
+//  name: Plugin_ChucK.h
+//  desc: ChucK in Unity (Chunity) plugin; creates AudioPluginChucK
+//
+//  author: Jack Atherton
+//    date: created 4/19/17
+//-----------------------------------------------------------------------------
+
 #pragma once
 
 #include "chuck.h"
@@ -129,5 +137,5 @@ extern "C" {
         CHUCKDESIGNERSHARED_API void addListenerCHOP(const char* varName, uint32_t opID);
         CHUCKDESIGNERSHARED_API void removeListenerCHOP(const char* varName, uint32_t opID);
         CHUCKDESIGNERSHARED_API int queryEvent(const char* varName, uint32_t opID);
-    }
-};
+    } // namespace ChucK_For_TouchDesigner
+}; // extern "C"

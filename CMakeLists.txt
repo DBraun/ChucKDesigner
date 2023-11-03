@@ -36,8 +36,8 @@ if(WIN32)
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*server_thread.c")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*lo/config.h")
 else()
-    list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.h")
-    list(FILTER CK_SOURCES EXCLUDE REGEX ".*win32.c")
+    list(FILTER CK_SOURCES EXCLUDE REGEX ".*chuck_yacc.h")
+    list(FILTER CK_SOURCES EXCLUDE REGEX ".*chuck_yacc.c")
     list(FILTER CK_SOURCES EXCLUDE REGEX ".*core/regex/*")
     list(APPEND CK_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/chuck.yy.c")
 endif()
@@ -90,6 +90,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 if(WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         "WIN32;"
+        "__PLATFORM_WINDOWS__;"
         "__PLATFORM_WIN32__;"
         "__WINDOWS_MODERN__;"
         "__WINDOWS_DS__;"
@@ -104,6 +105,7 @@ if(WIN32)
   target_link_libraries(${PROJECT_NAME} PUBLIC dsound dinput8 dxguid)
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE
+        "__PLATFORM_APPLE__;"
         "__MACOSX_CORE__;"
         "__APPLE__;"
         "__MACH__;"
@@ -156,7 +158,7 @@ target_include_directories(ChucKListenerCHOP PUBLIC
 
 set(Python_FIND_REGISTRY "LAST")
 set(Python_FIND_STRATEGY "LOCATION")
-find_package(Python 3.9 EXACT REQUIRED COMPONENTS Interpreter Development)
+find_package(Python 3.11 EXACT REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(${PROJECT_NAME} PUBLIC Python::Python)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ChucKDesignerShared)
@@ -242,7 +244,7 @@ target_include_directories(ChucKDesignerCHOP PUBLIC
 
 set(Python_FIND_REGISTRY "LAST")
 set(Python_FIND_STRATEGY "LOCATION")
-find_package(Python 3.9 EXACT REQUIRED COMPONENTS Interpreter Development)
+find_package(Python 3.11 EXACT REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(${PROJECT_NAME} PUBLIC Python::Python)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ChucKDesignerShared)
@@ -304,11 +306,11 @@ add_custom_command(TARGET ChucKListenerCHOP
 # python linking
 add_custom_command(TARGET ChucKDesignerCHOP
                  POST_BUILD
-                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib "$<TARGET_FILE:ChucKDesignerCHOP>"
+                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.11/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.11/lib/libpython3.11.dylib "$<TARGET_FILE:ChucKDesignerCHOP>"
                  )
 add_custom_command(TARGET ChucKListenerCHOP
                  POST_BUILD
-                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.9/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib "$<TARGET_FILE:ChucKListenerCHOP>"
+                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.11/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.11/lib/libpython3.11.dylib "$<TARGET_FILE:ChucKListenerCHOP>"
                  )
 endif()
 

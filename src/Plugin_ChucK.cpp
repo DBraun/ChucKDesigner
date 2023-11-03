@@ -974,10 +974,10 @@ namespace ChucK_For_TouchDesigner
             
             // create a msg asking to clear the VM
             Chuck_Msg * msg = new Chuck_Msg;
-            msg->type = MSG_CLEARVM;
+            msg->type = CK_MSG_CLEARVM;
             
             // null reply so that VM will delete for us when it's done
-            msg->reply = ( ck_msg_func )NULL;
+            msg->reply_queue = FALSE;
             
             // tell the VM to clear
             chuck->vm()->globals_manager()->execute_chuck_msg_with_globals( msg );
@@ -998,10 +998,10 @@ namespace ChucK_For_TouchDesigner
             
             // create a msg asking to clear the globals
             Chuck_Msg * msg = new Chuck_Msg;
-            msg->type = MSG_CLEARGLOBALS;
+            msg->type = CK_MSG_CLEARGLOBALS;
             
             // null reply so that VM will delete for us when it's done
-            msg->reply = ( ck_msg_func )NULL;
+            msg->reply_queue = FALSE;
             
             // tell the VM to clear
             chuck->vm()->globals_manager()->execute_chuck_msg_with_globals( msg );
