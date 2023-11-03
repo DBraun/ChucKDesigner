@@ -1,5 +1,8 @@
-rem Make sure Python 3.9 is installed and in your system PATH
+if "%PYTHONVER%"=="" (
+    set PYTHONVER=3.9
+)
+echo "Using Python version: %PYTHONVER%"
 
-cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
+cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPYTHONVER=%PYTHONVER%
 cmake --build build --config Release
 echo "All Done!"

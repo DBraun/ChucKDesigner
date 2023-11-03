@@ -12,6 +12,13 @@ else
     export CMAKE_OSX_ARCHITECTURES="x86_64"
 fi
 
+if [ "$PYTHONVER" == "" ]; then
+    # Guess which Python version TD uses.
+    export PYTHONVER=3.9
+fi
+
+echo Building for Python $PYTHONVER
+
 # export CMAKE_OSX_ARCHITECTURES="x86_64"
 
 echo Assuming TouchDesigner is located at $TOUCHDESIGNER_APP
@@ -28,7 +35,7 @@ flex -ochuck.yy.c chuck.lex
 cd ../../../..
 
 # Steps for making the Xcode project and compiling with it
-cmake -Bbuild -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=$CMAKE_OSX_ARCHITECTURES
+cmake -Bbuild -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=$CMAKE_OSX_ARCHITECTURES -DPYTHONVER=$PYTHONVER
 cmake --build build --config Release
 
 # Copy to Plugins directory

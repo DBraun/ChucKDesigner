@@ -26,6 +26,8 @@ Part 2 (Python API):
 
 ### ChucK
 
+ChucKDesigner is currently being built for ChucK 1.5.1.9 for TouchDesigner with Python 3.9 (2022 builds) or 3.11 (2023 builds). If you need to support something else, please check out earlier [releases](https://github.com/DBraun/ChucKDesigner/releases) or commits of this repository.
+
 [Downloading ChucK](https://chuck.stanford.edu/release/) is optional but highly encouraged! Use miniAudicle and the examples that come with the installation to learn ChucK. More educational resources are available from the [ChucK homepage](https://chuck.stanford.edu/). ChucKDesigner is very similar to [Chunity](https://chuck.stanford.edu/chunity/) (the integration of ChucK with Unity), so you are also encouraged to learn about [Chunity](https://github.com/ccrma/chunity/)!
 
 ### Windows
@@ -44,7 +46,7 @@ Install CMake and confirm that it's installed by running <code>cmake --version</
 Then in this repository,
 <br>
 <code>
-cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild
+cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPYTHONVER="3.9"
 </code>
 <br>
 Finally, open <code>build/ChucKDesignerCHOP.sln</code> and compile.
@@ -52,10 +54,10 @@ Finally, open <code>build/ChucKDesignerCHOP.sln</code> and compile.
 
 ### MacOS
 
-@DBraun doesn't have a macOS App Distribution Developer License, so you must compile ChucKDesigner on your own computer.
+[@DBraun](https://github.com/DBraun) doesn't have a macOS App Distribution Developer License, so you must compile ChucKDesigner on your own computer.
 
 1. Clone this repository with git. Then update all submodules in the root of the repository with `git submodule update --init --recursive`
-2. Install [Python 3.9 universal2](https://www.python.org/downloads/release/python-3910/) and confirm it's in your system PATH.
+2. Install [Python 3.9 universal2](https://www.python.org/downloads/release/python-3910/). Confirm it's in your system PATH (`where python3` in Terminal should indicate `/Library/Frameworks/Python.framework/Versions/3.9/bin/python3`).
 3. Install Xcode.
 4. [Install CMake](https://cmake.org/download/) and confirm that it's installed by running `cmake --version` in Terminal.
 5. In a Terminal Window, export a variable to the TouchDesigner.app to which you'd like to support. For example: `export TOUCHDESIGNER_APP=/Applications/TouchDesigner.app`, assuming this version is a 2022.22650 build or higher.
