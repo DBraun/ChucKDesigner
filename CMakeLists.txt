@@ -158,7 +158,7 @@ target_include_directories(ChucKListenerCHOP PUBLIC
 
 set(Python_FIND_REGISTRY "LAST")
 set(Python_FIND_STRATEGY "LOCATION")
-find_package(Python 3.11 EXACT REQUIRED COMPONENTS Interpreter Development)
+find_package(Python ${PYTHONVER} EXACT REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(${PROJECT_NAME} PUBLIC Python::Python)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ChucKDesignerShared)
@@ -244,7 +244,7 @@ target_include_directories(ChucKDesignerCHOP PUBLIC
 
 set(Python_FIND_REGISTRY "LAST")
 set(Python_FIND_STRATEGY "LOCATION")
-find_package(Python 3.11 EXACT REQUIRED COMPONENTS Interpreter Development)
+find_package(Python ${PYTHONVER} EXACT REQUIRED COMPONENTS Interpreter Development)
 target_link_libraries(${PROJECT_NAME} PUBLIC Python::Python)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ChucKDesignerShared)
@@ -306,11 +306,11 @@ add_custom_command(TARGET ChucKListenerCHOP
 # python linking
 add_custom_command(TARGET ChucKDesignerCHOP
                  POST_BUILD
-                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.11/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.11/lib/libpython3.11.dylib "$<TARGET_FILE:ChucKDesignerCHOP>"
+                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/lib/libpython${PYTHONVER}.dylib "$<TARGET_FILE:ChucKDesignerCHOP>"
                  )
 add_custom_command(TARGET ChucKListenerCHOP
                  POST_BUILD
-                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/3.11/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/3.11/lib/libpython3.11.dylib "$<TARGET_FILE:ChucKListenerCHOP>"
+                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/lib/libpython${PYTHONVER}.dylib "$<TARGET_FILE:ChucKListenerCHOP>"
                  )
 endif()
 
