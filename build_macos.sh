@@ -2,6 +2,7 @@ if [ "$TOUCHDESIGNER_APP" == "" ]; then
     # a reasonable default in case you forget to set the path to TouchDesigner.
     export TOUCHDESIGNER_APP=/Applications/TouchDesigner.app
 fi
+echo Assuming TouchDesigner is located at $TOUCHDESIGNER_APP
 
 # if building on Apple Silicon
 if [[ $(uname -m) == 'arm64' ]]; then
@@ -16,12 +17,7 @@ if [ "$PYTHONVER" == "" ]; then
     # Guess which Python version TD uses.
     export PYTHONVER=3.9
 fi
-
 echo Building for Python $PYTHONVER
-
-# export CMAKE_OSX_ARCHITECTURES="x86_64"
-
-echo Assuming TouchDesigner is located at $TOUCHDESIGNER_APP
 
 # Remove any old plugins and dylib
 rm Plugins/libChucKDesignerShared.dylib
@@ -35,7 +31,7 @@ flex -ochuck.yy.c chuck.lex
 cd ../../../..
 
 # Steps for making the Xcode project and compiling with it
-cmake -Bbuild -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=$CMAKE_OSX_ARCHITECTURES -DPYTHONVER=$PYTHONVER
+cmake -Bbuild -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=$CMAKE_OSX_ARCHITECTURES -DPYTHONVER=$PYTHONVER -DPython_ROOT_DIR=/Applications/TouchDesigner.app/Contents/Frameworks/Python.framework/Versions/$PYTHONVER
 cmake --build build --config Release
 
 # Copy to Plugins directory

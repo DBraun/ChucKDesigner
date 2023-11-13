@@ -303,16 +303,6 @@ add_custom_command(TARGET ChucKListenerCHOP
                  POST_BUILD
                  COMMAND install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib "$<TARGET_FILE:ChucKListenerCHOP>"
                  )
-
-# python linking
-add_custom_command(TARGET ChucKDesignerCHOP
-                 POST_BUILD
-                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/lib/libpython${PYTHONVER}.dylib "$<TARGET_FILE:ChucKDesignerCHOP>"
-                 )
-add_custom_command(TARGET ChucKListenerCHOP
-                 POST_BUILD
-                 COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python $TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/lib/libpython${PYTHONVER}.dylib "$<TARGET_FILE:ChucKListenerCHOP>"
-                 )
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
