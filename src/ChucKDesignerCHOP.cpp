@@ -471,6 +471,9 @@ extern "C"
         info->customOPInfo.authorName->setString("David Braun");
         info->customOPInfo.authorEmail->setString("github.com/DBraun");
 
+        info->customOPInfo.majorVersion = 0;
+        info->customOPInfo.minorVersion = 3;
+
         info->customOPInfo.minInputs = 0;
         info->customOPInfo.maxInputs = 1;
             
@@ -556,6 +559,7 @@ ChucKDesignerCHOP::getChannelName(int32_t index, OP_String *name, const OP_Input
 
 void
 ChucKDesignerCHOP::reset() {
+    myError.str("");
     ChucK_For_TouchDesigner::clearGlobals(m_chuckID);
     ChucK_For_TouchDesigner::clearChuckInstance(m_chuckID);
     ChucK_For_TouchDesigner::cleanupChuckInstance(m_chuckID, myNodeInfo->opId);
@@ -578,11 +582,7 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
     if (needCompile) {
         needCompile = false;
 
-        // Until ChucK on windows parses the working directory better,
-        // we have to pass it as a relative path rather than an absolute path.
-        // https://github.com/ccrma/chuck/blob/de0530b4d0d85c9fe4abca17019730fe8e8e0454/src/core/chuck.cpp#L524
-        string globalDir = inputs->getParString("Workingdirectory");
-        //string globalDir = inputs->getParFilePath("Workingdirectory");
+        string globalDir = inputs->getParFilePath("Workingdirectory");
 
         double sample_rate = inputs->getParDouble("Samplerate");
 
@@ -602,16 +602,18 @@ ChucKDesignerCHOP::execute(CHOP_Output* output,
 
         ChucK_For_TouchDesigner::initChuckInstance(m_chuckID, sample_rate, m_inChannels, m_outChannels, globalDir);
 
-        const OP_DATInput* input = inputs->getParDAT("Code");
-        const char* code = *(input->cellData);
+        const OP_DATInput* codeInput = inputs->getParDAT("Code");
 
-        bool result = ChucK_For_TouchDesigner::runChuckCode(m_chuckID, code);
-        if (result) {
-            // clear any existing error
-            myError.str("");
-        }
-        else {
-            myError.str("ChucK code did not compile correctly.");
+        myError.str("");
+
+        if (codeInput) {
+            const char* code = *(codeInput->cellData);
+            bool result = ChucK_For_TouchDesigner::runChuckCode(m_chuckID, code);
+            if (!result) {
+                myError.str("ChucK code did not compile correctly.");
+            }
+        } else {
+            myError.str("You must specify ChucK Code.");
         }
     }
     

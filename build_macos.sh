@@ -15,7 +15,7 @@ fi
 
 if [ "$PYTHONVER" == "" ]; then
     # Guess which Python version TD uses.
-    export PYTHONVER=3.9
+    export PYTHONVER=3.11
 fi
 echo Building for Python $PYTHONVER
 

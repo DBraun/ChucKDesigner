@@ -1,5 +1,5 @@
 if "%PYTHONVER%"=="" (
-    set PYTHONVER=3.9
+    set PYTHONVER=3.11
 )
 echo "Using Python version: %PYTHONVER%"
 
