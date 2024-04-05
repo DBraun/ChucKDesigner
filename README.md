@@ -26,7 +26,7 @@ Part 2 (Python API):
 
 ### ChucK
 
-ChucKDesigner is currently being built for ChucK 1.5.2 for TouchDesigner with 3.11 (2023 builds) and Python 3.9 (2022 builds). If you need to support something else, please check out earlier [releases](https://github.com/DBraun/ChucKDesigner/releases) or commits of this repository.
+ChucKDesigner is currently being built for ChucK 1.5.2.3 for TouchDesigner with 3.11 (2023 builds) and Python 3.9 (2022 builds). If you need to support something else, please check out earlier [releases](https://github.com/DBraun/ChucKDesigner/releases) or commits of this repository.
 
 [Downloading ChucK](https://chuck.stanford.edu/release/) is optional but highly encouraged! Use miniAudicle and the examples that come with the installation to learn ChucK. More educational resources are available from the [ChucK homepage](https://chuck.stanford.edu/). ChucKDesigner is very similar to [Chunity](https://chuck.stanford.edu/chunity/) (the integration of ChucK with Unity), so you are also encouraged to learn about [Chunity](https://github.com/ccrma/chunity/)!
 
