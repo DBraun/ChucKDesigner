@@ -76,7 +76,7 @@ jobs:
 
     - name: Install Certificate
       run: |
-        echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+        echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
         security create-keychain -p "" build.keychain
         security default-keychain -s build.keychain
         security unlock-keychain -p "" build.keychain
@@ -125,8 +125,8 @@ jobs:
       run: |
         cmake -Bbuild -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=${{matrix.arch}} -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DPYTHONVER="${{matrix.python-version}}" -DPython_ROOT_DIR=$pythonLocation
         cmake --build build --config Release
-        codesign --force --verify --verbose=2 --timestamp --options=runtime --deep --sign "Developer ID Application: David Braun (${{secrets.CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}})" build/Release/ChucKDesignerCHOP.plugin
-        codesign --force --verify --verbose=2 --timestamp --options=runtime --deep --sign "Developer ID Application: David Braun (${{secrets.CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}})" build/Release/ChucKListenerCHOP.plugin
+        codesign --force --verify --verbose=2 --timestamp --options=runtime --deep --sign "Developer ID Application" build/Release/ChucKDesignerCHOP.plugin
+        codesign --force --verify --verbose=2 --timestamp --options=runtime --deep --sign "Developer ID Application" build/Release/ChucKListenerCHOP.plugin
         codesign --verify --deep --strict --verbose=2 build/Release/ChucKDesignerCHOP.plugin
         codesign --verify --deep --strict --verbose=2 build/Release/ChucKListenerCHOP.plugin
 
