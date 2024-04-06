@@ -233,6 +233,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_COPYRIGHT "David Braun"
     MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/src/Info.plist
     XCODE_ATTRIBUTE_FRAMEWORK_SEARCH_PATHS "/System/Library/PrivateFrameworks /Library/Frameworks"
+    XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES
     )
 
 # Include header directories

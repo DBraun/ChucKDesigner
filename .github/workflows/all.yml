@@ -3,6 +3,7 @@ env:
   MACOS_CERTIFICATE_BASE64: ${{ secrets.MACOS_CERTIFICATE_BASE64 }}
   MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
   P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+  KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
 name: Compile
 on:
   pull_request: {}
@@ -78,24 +79,15 @@ jobs:
     - name: Install Certificate
       # https://docs.github.com/en/actions/deployment/deploying-xcode-applications/installing-an-apple-certificate-on-macos-runners-for-xcode-development
       run: |
-        # create variables
-        CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-        KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-
-        # import certificate and provisioning profile from secrets
-        echo -n "$MACOS_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
-
-        # create temporary keychain
-        security create-keychain -p "$MACOS_CERTIFICATE_PASSWORD" $KEYCHAIN_PATH
-        security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
-        security unlock-keychain -p "$MACOS_CERTIFICATE_PASSWORD" $KEYCHAIN_PATH
-
-        # import certificate to keychain
-        security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-        security set-key-partition-list -S apple-tool:,apple: -k "$MACOS_CERTIFICATE_PASSWORD" $KEYCHAIN_PATH
-        security list-keychain -d user -s $KEYCHAIN_PATH
-
-        security find-identity -v
+        KEYCHAIN_PATH=${RUNNER_TEMP}/app-signing.keychain-db
+        CERTIFICATE_PATH=${RUNNER_TEMP}/build_certificate.p12
+        echo -n "${MACOS_CERTIFICATE_BASE64}" | base64 --decode --output "${CERTIFICATE_PATH}"
+        security create-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_PATH}"
+        security set-keychain-settings -lut 21600 "${KEYCHAIN_PATH}"
+        security unlock-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_PATH}"
+        security import "${CERTIFICATE_PATH}" -P "${MACOS_CERTIFICATE_PASSWORD}" -A -t cert -f pkcs12 -k "${KEYCHAIN_PATH}"
+        echo "Listing keychain:\n"
+        security list-keychain -d user -s "${KEYCHAIN_PATH}"
 
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -139,8 +131,8 @@ jobs:
       run: |
         cmake -Bbuild -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=${{matrix.arch}} -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DPYTHONVER="${{matrix.python-version}}" -DPython_ROOT_DIR=$pythonLocation
         cmake --build build --config Release
-        codesign --force --verify --verbose=2 --timestamp --options=runtime --deep --sign "Developer ID Application" build/Release/ChucKDesignerCHOP.plugin
-        codesign --force --verify --verbose=2 --timestamp --options=runtime --deep --sign "Developer ID Application" build/Release/ChucKListenerCHOP.plugin
+        codesign --force --deep --timestamp --verify --verbose=2 --options=runtime --sign "Developer ID Application" build/Release/ChucKDesignerCHOP.plugin
+        codesign --force --deep --timestamp --verify --verbose=2 --options=runtime --sign "Developer ID Application" build/Release/ChucKListenerCHOP.plugin
         codesign --verify --deep --strict --verbose=2 build/Release/ChucKDesignerCHOP.plugin
         codesign --verify --deep --strict --verbose=2 build/Release/ChucKListenerCHOP.plugin
 
