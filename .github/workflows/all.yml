@@ -154,7 +154,7 @@ jobs:
         cp ${{ github.workspace }}/build/Release/libChucKDesignerShared.dylib ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
         mv ${{ github.workspace }}/build/Release/ChucKDesignerCHOP.plugin ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
         mv ${{ github.workspace }}/build/Release/ChucKListenerCHOP.plugin ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
-        zip -r ChucKDesigner-${{ matrix.os }}-Python${{ matrix.python-major }}.zip ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
+        zip -r ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}.zip ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
