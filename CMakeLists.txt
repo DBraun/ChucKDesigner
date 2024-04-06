@@ -9,7 +9,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 ################################################################################
 # Sub-projects
 ################################################################################
-project(ChucKDesignerShared VERSION ${VERSION})
 
 file(GLOB CK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/*.h
@@ -44,6 +43,8 @@ else()
 endif()
 
 file(GLOB TOUCHDESIGNER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/*)
+
+project(ChucKDesignerShared VERSION ${VERSION})
 
 add_library(ChucKDesignerShared SHARED
     ${CK_SOURCES}
