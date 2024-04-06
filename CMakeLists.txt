@@ -104,6 +104,7 @@ if(WIN32)
   # more
   target_link_libraries(${PROJECT_NAME} PUBLIC wsock32)
   target_link_libraries(${PROJECT_NAME} PUBLIC dsound dinput8 dxguid)
+  target_link_libraries(${PROJECT_NAME} PUBLIC iphlpapi)
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         "__PLATFORM_APPLE__;"
