@@ -98,6 +98,8 @@ jobs:
         security list-keychain -d user -s $KEYCHAIN_PATH
         echo "find-identity:\n"
         security find-identity -v
+        echo "find-identity codesigning:\n"
+        security find-identity -p codesigning -v
 
     - name: Setup Python
       uses: actions/setup-python@v5
