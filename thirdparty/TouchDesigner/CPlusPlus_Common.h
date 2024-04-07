@@ -103,6 +103,10 @@ enum class OP_PixelFormat : int32_t
 	MonoA16Float,
 	MonoA32Float,
 
+	// RGBX, Alpha channel is ignored, will be treated a 1.0 for operations.
+	RGBX16Float = 500,
+	RGBX32Float,
+
 	// sRGB. use SBGRA if possible since that's what most GPUs use
 	SBGRA8Fixed = 600,
 	SRGBA8Fixed,
@@ -467,10 +471,7 @@ public:
 	// Used to do other operations to the node such as call python callbacks
 	OP_Context*		context;
 
-	// The number of times this node has cooked. Incremented at the start of the cook.
-	uint32_t		cookCount;
-
-	int32_t			reserved[14];
+	int32_t			reserved[15];
 };
 
 class OP_DATInput

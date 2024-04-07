@@ -22,13 +22,8 @@
 
 //#include <vector>
 
-#ifdef _WIN32
-    #include <Python.h>
-    #include <structmember.h>
-#else
-    #include <Python/Python.h>
-    #include <Python/structmember.h>
-#endif
+#include <Python.h>
+#include <structmember.h>
 
 const char* PythonCallbacksDATStubs =
 "# This is an example callbacks DAT for a ChucK Listener Operator.\n"

@@ -220,7 +220,7 @@ add_library(ChucKDesignerCHOP MODULE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKDesignerCHOP.cpp
     ${TOUCHDESIGNER_SOURCES}
     )
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_target_properties(${PROJECT_NAME} PROPERTIES
     BUNDLE true
     BUNDLE_EXTENSION "plugin"
