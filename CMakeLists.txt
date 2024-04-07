@@ -297,18 +297,20 @@ add_custom_command(TARGET ${PROJECT_NAME}
                  )
 else()
 
+# These two are for renaming what GitHub actions produces
 add_custom_command(TARGET ChucKDesignerCHOP POST_BUILD
-    COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKDesignerCHOP>"
+    COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python @executable_path/../Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKDesignerCHOP>"
 )
 add_custom_command(TARGET ChucKListenerCHOP POST_BUILD
-    COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKListenerCHOP>"
+    COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python @executable_path/../Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKListenerCHOP>"
 )
 
+# These two are for renaming what an ordinary mac produces
 add_custom_command(TARGET ChucKDesignerCHOP POST_BUILD
-    COMMAND install_name_tool -change @rpath/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKDesignerCHOP>"
+    COMMAND install_name_tool -change @rpath/Python.framework/Versions/${PYTHONVER}/Python @executable_path/../Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKDesignerCHOP>"
 )
 add_custom_command(TARGET ChucKListenerCHOP POST_BUILD
-    COMMAND install_name_tool -change @rpath/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKListenerCHOP>"
+    COMMAND install_name_tool -change @rpath/Python.framework/Versions/${PYTHONVER}/Python @executable_path/../Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKListenerCHOP>"
 )
 
 # libChucKDesignerShared replacements
