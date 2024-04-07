@@ -15,7 +15,7 @@ fi
 
 if [ "$PYTHONVER" == "" ]; then
     # Guess which Python version TD uses.
-    export PYTHONVER=3.11
+    export PYTHONVER="3.11"
 fi
 echo Building for Python $PYTHONVER
 
@@ -31,7 +31,7 @@ flex -ochuck.yy.c chuck.lex
 cd ../../../..
 
 # Steps for making the Xcode project and compiling with it
-cmake -Bbuild -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=$CMAKE_OSX_ARCHITECTURES -DPYTHONVER=$PYTHONVER -DPython_ROOT_DIR=/Applications/TouchDesigner.app/Contents/Frameworks/Python.framework/Versions/$PYTHONVER
+cmake -Bbuild -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=$CMAKE_OSX_ARCHITECTURES -DPYTHONVER=$PYTHONVER -DPython_ROOT_DIR=$TOUCHDESIGNER_APP/Contents/Frameworks/Python.framework/Versions/$PYTHONVER
 cmake --build build --config Release
 
 # Copy to Plugins directory

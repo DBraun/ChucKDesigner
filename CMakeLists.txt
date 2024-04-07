@@ -9,7 +9,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 ################################################################################
 # Sub-projects
 ################################################################################
-project(ChucKDesignerShared VERSION ${VERSION})
 
 file(GLOB CK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/*.h
@@ -45,32 +44,33 @@ endif()
 
 file(GLOB TOUCHDESIGNER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner/*)
 
+project(ChucKDesignerShared VERSION ${VERSION})
+
 add_library(ChucKDesignerShared SHARED
     ${CK_SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Plugin_ChucK.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Plugin_ChucK.cpp
     ${TOUCHDESIGNER_SOURCES}
     )
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
 # Include header directories
-target_include_directories(ChucKDesignerShared PUBLIC
+target_include_directories(ChucKDesignerShared PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner>
-    $<INSTALL_INTERFACE:ChucKDesignerShared>
     )
 if(APPLE)
-    target_include_directories(ChucKDesignerShared PUBLIC
+    target_include_directories(ChucKDesignerShared PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/lo>
         )
 
     # Link MultitouchSupport Apple framework
     find_library( multitouchsupportlibs MultitouchSupport /System/Library/PrivateFrameworks )
     message(STATUS "Found multitouchsupportlibs libs: ${multitouchsupportlibs}" )
-    target_link_libraries(${PROJECT_NAME} PUBLIC ${multitouchsupportlibs})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${multitouchsupportlibs})
 else()
-    target_include_directories(ChucKDesignerShared PUBLIC
+    target_include_directories(ChucKDesignerShared PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex>
         )
 endif()
@@ -98,13 +98,13 @@ if(WIN32)
         "_WINDOWS;"
     )
   # win sock 32
-  target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
+  target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32)
   # windows multimedia for rt midi
-  target_link_libraries(${PROJECT_NAME} PUBLIC winmm)
+  target_link_libraries(${PROJECT_NAME} PRIVATE winmm)
   # more
-  target_link_libraries(${PROJECT_NAME} PUBLIC wsock32)
-  target_link_libraries(${PROJECT_NAME} PUBLIC dsound dinput8 dxguid)
-  target_link_libraries(${PROJECT_NAME} PUBLIC iphlpapi)
+  target_link_libraries(${PROJECT_NAME} PRIVATE wsock32)
+  target_link_libraries(${PROJECT_NAME} PRIVATE dsound dinput8 dxguid)
+  target_link_libraries(${PROJECT_NAME} PRIVATE iphlpapi)
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         "__PLATFORM_APPLE__;"
@@ -112,7 +112,7 @@ else()
         "__APPLE__;"
         "__MACH__;"
     )
-    target_link_libraries(${PROJECT_NAME} PUBLIC "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio" "-framework IOKit" "-framework Carbon" "-framework AppKit" "-framework Foundation")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio" "-framework IOKit" "-framework Carbon" "-framework AppKit" "-framework Foundation")
 endif()
 
 if (MSVC)
@@ -134,12 +134,13 @@ add_library(ChucKListenerCHOP MODULE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKListenerCHOP.cpp
     ${TOUCHDESIGNER_SOURCES}
     )
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_target_properties(${PROJECT_NAME} PROPERTIES
     BUNDLE true
     BUNDLE_EXTENSION "plugin"
-    # PRODUCT_BUNDLE_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
-    # MACOSX_BUNDLE_GUI_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
+    INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
+    PRODUCT_BUNDLE_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
+    MACOSX_BUNDLE_GUI_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
     MACOSX_BUNDLE_INFO_STRING ${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION}
@@ -150,20 +151,19 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     )
 
 # Include header directories
-target_include_directories(ChucKListenerCHOP PUBLIC
+target_include_directories(ChucKListenerCHOP PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner>
-    $<INSTALL_INTERFACE:ChucKListenerCHOP>
     )
 
 set(Python_FIND_REGISTRY "LAST")
 set(Python_FIND_STRATEGY "LOCATION")
 find_package(Python ${PYTHONVER} EXACT REQUIRED COMPONENTS Interpreter Development)
-target_link_libraries(${PROJECT_NAME} PUBLIC Python::Python)
+target_link_libraries(${PROJECT_NAME} PRIVATE Python::Python)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ChucKDesignerShared)
+target_link_libraries(${PROJECT_NAME} PRIVATE ChucKDesignerShared)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
@@ -186,19 +186,19 @@ if(WIN32)
         "_WINDOWS;"
     )
     # win sock 32
-    target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32)
     # windows multimedia for rt midi
-    target_link_libraries(${PROJECT_NAME} PUBLIC winmm)
+    target_link_libraries(${PROJECT_NAME} PRIVATE winmm)
     # more
-    target_link_libraries(${PROJECT_NAME} PUBLIC wsock32)
-    target_link_libraries(${PROJECT_NAME} PUBLIC dsound dinput8 dxguid)
+    target_link_libraries(${PROJECT_NAME} PRIVATE wsock32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE dsound dinput8 dxguid)
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         "__MACOSX_CORE__;"
         "__APPLE__;"
         "__MACH__;"
     )
-    target_link_libraries(${PROJECT_NAME} PUBLIC "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
 endif()
 
 if(MSVC)
@@ -224,8 +224,9 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 set_target_properties(${PROJECT_NAME} PROPERTIES
     BUNDLE true
     BUNDLE_EXTENSION "plugin"
-    # PRODUCT_BUNDLE_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
-    # MACOSX_BUNDLE_GUI_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
+    INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
+    PRODUCT_BUNDLE_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
+    MACOSX_BUNDLE_GUI_IDENTIFIER design.dirt.cpp.${PROJECT_NAME}
     MACOSX_BUNDLE_INFO_STRING ${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME}
     MACOSX_BUNDLE_BUNDLE_VERSION ${VERSION}
@@ -233,23 +234,22 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_COPYRIGHT "David Braun"
     MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/src/Info.plist
     XCODE_ATTRIBUTE_FRAMEWORK_SEARCH_PATHS "/System/Library/PrivateFrameworks /Library/Frameworks"
-    )
+)
 
 # Include header directories
-target_include_directories(ChucKDesignerCHOP PUBLIC
+target_include_directories(ChucKDesignerCHOP PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/chuck/src/core/regex>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/TouchDesigner>
-    $<INSTALL_INTERFACE:ChucKDesignerCHOP>
     )
 
 set(Python_FIND_REGISTRY "LAST")
 set(Python_FIND_STRATEGY "LOCATION")
 find_package(Python ${PYTHONVER} EXACT REQUIRED COMPONENTS Interpreter Development)
-target_link_libraries(${PROJECT_NAME} PUBLIC Python::Python)
+target_link_libraries(${PROJECT_NAME} PRIVATE Python::Python)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ChucKDesignerShared)
+target_link_libraries(${PROJECT_NAME} PRIVATE ChucKDesignerShared)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
@@ -272,19 +272,19 @@ if(WIN32)
         "_WINDOWS;"
     )
     # win sock 32
-    target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32)
     # windows multimedia for rt midi
-    target_link_libraries(${PROJECT_NAME} PUBLIC winmm)
+    target_link_libraries(${PROJECT_NAME} PRIVATE winmm)
     # more
-    target_link_libraries(${PROJECT_NAME} PUBLIC wsock32)
-    target_link_libraries(${PROJECT_NAME} PUBLIC dsound dinput8 dxguid)
+    target_link_libraries(${PROJECT_NAME} PRIVATE wsock32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE dsound dinput8 dxguid)
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         "__MACOSX_CORE__;"
         "__APPLE__;"
         "__MACH__;"
     )
-    target_link_libraries(${PROJECT_NAME} PUBLIC "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CoreFoundation" "-framework CoreMIDI" "-framework CoreAudio")
 endif()
 
 if(MSVC)
@@ -296,6 +296,22 @@ add_custom_command(TARGET ${PROJECT_NAME}
                  # "%USERPROFILE%/Documents/Derivative/Plugins"
                  )
 else()
+
+add_custom_command(TARGET ChucKDesignerCHOP POST_BUILD
+    COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKDesignerCHOP>"
+)
+add_custom_command(TARGET ChucKListenerCHOP POST_BUILD
+    COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKListenerCHOP>"
+)
+
+add_custom_command(TARGET ChucKDesignerCHOP POST_BUILD
+    COMMAND install_name_tool -change @rpath/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKDesignerCHOP>"
+)
+add_custom_command(TARGET ChucKListenerCHOP POST_BUILD
+    COMMAND install_name_tool -change @rpath/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKListenerCHOP>"
+)
+
+# libChucKDesignerShared replacements
 add_custom_command(TARGET ChucKDesignerCHOP
                  POST_BUILD
                  COMMAND install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib "$<TARGET_FILE:ChucKDesignerCHOP>"

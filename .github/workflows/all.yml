@@ -1,3 +1,13 @@
+env:
+  CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM: ${{ secrets.CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM }}
+  MACOS_CERTIFICATE_BASE64: ${{ secrets.MACOS_CERTIFICATE_BASE64 }}
+  MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+  P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+  KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+  NOTARIZATION_TEAM_ID: ${{ secrets.NOTARIZATION_TEAM_ID }}
+  NOTARIZATION_USERNAME: ${{ secrets.NOTARIZATION_USERNAME }}
+  NOTARIZATION_PASSWORD: ${{ secrets.NOTARIZATION_PASSWORD }}
+
 name: Compile
 on:
   pull_request: {}
@@ -43,38 +53,92 @@ jobs:
         7z a ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}.zip ./ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}/* -r
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
         path: ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}.zip
+        if-no-files-found: error
 
   build-macos:
-    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - { name: "macos-x86_64", os: "macos-11", python-version: "3.9", python-major: "39"}
-          - { name: "macos-x86_64", os: "macos-11", python-version: "3.11", python-major: "311"}
+          - name: macos-x86_64
+            arch: x86_64
+            os: macos-12
+            python-version: "3.11"
+            python-major: "311"
+          - name: macos-arm64
+            arch: arm64
+            os: macos-12
+            python-version: "3.11"
+            python-major: "311"
+
+    runs-on: macos-12
+    env:
+      DEST_DIR: ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: true
 
-    - name: Setup Python 3.8
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.8'
+    - name: Install Certificate
+      # https://docs.github.com/en/actions/deployment/deploying-xcode-applications/installing-an-apple-certificate-on-macos-runners-for-xcode-development
+      run: |
+        # create variables
+        CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+        KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+        # import certificate and provisioning profile from secrets
+        echo -n "$MACOS_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+
+        # create temporary keychain
+        security create-keychain -p "$MACOS_CERTIFICATE_PASSWORD" $KEYCHAIN_PATH
+        security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+        security unlock-keychain -p "$MACOS_CERTIFICATE_PASSWORD" $KEYCHAIN_PATH
+
+        # import certificate to keychain
+        security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+        security set-key-partition-list -S apple-tool:,apple: -k "$MACOS_CERTIFICATE_PASSWORD" $KEYCHAIN_PATH
+        echo "list-keychain:\n"
+        security list-keychain -d user -s $KEYCHAIN_PATH
+        echo "find-identity:\n"
+        security find-identity -v
+        echo "find-identity codesigning:\n"
+        security find-identity -p codesigning -v
 
     - name: Setup Python
-      run: |
-        which python
-        python --version
-        pip install --upgrade certifi
-        cd install_script
-        python macos_install_python.py
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
 
-    - name: Get CMake
-      uses: lukka/get-cmake@latest
+    - name: Brew install requirements (arm64)
+      if: ${{ endsWith( matrix.name, 'macos-arm64') }}
+      run: |
+        brew update
+        PACKAGES=(flac libogg libtool libvorbis opus mpg123 lame)
+        DEPS=($(brew deps --union --topological $(echo $PACKAGES) | tr '\n' ' '))
+        PACKAGES=("${DEPS[@]}" "${PACKAGES[@]}")
+        export HOMEBREW_NO_INSTALL_CLEANUP=1
+        export HOMEBREW_NO_INSTALL_UPGRADE=1
+        export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
+        for PACKAGE in "${PACKAGES[@]}"
+        do
+          echo "Fetching bottle: $PACKAGE"
+          response=$(brew fetch --bottle-tag=arm64_monterey $PACKAGE 2>&1)
+          package_path=$(echo $response | sed -n 's/.*\:\ \(.*\.tar\.gz\).*/\1/p')
+          package_path=$(echo "$package_path" | xargs)
+          echo "Package Path: $package_path"
+          brew reinstall --verbose --force-bottle "$package_path" || true
+        done
+
+        brew uninstall --ignore-dependencies curl git || true
+  
+    - name: Install dependencies macOS
+      if: ${{ endsWith( matrix.name, 'macos-x86_64') }}
+      run: |
+        brew install autoconf autogen automake flac libogg libtool libvorbis opus mpg123 pkg-config
 
     - name: Some Setup
       run: |
@@ -84,32 +148,51 @@ jobs:
 
     - name: Build MacOS (Release)
       run: |
-        export PATH=/Library/Frameworks/Python.framework/Versions/${{ matrix.python-version }}:/Library/Frameworks/Python.framework/Versions/${{ matrix.python-version }}/bin:/Library/Frameworks/Python.framework/Versions/${{ matrix.python-version }}/lib:$PATH
-        which python3
-        python3 --version
-        which python3
-        python3 --version
-        mkdir build && cd build
-        cmake .. -G "Xcode" -DCMAKE_OSX_ARCHITECTURES="x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
-        xcodebuild -configuration Release -project ChucKDesignerCHOP.xcodeproj
-        ls -r *
-        install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib Release/ChucKDesignerCHOP.plugin/Contents/MacOS/ChucKDesignerCHOP
-        install_name_tool -change @rpath/libChucKDesignerShared.dylib @loader_path/../../../libChucKDesignerShared.dylib Release/ChucKListenerCHOP.plugin/Contents/MacOS/ChucKListenerCHOP
+        cmake -Bbuild -G "Xcode" -DCMAKE_OSX_ARCHITECTURES=${{matrix.arch}} -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DPYTHONVER="${{matrix.python-version}}" -DPython_ROOT_DIR=$pythonLocation
+        cmake --build build --config Release
+        codesign --entitlements "mac/miniAudicle.entitlements" --force --deep --timestamp --verify --verbose=2 --options=runtime --sign "Developer ID Application: David Braun (${{secrets.CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}})" build/Release/ChucKDesignerCHOP.plugin
+        codesign --entitlements "mac/miniAudicle.entitlements" --force --deep --timestamp --verify --verbose=2 --options=runtime --sign "Developer ID Application: David Braun (${{secrets.CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}})" build/Release/ChucKListenerCHOP.plugin
+        codesign --entitlements "mac/miniAudicle.entitlements" --force --deep --timestamp --verify --verbose=2 --options=runtime --sign "Developer ID Application: David Braun (${{secrets.CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}})" build/Release/libChucKDesignerShared.dylib
+        codesign --verify --deep --strict --verbose=2 build/Release/ChucKDesignerCHOP.plugin
+        codesign --verify --deep --strict --verbose=2 build/Release/ChucKListenerCHOP.plugin
+        codesign --verify --deep --strict --verbose=2 build/Release/libChucKDesignerShared.dylib
 
     - name: Make distribution
       run: |
-        mkdir ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
-        cp ${{ github.workspace }}/build/Release/libChucKDesignerShared.dylib ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
-        mv ${{ github.workspace }}/build/Release/ChucKDesignerCHOP.plugin ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
-        mv ${{ github.workspace }}/build/Release/ChucKListenerCHOP.plugin ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
-        zip -r ChucKDesigner-${{ matrix.os }}-Python${{ matrix.python-major }}.zip ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
+        mkdir $DEST_DIR
+        cp ${{ github.workspace }}/build/Release/libChucKDesignerShared.dylib $DEST_DIR
+        mv ${{ github.workspace }}/build/Release/ChucKDesignerCHOP.plugin $DEST_DIR
+        mv ${{ github.workspace }}/build/Release/ChucKListenerCHOP.plugin $DEST_DIR
+        zip -r $DEST_DIR.zip $DEST_DIR
 
-    # Don't upload until we figure out codesigning.
-    # - name: Upload artifact
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
-    #     path: ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}.zip
+    - name: Notarize
+      run: |
+        xcrun notarytool submit "$DEST_DIR.zip" \
+        --team-id "$NOTARIZATION_TEAM_ID" \
+        --apple-id "$NOTARIZATION_USERNAME" \
+        --password "$NOTARIZATION_PASSWORD" \
+        --wait
+
+    - name: Staple
+      # While you can notarize a ZIP archive, you can’t staple to it directly.
+      # Instead, run stapler against each item that you added to the archive.
+      # Then create a new ZIP file containing the stapled items for distribution.
+      # Although tickets are created for standalone binaries, it’s not currently possible to staple tickets to them.
+      run: |
+        xcrun stapler staple $DEST_DIR/ChucKDesignerCHOP.plugin
+        xcrun stapler staple $DEST_DIR/ChucKListenerCHOP.plugin
+
+    - name: Make stapled distribution
+      run: |
+        rm $DEST_DIR.zip
+        zip -r $DEST_DIR.zip $DEST_DIR
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
+        path: ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}.zip
+        if-no-files-found: error
 
   create-release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -117,7 +200,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Create Release on GitHub"
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           path: "dist"
 
