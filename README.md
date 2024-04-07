@@ -54,7 +54,9 @@ Finally, open <code>build/ChucKDesignerCHOP.sln</code> and compile.
 
 ### MacOS
 
-[@DBraun](https://github.com/DBraun) doesn't have a macOS App Distribution Developer License, so you must compile ChucKDesigner on your own computer.
+Download and unzip the latest macOS [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.plugin` and `.dylib` files to this project's `Plugins` folder or `~/Library/Application Support/Derivative/TouchDesigner099/Plugins`. That's all!
+
+If you'd like to build the ChucKDesigner plugins yourself, these are the instructions:
 
 1. Clone this repository with git. Then update all submodules in the root of the repository with `git submodule update --init --recursive`
 2. Install Xcode.
@@ -63,8 +65,6 @@ Finally, open <code>build/ChucKDesignerCHOP.sln</code> and compile.
 5. Optional: depending on the Python version associated with the TouchDesigner you intend to use, run `export PYTHONVER=3.11` or `export PYTHONVER=3.9`.
 6. In the same Terminal window, navigate to the root of this repository and run `sh build_macos.sh`
 7. Open `ChucKDesigner.toe` and play around!
-
-<!-- Download and unzip the latest macOS [release](https://github.com/DBraun/ChucKDesigner/releases). Copy the latest `.plugin` and `.dylib` files to this project's `Plugins` folder or `~/Library/Application Support/Derivative/TouchDesigner099/Plugins`. -->
 
 ## API
 
