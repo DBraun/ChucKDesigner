@@ -20,15 +20,9 @@
 #include <assert.h>
 #include "chuck_globals.h"
 
-#ifdef _WIN32
-    #include <Python.h>
-    #include <structmember.h>
-    #include <unicodeobject.h>
-#else
-    #include <Python/Python.h>
-    #include <Python/structmember.h>
-    #include <Python/unicodeobject.h>
-#endif
+#include <Python.h>
+#include <structmember.h>
+#include <unicodeobject.h>
 
 #define FAIL_IN_CUSTOM_OPERATOR_METHOD Py_INCREF(Py_None);return Py_None;
 

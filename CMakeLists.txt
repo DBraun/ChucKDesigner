@@ -220,7 +220,7 @@ add_library(ChucKDesignerCHOP MODULE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ChucKDesignerCHOP.cpp
     ${TOUCHDESIGNER_SOURCES}
     )
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 set_target_properties(${PROJECT_NAME} PROPERTIES
     BUNDLE true
     BUNDLE_EXTENSION "plugin"
@@ -297,18 +297,20 @@ add_custom_command(TARGET ${PROJECT_NAME}
                  )
 else()
 
+# These two are for renaming what GitHub actions produces
 add_custom_command(TARGET ChucKDesignerCHOP POST_BUILD
-    COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKDesignerCHOP>"
+    COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python @executable_path/../Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKDesignerCHOP>"
 )
 add_custom_command(TARGET ChucKListenerCHOP POST_BUILD
-    COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKListenerCHOP>"
+    COMMAND install_name_tool -change /Library/Frameworks/Python.framework/Versions/${PYTHONVER}/Python @executable_path/../Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKListenerCHOP>"
 )
 
+# These two are for renaming what an ordinary mac produces
 add_custom_command(TARGET ChucKDesignerCHOP POST_BUILD
-    COMMAND install_name_tool -change @rpath/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKDesignerCHOP>"
+    COMMAND install_name_tool -change @rpath/Python.framework/Versions/${PYTHONVER}/Python @executable_path/../Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKDesignerCHOP>"
 )
 add_custom_command(TARGET ChucKListenerCHOP POST_BUILD
-    COMMAND install_name_tool -change @rpath/Python.framework/Versions/${PYTHONVER}/Python $ENV{TOUCHDESIGNER_APP}/Contents/Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKListenerCHOP>"
+    COMMAND install_name_tool -change @rpath/Python.framework/Versions/${PYTHONVER}/Python @executable_path/../Frameworks/Python.framework/Versions/${PYTHONVER}/Python "$<TARGET_FILE:ChucKListenerCHOP>"
 )
 
 # libChucKDesignerShared replacements
