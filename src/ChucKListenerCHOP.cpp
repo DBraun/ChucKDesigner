@@ -272,7 +272,7 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 		ChucK_For_TouchDesigner::getNamedGlobalIntArray(chuck_id, varName.c_str(), ChucK_For_TouchDesigner::sharedIntArrayCallback);
 	}
 
-	// << event stuff
+#pragma region Events
 	std::string Eventvars = inputs->getParString("Eventvars");
 
 	auto Eventvarstrings = split(Eventvars, ' ');
@@ -301,13 +301,17 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 			myEventVarNames.insert(varName);
 		}
 	}
-	// end event stuff >>
+#pragma endregion Events
 
 	int i = 0;
 	for (const std::string varName : myFloatVarNames)
 	{
         auto name = varName.c_str();
-        t_CKFLOAT val = ChucK_For_TouchDesigner::getFloat(name);
+        t_CKFLOAT val = 0;
+        if (!ChucK_For_TouchDesigner::getFloat(name, val))
+        {
+		    continue;
+        }
         if (i < output->numChannels) {
             output->channels[i][0] = val;
         }
@@ -331,8 +335,11 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 
 	for (const std::string varName : myIntVarNames)
 	{
-		auto name = varName.c_str();
-		t_CKINT val = ChucK_For_TouchDesigner::getInt(name);
+        auto name = varName.c_str();
+        t_CKINT val = 0;
+        if (!ChucK_For_TouchDesigner::getInt(name, val)) {
+            continue;
+        }
 		if (i < output->numChannels) {
 			output->channels[i][0] = val;
 		}
@@ -356,13 +363,16 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 	for (const std::string varName : myStringVarNames)
 	{
 		auto name = varName.c_str();
-		auto str = ChucK_For_TouchDesigner::getString(name);
+        std::string str = "";
+        if (!ChucK_For_TouchDesigner::getString(name, str)) {
+            continue;
+		}
 
 		// We'll only be adding one extra argument
 		PyObject* args = myNodeInfo->context->createArgumentsTuple(2, nullptr);
 		// The first argument is already set to the 'op' variable, so we set the second argument to our speed value
 		PyTuple_SET_ITEM(args, 1, PyUnicode_FromString(name));
-		PyTuple_SET_ITEM(args, 2, PyUnicode_FromString(str));
+		PyTuple_SET_ITEM(args, 2, PyUnicode_FromString(str.c_str()));
 
 		PyObject* result = myNodeInfo->context->callPythonCallback("getString", args, nullptr, nullptr);
 		// callPythonCallback doesn't take ownership of the argts
@@ -376,9 +386,8 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
     {
         auto name = varName.c_str();
 		int numItems = 0;
-        auto vec = ChucK_For_TouchDesigner::getFloatArray(name, numItems);
-        
-        if (!numItems || !vec) {
+        t_CKFLOAT* vec = nullptr;
+        if (!ChucK_For_TouchDesigner::getFloatArray(name, &vec, numItems)) {
             continue;
         }
 
@@ -408,9 +417,9 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 	{
 		auto name = varName.c_str();
 		int numItems = 0;
-		auto vec = ChucK_For_TouchDesigner::getIntArray(name, numItems);
+        t_CKINT* vec = nullptr;
 
-        if (!numItems || !vec) {
+        if (!ChucK_For_TouchDesigner::getIntArray(name, &vec, numItems)) {
             continue;
         }
         
@@ -453,7 +462,6 @@ ChucKListenerCHOP::execute(CHOP_Output* output,
 			// We own result now, so we need to Py_DECREF it unless we want to hold onto it
 			if (result) { Py_DECREF(result); }
 		}
-
 	}
     
 }

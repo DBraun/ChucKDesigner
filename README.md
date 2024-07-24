@@ -44,12 +44,11 @@ Install <a href="https://www.python.org/downloads/release/python-3117/">Python 3
 Install CMake and confirm that it's installed by running <code>cmake --version</code> in a command prompt.
 <br>
 Then in this repository,
-<br>
 <code>
 cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPYTHONVER="3.11"
 </code>
 <br>
-Finally, open <code>build/ChucKDesignerCHOP.sln</code> and compile.
+Then, <code>cmake --build build --config Release</code> to compile.
 </details>
 
 ### MacOS
@@ -70,7 +69,17 @@ If you'd like to build the ChucKDesigner plugins yourself, these are the instruc
 
 ### Python interface to ChucK Audio CHOP
 
-The ChucK Audio CHOP's functions:
+The ChucK Audio CHOP's getter methods:
+
+* `.get_float(name: str) -> float`
+* `.get_int(name: str) -> int`
+* `.get_string(name: str) -> str`
+* `.get_float_array(name: str) -> List[float]`
+* `.get_int_array(name: str) -> List[int]`
+
+Note that these getters return results with a one-frame delay. They will return `None` the first time they're called. If `None` is returned on later calls, it means that the requested global variable wasn't found.
+
+The ChucK Audio CHOP's setter methods:
 
 * `.set_float(name: str, val: float)`
 * `.set_int(name: str, val: int)`
@@ -83,6 +92,8 @@ The ChucK Audio CHOP's functions:
 * `.set_associative_int_array_value(name: str, key: str, val: int)`
 * `.broadcast_event(name: str)`
 * `.set_log_level(level: int)` **0 is None and 10 is "Crazy"**
+
+### Example
 
 Suppose the ChucK Audio CHOP has compiled this code:
 

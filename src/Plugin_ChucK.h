@@ -41,7 +41,6 @@ extern "C" {
         CHUCKDESIGNERSHARED_API bool getNamedChuckInt(unsigned int chuckID, const char* name, void (*callback)(const char*, t_CKINT));
         CHUCKDESIGNERSHARED_API bool getChuckIntWithID(unsigned int chuckID, t_CKINT callbackID, const char* name, void (*callback)(t_CKINT, t_CKINT));
 
-
         CHUCKDESIGNERSHARED_API bool setChuckFloat(unsigned int chuckID, const char* name, t_CKFLOAT val);
         CHUCKDESIGNERSHARED_API bool getChuckFloat(unsigned int chuckID, const char* name, void (*callback)(t_CKFLOAT));
         CHUCKDESIGNERSHARED_API bool getNamedChuckFloat(unsigned int chuckID, const char* name, void (*callback)(const char*, t_CKFLOAT));
@@ -79,6 +78,8 @@ extern "C" {
         CHUCKDESIGNERSHARED_API bool getGlobalAssociativeIntArrayValue(unsigned int chuckID, const char* name, char* key, void (*callback)(t_CKINT));
         CHUCKDESIGNERSHARED_API bool getNamedGlobalAssociativeIntArrayValue(unsigned int chuckID, const char* name, char* key, void (*callback)(const char*, t_CKINT));
         CHUCKDESIGNERSHARED_API bool getGlobalAssociativeIntArrayValueWithID(unsigned int chuckID, t_CKINT callbackID, const char* name, char* key, void (*callback)(t_CKINT, t_CKINT));
+        CHUCKDESIGNERSHARED_API bool setGlobalIntArray_AT(unsigned int chuckID, const char* name, t_CKINT arrayValues[], unsigned int numValues);  // internal/audio-thread-friendly global array setter
+        CHUCKDESIGNERSHARED_API bool setGlobalIntArrayValue_AT(unsigned int chuckID, const char* name, unsigned int index, t_CKINT value);  // internal/audio-thread-friendly
         // TODO: set entire dict, add to dict in batch; get entire dict
 
         // float array methods
@@ -94,7 +95,8 @@ extern "C" {
         CHUCKDESIGNERSHARED_API bool getGlobalAssociativeFloatArrayValue(unsigned int chuckID, const char* name, char* key, void (*callback)(t_CKFLOAT));
         CHUCKDESIGNERSHARED_API bool getNamedGlobalAssociativeFloatArrayValue(unsigned int chuckID, const char* name, char* key, void (*callback)(const char*, t_CKFLOAT));
         CHUCKDESIGNERSHARED_API bool getGlobalAssociativeFloatArrayValueWithID(unsigned int chuckID, t_CKINT callbackID, const char* name, char* key, void (*callback)(t_CKINT, t_CKFLOAT));
-
+        CHUCKDESIGNERSHARED_API bool setGlobalFloatArray_AT(unsigned int chuckID, const char* name, t_CKFLOAT arrayValues[], unsigned int numValues);  // internal/audio-thread-friendly global array setter
+        CHUCKDESIGNERSHARED_API bool setGlobalFloatArrayValue_AT(unsigned int chuckID, const char* name, unsigned int index, t_CKFLOAT value);  // internal/audio-thread-friendly
 
         CHUCKDESIGNERSHARED_API bool initChuckInstance(unsigned int chuckID, unsigned int sampleRate, unsigned int numInChannels, unsigned int numOutChannels, string globalDir);
         CHUCKDESIGNERSHARED_API bool clearChuckInstance(unsigned int chuckID);
@@ -118,11 +120,16 @@ extern "C" {
 
         CHUCKDESIGNERSHARED_API bool processBlock(unsigned int chuckID, const float** inBuffer, int inBufferNumChannels, int inBufferNumSamples, float* inChucKBuffer, float* outChucKBuffer, float** outBuffer, int numOutSamples, int numOutChannels);
         
-        CHUCKDESIGNERSHARED_API t_CKFLOAT getFloat(const char* varStr);
-        CHUCKDESIGNERSHARED_API t_CKINT getInt(const char* varStr);
-        CHUCKDESIGNERSHARED_API const char* getString(const char* varStr);
-        CHUCKDESIGNERSHARED_API t_CKFLOAT* getFloatArray(const char* varName, int& numItems);
-        CHUCKDESIGNERSHARED_API t_CKINT* getIntArray(const char* varName, int& numItems);
+        CHUCKDESIGNERSHARED_API bool getFloat(const char* varName, t_CKFLOAT& val);
+        CHUCKDESIGNERSHARED_API bool getInt(const char* varStr, t_CKINT& val);
+        CHUCKDESIGNERSHARED_API bool getString(const char* varStr, std::string& val);
+        CHUCKDESIGNERSHARED_API bool getFloatArray(const char* varName, t_CKFLOAT** vec, int& numItems);
+        CHUCKDESIGNERSHARED_API bool getIntArray(const char* varName, t_CKINT** vec, int& numItems);
+
+        CHUCKDESIGNERSHARED_API bool getFloatArrayValue(const char* varName, unsigned int index, t_CKFLOAT& val);
+        CHUCKDESIGNERSHARED_API bool getIntArrayValue(const char* varName, unsigned int index, t_CKINT& val);
+        //CHUCKDESIGNERSHARED_API bool getAssociativeFloatArrayValue(const char* varName, char* key, unsigned int index, t_CKFLOAT& val);
+        //CHUCKDESIGNERSHARED_API bool getAssociativeIntArrayValue(const char* varName, char* key, unsigned int index, t_CKINT& val);
 
         CHUCKDESIGNERSHARED_API void sharedFloatCallback(const char* varName, t_CKFLOAT val);
         CHUCKDESIGNERSHARED_API void sharedIntCallback(const char* varName, t_CKINT val);
@@ -130,6 +137,9 @@ extern "C" {
 
         CHUCKDESIGNERSHARED_API void sharedFloatArrayCallback(const char* varName, t_CKFLOAT vals[], t_CKUINT numItems);
         CHUCKDESIGNERSHARED_API void sharedIntArrayCallback(const char* varName, t_CKINT vals[], t_CKUINT numItems);
+
+        //CHUCKDESIGNERSHARED_API void sharedAssociativeFloatArrayCallback(const char* varName, t_CKFLOAT val);
+        //CHUCKDESIGNERSHARED_API void sharedAssociativeIntArrayCallback(const char* varName, t_CKUINT val);
 
         CHUCKDESIGNERSHARED_API void sharedEventCallback(const char* varName);
         CHUCKDESIGNERSHARED_API void sharedEventNonCallback(const char* varName);
