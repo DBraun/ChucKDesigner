@@ -44,12 +44,11 @@ Install <a href="https://www.python.org/downloads/release/python-3117/">Python 3
 Install CMake and confirm that it's installed by running <code>cmake --version</code> in a command prompt.
 <br>
 Then in this repository,
-<br>
 <code>
 cmake . -DCMAKE_BUILD_TYPE=Release -Bbuild -DPYTHONVER="3.11"
 </code>
 <br>
-Finally, open <code>build/ChucKDesignerCHOP.sln</code> and compile.
+Then, <code>cmake --build build --config Release</code> to compile.
 </details>
 
 ### MacOS

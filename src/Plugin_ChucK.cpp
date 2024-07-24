@@ -11,8 +11,12 @@
 #include "Plugin_ChucK.h"
 #include "chuck_globals.h"
 
+#include "chuck_vm.h"
+#include "util_platforms.h" // for ck_usleep
+
 #include <iostream>
 #include <map>
+
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -545,7 +549,9 @@ namespace ChucK_For_TouchDesigner
     }
 
 
-    CHUCKDESIGNERSHARED_API bool getGlobalAssociativeIntArrayValueWithID(unsigned int chuckID, t_CKINT callbackID, const char* name, char* key, void(*callback)(t_CKINT, t_CKINT))
+    CHUCKDESIGNERSHARED_API bool getGlobalAssociativeIntArrayValueWithID(
+		unsigned int chuckID, t_CKINT callbackID, const char* name, 
+		char* key, void(*callback)(t_CKINT, t_CKINT))
     {
         if (chuck_instances.count(chuckID) == 0) { return false; }
         Chuck_Globals_Manager* gm = chuck_instances[chuckID]->globals();
@@ -555,6 +561,27 @@ namespace ChucK_For_TouchDesigner
             name, callbackID, key, callback);
     }
 
+	// internal/audio-thread-friendly global array setter
+    CHUCKDESIGNERSHARED_API bool setGlobalIntArray_AT(
+		unsigned int chuckID,const char* name, t_CKINT arrayValues[], unsigned int numValues)
+	{
+      if (chuck_instances.count(chuckID) == 0) { return false; }
+      Chuck_Globals_Manager* gm = chuck_instances[chuckID]->globals();
+      if (gm == NULL) { return false; }
+
+      return gm->set_global_int_array(name, arrayValues, numValues);
+    }
+
+    // internal/audio-thread-friendly
+    CHUCKDESIGNERSHARED_API bool setGlobalIntArrayValue_AT(
+		unsigned int chuckID, const char* name, unsigned int index, t_CKINT value)
+	{
+      if (chuck_instances.count(chuckID) == 0) { return false; }
+      Chuck_Globals_Manager* gm = chuck_instances[chuckID]->globals();
+      if (gm == NULL) { return false; }
+
+      return gm->set_global_float_array_value(name, index, value);
+    }
 
     // float array methods
     CHUCKDESIGNERSHARED_API bool setGlobalFloatArray(unsigned int chuckID,
@@ -699,6 +726,27 @@ namespace ChucK_For_TouchDesigner
             name, callbackID, key, callback);
     }
 
+
+
+    // internal/audio-thread-friendly global array setter
+    CHUCKDESIGNERSHARED_API bool setGlobalFloatArray_AT(
+		unsigned int chuckID, const char* name, t_CKFLOAT arrayValues[], unsigned int numValues)
+	{
+      if (chuck_instances.count(chuckID) == 0) { return false; }
+      Chuck_Globals_Manager* gm = chuck_instances[chuckID]->globals();
+      if (gm == NULL) { return false; }
+
+      return gm->set_global_float_array(name, arrayValues, numValues);
+    }
+
+    CHUCKDESIGNERSHARED_API bool setGlobalFloatArrayValue_AT(
+		unsigned int chuckID, const char* name, unsigned int index, t_CKFLOAT value) {
+      if (chuck_instances.count(chuckID) == 0) { return false; }
+      Chuck_Globals_Manager* gm = chuck_instances[chuckID]->globals();
+      if (gm == NULL) { return false; }
+
+      return gm->set_global_float_array_value(name, index, value);
+    }
 
     CHUCKDESIGNERSHARED_API bool setChoutCallback(unsigned int chuckID, void (*callback)(const char*))
     {
@@ -1028,6 +1076,9 @@ namespace ChucK_For_TouchDesigner
                 data_instances.erase( chuckID );
             }
 
+            // wait a bit
+            ck_usleep(30000);
+
             op_ids_to_chuck_ids.erase(opId);
 
             // todo: is this dangerous?
@@ -1077,12 +1128,14 @@ namespace ChucK_For_TouchDesigner
     CHUCKDESIGNERSHARED_API void cleanRegisteredChucks() {
     
         // first, invalidate all callbacks' references to chucks
-        for( std::map< unsigned int, EffectData::Data * >::iterator it =
-             data_instances.begin(); it != data_instances.end(); it++ )
+        for (std::map<unsigned int, EffectData::Data*>::iterator it = data_instances.begin(); it != data_instances.end(); it++)
         {
-            EffectData::Data * data = it->second;
+            EffectData::Data* data = it->second;
             data->myId = -1;
         }
+
+        // wait for callbacks to finish their current run
+        ck_usleep(30000);
 
         // next, delete chucks
         for( std::map< unsigned int, ChucK * >::iterator it =

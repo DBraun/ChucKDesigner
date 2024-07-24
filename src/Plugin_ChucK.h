@@ -79,6 +79,8 @@ extern "C" {
         CHUCKDESIGNERSHARED_API bool getGlobalAssociativeIntArrayValue(unsigned int chuckID, const char* name, char* key, void (*callback)(t_CKINT));
         CHUCKDESIGNERSHARED_API bool getNamedGlobalAssociativeIntArrayValue(unsigned int chuckID, const char* name, char* key, void (*callback)(const char*, t_CKINT));
         CHUCKDESIGNERSHARED_API bool getGlobalAssociativeIntArrayValueWithID(unsigned int chuckID, t_CKINT callbackID, const char* name, char* key, void (*callback)(t_CKINT, t_CKINT));
+        CHUCKDESIGNERSHARED_API bool setGlobalIntArray_AT(unsigned int chuckID, const char* name, t_CKINT arrayValues[], unsigned int numValues);  // internal/audio-thread-friendly global array setter
+        CHUCKDESIGNERSHARED_API bool setGlobalIntArrayValue_AT(unsigned int chuckID, const char* name, unsigned int index, t_CKINT value);  // internal/audio-thread-friendly
         // TODO: set entire dict, add to dict in batch; get entire dict
 
         // float array methods
@@ -94,7 +96,8 @@ extern "C" {
         CHUCKDESIGNERSHARED_API bool getGlobalAssociativeFloatArrayValue(unsigned int chuckID, const char* name, char* key, void (*callback)(t_CKFLOAT));
         CHUCKDESIGNERSHARED_API bool getNamedGlobalAssociativeFloatArrayValue(unsigned int chuckID, const char* name, char* key, void (*callback)(const char*, t_CKFLOAT));
         CHUCKDESIGNERSHARED_API bool getGlobalAssociativeFloatArrayValueWithID(unsigned int chuckID, t_CKINT callbackID, const char* name, char* key, void (*callback)(t_CKINT, t_CKFLOAT));
-
+        CHUCKDESIGNERSHARED_API bool setGlobalFloatArray_AT(unsigned int chuckID, const char* name, t_CKFLOAT arrayValues[], unsigned int numValues);  // internal/audio-thread-friendly global array setter
+        CHUCKDESIGNERSHARED_API bool setGlobalFloatArrayValue_AT(unsigned int chuckID, const char* name, unsigned int index, t_CKFLOAT value);  // internal/audio-thread-friendly
 
         CHUCKDESIGNERSHARED_API bool initChuckInstance(unsigned int chuckID, unsigned int sampleRate, unsigned int numInChannels, unsigned int numOutChannels, string globalDir);
         CHUCKDESIGNERSHARED_API bool clearChuckInstance(unsigned int chuckID);
