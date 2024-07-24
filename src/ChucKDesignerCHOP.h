@@ -108,6 +108,36 @@ public:
         ChucK_For_TouchDesigner::setGlobalAssociativeIntArrayValue(m_chuckID, name, key, value);
     }
 
+    bool getGlobalFloat(const char* name, t_CKFLOAT &val)
+    {
+        ChucK_For_TouchDesigner::getNamedChuckFloat(m_chuckID, name, ChucK_For_TouchDesigner::sharedFloatCallback);
+        return ChucK_For_TouchDesigner::getFloat(name, val);
+    }
+
+    bool getGlobalInt(const char* name, t_CKINT& val)
+    {
+        ChucK_For_TouchDesigner::getNamedChuckInt(m_chuckID, name, ChucK_For_TouchDesigner::sharedIntCallback);
+        return ChucK_For_TouchDesigner::getInt(name, val);
+    }
+
+    bool getGlobalString(const char* name, std::string& val)
+    {
+        ChucK_For_TouchDesigner::getNamedChuckString(m_chuckID, name, ChucK_For_TouchDesigner::sharedStringCallback);
+        return ChucK_For_TouchDesigner::getString(name, val);
+    }
+
+    bool getGlobalIntArray(const char* name, t_CKINT** vec, int& numValues)
+    {
+        ChucK_For_TouchDesigner::getNamedGlobalIntArray(m_chuckID, name, ChucK_For_TouchDesigner::sharedIntArrayCallback);
+        return ChucK_For_TouchDesigner::getIntArray(name, vec, numValues);
+    }
+
+    bool getGlobalFloatArray(const char* name, t_CKFLOAT** vec, int& numValues)
+    {
+        ChucK_For_TouchDesigner::getNamedGlobalFloatArray(m_chuckID, name, ChucK_For_TouchDesigner::sharedFloatArrayCallback);
+        return ChucK_For_TouchDesigner::getFloatArray(name, vec, numValues);
+    }
+
     void
     broadcastChuckEvent(const char* name)
     {

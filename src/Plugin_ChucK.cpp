@@ -727,7 +727,6 @@ namespace ChucK_For_TouchDesigner
     }
 
 
-
     // internal/audio-thread-friendly global array setter
     CHUCKDESIGNERSHARED_API bool setGlobalFloatArray_AT(
 		unsigned int chuckID, const char* name, t_CKFLOAT arrayValues[], unsigned int numValues)
@@ -739,6 +738,7 @@ namespace ChucK_For_TouchDesigner
       return gm->set_global_float_array(name, arrayValues, numValues);
     }
 
+
     CHUCKDESIGNERSHARED_API bool setGlobalFloatArrayValue_AT(
 		unsigned int chuckID, const char* name, unsigned int index, t_CKFLOAT value) {
       if (chuck_instances.count(chuckID) == 0) { return false; }
@@ -747,6 +747,7 @@ namespace ChucK_For_TouchDesigner
 
       return gm->set_global_float_array_value(name, index, value);
     }
+
 
     CHUCKDESIGNERSHARED_API bool setChoutCallback(unsigned int chuckID, void (*callback)(const char*))
     {
@@ -934,49 +935,72 @@ namespace ChucK_For_TouchDesigner
         return count;
     }
 
-    CHUCKDESIGNERSHARED_API t_CKFLOAT getFloat(const char* varName) {
-        if (myFloatVars.find(varName) != myFloatVars.end()) {
-            return myFloatVars[varName];
-        }
-        return 0.f;
+    CHUCKDESIGNERSHARED_API bool getFloat(const char* varName, t_CKFLOAT &val) {
+      if (myFloatVars.find(varName) != myFloatVars.end()) {
+        val = myFloatVars[varName];
+        return true;
+      }
+      return false;
     }
 
-    CHUCKDESIGNERSHARED_API t_CKINT getInt(const char* varName) {
+    CHUCKDESIGNERSHARED_API bool getInt(const char* varName, t_CKINT& val) {
         if (myIntVars.find(varName) != myIntVars.end()) {
-            return myIntVars[varName];
+            val = myIntVars[varName];
+            return true;
         }
-        return 0;
+        return false;
     }
 
-    CHUCKDESIGNERSHARED_API const char* getString(const char* varName) {
+    CHUCKDESIGNERSHARED_API bool getString(const char* varName, std::string& val) {
         if (myStringVars.find(varName) != myStringVars.end()) {
-            return myStringVars[varName].c_str();
+			val = myStringVars[varName];
+			return true;
         }
-        return "";
+        return false;
     }
 
-    CHUCKDESIGNERSHARED_API t_CKFLOAT* getFloatArray(const char* varName, int& numItems) {
+    CHUCKDESIGNERSHARED_API bool getFloatArray(const char* varName, t_CKFLOAT** vec, int& numItems) {
         if (
             (myFloatArrayVars.find(varName) != myFloatArrayVars.end()) &&
             (myFloatArrayVarSizes.find(varName) != myFloatArrayVarSizes.end())
             ) {
             numItems = myFloatArrayVarSizes[varName];
-            return myFloatArrayVars[varName];
+            *vec = myFloatArrayVars[varName];
+            return true;
         }
         numItems = 0;
-        return nullptr;
+        return false;
     }
 
-    CHUCKDESIGNERSHARED_API t_CKINT* getIntArray(const char* varName, int& numItems) {
+    CHUCKDESIGNERSHARED_API bool getIntArray(const char* varName, t_CKINT** vec, int& numItems) {
         if (
             (myIntArrayVars.find(varName) != myIntArrayVars.end()) &&
             (myIntArrayVarSizes.find(varName) != myIntArrayVarSizes.end())
             ) {
             numItems = myIntArrayVarSizes[varName];
-            return myIntArrayVars[varName];
+            *vec = myIntArrayVars[varName];
+            return true;
         }
         numItems = 0;
-        return nullptr;
+        return false;
+    }
+
+    CHUCKDESIGNERSHARED_API bool getFloatArrayValue(const char* varName, unsigned int index, t_CKFLOAT& val) {
+      if ((myFloatArrayVars.find(varName) != myFloatArrayVars.end()) &&
+          (myFloatArrayVarSizes.find(varName) != myFloatArrayVarSizes.end())) {
+        val = myFloatArrayVars[varName][index];
+        return true;
+      }
+      return false;
+    }
+
+    CHUCKDESIGNERSHARED_API bool getIntArrayValue(const char* varName, unsigned int index, t_CKINT& val) {
+      if ((myIntArrayVars.find(varName) != myIntArrayVars.end()) &&
+          (myIntArrayVars.find(varName) != myIntArrayVars.end())) {
+        val = myIntArrayVars[varName][index];
+        return true;
+      }
+      return false;
     }
 
     CHUCKDESIGNERSHARED_API bool initChuckInstance( unsigned int chuckID, unsigned int sampleRate, unsigned int numInChannels, unsigned int numOutChannels, string globalDir )
