@@ -15,6 +15,7 @@
 #include "ChucKListenerCHOP.h"
 #include "Plugin_ChucK.h"
 
+#include <algorithm>
 #include <stdio.h>
 #include <string.h>
 #include <cmath>
