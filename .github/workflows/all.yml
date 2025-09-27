@@ -21,8 +21,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - { name: "win64", os: "windows-2022", python-version: "3.9", python-major: "39"}
-          - { name: "win64", os: "windows-2022", python-version: "3.11", python-major: "311"}
+          - { name: "win64", os: "windows-2025", python-version: "3.9", python-major: "39"}
+          - { name: "win64", os: "windows-2025", python-version: "3.11", python-major: "311"}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -66,16 +66,16 @@ jobs:
         include:
           - name: macos-x86_64
             arch: x86_64
-            os: macos-12
+            os: macos-14
             python-version: "3.11"
             python-major: "311"
           - name: macos-arm64
             arch: arm64
-            os: macos-12
+            os: macos-14
             python-version: "3.11"
             python-major: "311"
 
-    runs-on: macos-12
+    runs-on: macos-14
     env:
       DEST_DIR: ChucKDesigner-${{ matrix.name }}-Python${{ matrix.python-major }}
     steps:
