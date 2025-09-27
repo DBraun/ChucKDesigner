@@ -10,8 +10,13 @@ env:
 
 name: Compile
 on:
+  workflow_dispatch: {}
   pull_request: {}
   push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
     tags:
     - '*'
 jobs:
